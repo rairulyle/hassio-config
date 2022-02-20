@@ -1,0 +1,154 @@
+- title: "Overview"
+  path: overview
+  icon: "mdi:home-assistant"
+  cards:
+    - type: "vertical-stack"
+      cards:
+        #Overview
+        - type: "custom:auto-entities"
+          card:
+            type: "grid"
+            columns: 1
+            square: false
+          card_param: "cards"
+          sort:
+            count: 1
+          filter:
+            include:
+              - domain: "weather"
+                options:
+                  type: "custom:button-card"
+                  template: "custom_card_rairulyle_welcome_scenes"
+                  variables:
+                    ulm_weather: weather.openweathermap
+        - type: "custom:button-card"
+          template: card_title
+          name: 🦊 What is up?!
+        - type: "custom:button-card"
+          template: custom_card_rairulyle_person
+          variables:
+            ulm_card_person_entity: person.person1
+            ulm_card_person_use_entity_picture: true
+            ulm_card_person_zones:
+              - zone.manulife
+            ulm_address: device_tracker.one_plus_7_pro
+        - type: "custom:button-card"
+          template: custom_card_rairulyle_person
+          variables:
+            ulm_card_person_entity: person.person2
+            ulm_card_person_use_entity_picture: true
+            ulm_card_person_zones:
+              - zone.malayan_colleges_laguna
+            ulm_address: device_tracker.xiaomi_mi_10t_5g
+        - type: "custom:button-card"
+          template: card_title
+          name: ⚡ Network Speed
+        - type: grid
+          square: false
+          columns: 3
+          cards:
+            - type: "custom:button-card"
+              template: card_graph
+              variables:
+                ulm_card_graph_color: "var(--google-blue)"
+                ulm_card_graph_name: Ping
+                ulm_card_graph_entity: sensor.speedtest_ping
+                ulm_card_graph_type: fill
+                ulm_card_graph_hours: 24
+            - type: "custom:button-card"
+              template: card_graph
+              variables:
+                ulm_card_graph_color: "var(--google-blue)"
+                ulm_card_graph_name: Download
+                ulm_card_graph_entity: sensor.speedtest_download
+                ulm_card_graph_type: fill
+                ulm_card_graph_hours: 24
+            - type: "custom:button-card"
+              template: card_graph
+              variables:
+                ulm_card_graph_color: "var(--google-blue)"
+                ulm_card_graph_name: Upload
+                ulm_card_graph_entity: sensor.speedtest_upload
+                ulm_card_graph_type: fill
+                ulm_card_graph_hours: 24
+
+        # Main Room
+        - type: "custom:button-card"
+          template: card_title
+          name: 🛋️ Main Room
+        - type: "custom:button-card"
+          template: card_media_player
+          entity: media_player.google_home_mini
+          name: Google Home Mini
+        - type: grid
+          square: false
+          columns: 2
+          cards:
+            - type: "custom:button-card"
+              template: card_power_outlet
+              entity: switch.main_room_aircon_plug_socket_1
+              icon: mdi:air-conditioner
+              name: Aircon
+            - type: "custom:button-card"
+              template: custom_card_rairulyle_diffuser
+              entity: humidifier.main_room_diffuser
+              name: Diffuser
+        - type: "custom:button-card"
+          template: card_vacuum
+          entity: vacuum.ijai_v3_aaa0_robot_cleaner
+
+        # Kitchen
+        - type: "custom:button-card"
+          template: card_title
+          name: 🍽️ Kitchen
+        - type: grid
+          square: false
+          columns: 2
+          cards:
+            - type: "custom:button-card"
+              template: card_light
+              entity: switch.kitchen_bulb_socket_switch_1
+              variables:
+                ulm_card_light_name: Main Light
+                ulm_card_light_icon: mdi:lightbulb
+            - type: "custom:button-card"
+              template: card_light
+              entity: switch.kitchen_led_light_socket
+              variables:
+                ulm_card_light_name: Led Light
+                ulm_card_light_icon: mdi:led-strip-variant
+
+        # Bedroom
+        - type: "custom:button-card"
+          template: card_title
+          name: 🛏️ Bedroom
+        - type: grid
+          square: false
+          columns: 2
+          cards:
+            - type: "custom:button-card"
+              template: card_power_outlet
+              entity: switch.bedroom_aircon_plug_socket_1
+              icon: mdi:air-conditioner
+              name: Aircon
+            - type: "custom:button-card"
+              template: card_light
+              entity: switch.bedroom_led_light_socket_1
+              variables:
+                ulm_card_light_name: Led Light
+                ulm_card_light_icon: mdi:led-strip-variant
+
+        # Bathroom
+        - type: "custom:button-card"
+          template: card_title
+          name: 🚿 Bathroom
+        - type: grid
+          square: false
+          columns: 2
+          cards:
+            - type: "custom:button-card"
+              template: card_light
+              entity: switch.bathroom_smart_plug_socket_1
+              variables:
+                ulm_card_light_name: Led Light
+                ulm_card_light_icon: mdi:led-strip-variant
