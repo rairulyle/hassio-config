@@ -1,0 +1,27 @@
+- title: "Overview"
+  path: batteries
+  icon: "mdi:battery-high"
+  cards:
+    - type: "vertical-stack"
+      cards:
+        - type: "custom:button-card"
+          template: card_title
+          name: 🔋 Batteries
+        - type: "custom:auto-entities"
+          card:
+            type: "grid"
+            columns: 2
+            square: false
+          card_param: "cards"
+          filter:
+            include:
+              - attributes:
+                  unit_of_measurement: "%"
+                  device_class: "battery"
+                options:
+                  type: "custom:button-card"
+                  template: "card_battery"
+                  variables:
+                    ulm_card_battery_battery_state_entity_id: "this.entity_id"
+                    ulm_card_battery_battery_level_danger: 30
+                    ulm_card_battery_battery_level_warning: 80
