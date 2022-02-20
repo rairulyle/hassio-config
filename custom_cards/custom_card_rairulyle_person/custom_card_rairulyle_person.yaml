@@ -64,7 +64,7 @@ custom_card_rairulyle_person:
         - line-height: "14px"
         - background-color: >
             [[[
-              if (states[variables.ulm_card_person_entity].state !== 'home') {
+              if (!states[variables.ulm_card_person_entity].state.toLowerCase().includes('home')) {
                 return "rgba(var(--color-green),1)";
               } else {
                 return "rgba(var(--color-blue),1)";

@@ -39,6 +39,7 @@
             ulm_card_person_use_entity_picture: true
             ulm_card_person_zones:
               - zone.malayan_colleges_laguna
+              - zone.person2_home
             ulm_address: device_tracker.xiaomi_mi_10t_5g
         - type: "custom:button-card"
           template: card_title
