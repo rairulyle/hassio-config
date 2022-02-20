@@ -1,0 +1,60 @@
+---
+### Card Diffuser/Humidifier ###
+custom_card_rairulyle_diffuser:
+  template:
+    - "icon_info_bg"
+    - "yellow"
+    - "ulm_language_variables"
+  variables:
+    ulm_card_toggle_service_data:
+      entity_id: "[[[ return entity.entity_id ]]]"
+    ulm_card_mode_service_data:
+      entity_id: "[[[ return entity.entity_id ]]]"
+      mode: |
+        [[[
+          if (entity.state === "off") {
+            return "small"
+          } else if (entity.state === "on" && entity.attributes.mode === "small") {
+            return "large"
+          }
+        ]]]
+  triggers_update: "all"
+  tap_action:
+    action: "call-service"
+    service: |
+      [[[
+        if (entity.state === "off") {
+          return "script.turn_on_diffuser";
+        } else if (entity.state === "on" && entity.attributes.mode === "small") {
+          return "humidifier.set_mode";
+        } else if (entity.state === "on" && entity.attributes.mode === "large") {
+          return "humidifier.turn_off";
+        }
+      ]]]
+    service_data: |
+      [[[
+        if (entity.state === "on" && entity.attributes.mode === "small") {
+          return variables.ulm_card_mode_service_data;
+        } else {
+          return variables.ulm_card_toggle_service_data;
+        }
+      ]]]
+  label: |
+    [[[
+      var mode = entity.attributes.mode;
+      if (mode === "small") {
+        mode = "weak"
+      } else if (mode === "large") {
+        mode = "strong";
+      }
+
+      if (entity.state === "on") {
+        return variables.ulm_on + " • " + mode;
+      } else if (entity.state === "off") {
+        return variables.ulm_off;
+      } else if (entity.state === "unavailable") {
+        return variables.ulm_unavailable;
+      } else {
+        return entity.state;
+      }
+    ]]]
