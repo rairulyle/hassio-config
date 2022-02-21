@@ -1,12 +1,33 @@
-- title: "Overview"
-  path: batteries
-  icon: "mdi:battery-high"
+- title: "Status"
+  path: motions
+  icon: "mdi:chart-box-outline"
   cards:
     - type: "vertical-stack"
       cards:
         - type: "custom:button-card"
           template: card_title
+          name: 🏃 Motions
+        - type: "custom:auto-entities"
+          card:
+            type: "grid"
+            columns: 2
+            square: false
+          card_param: "cards"
+          filter:
+            include:
+              - domain: "binary_sensor"
+                attributes:
+                  device_class: "motion"
+                options:
+                  type: "custom:button-card"
+                  template: card_binary_sensor
+                  variables:
+                    - ulm_card_binary_sensor_alert: true
+                  show_last_changed: true
+        - type: "custom:button-card"
+          template: card_title
           name: 🔋 Batteries
+          label: Battery Level < 40%
         - type: "custom:auto-entities"
           card:
             type: "grid"
@@ -18,6 +39,7 @@
               - attributes:
                   unit_of_measurement: "%"
                   device_class: "battery"
+                state: "< 40"
                 options:
                   type: "custom:button-card"
                   template: "card_battery"

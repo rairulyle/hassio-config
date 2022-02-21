@@ -1,0 +1,5 @@
+# EN.yaml for custom_card_paddy0174_temperature
+ulm_custom_card_rairulyle_light_language_variables:
+  variables:
+    ulm_custom_card_rairulyle_card_locked: "locked"
+    ulm_custom_card_rairulyle_card_unlocked: "unlocked"

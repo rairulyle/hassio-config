@@ -90,6 +90,8 @@
               entity: switch.main_room_aircon_plug_socket_1
               icon: mdi:air-conditioner
               name: Aircon
+              variables:
+                ulm_card_power_outlet_consumption_sensor: sensor.main_room_aircon_plug_power
             - type: "custom:button-card"
               template: custom_card_rairulyle_diffuser
               entity: humidifier.main_room_diffuser
@@ -123,6 +125,11 @@
         - type: "custom:button-card"
           template: card_title
           name: 🛏️ Bedroom
+        - type: "custom:button-card"
+          template: card_media_player_chromecast_with_controls
+          variables:
+            ulm_card_media_player_with_controls_name: "Chromecast"
+            ulm_card_media_player_with_controls_entity: media_player.bedroom_chromecast
         - type: grid
           square: false
           columns: 2
@@ -132,12 +139,15 @@
               entity: switch.bedroom_aircon_plug_socket_1
               icon: mdi:air-conditioner
               name: Aircon
+              variables:
+                ulm_card_power_outlet_consumption_sensor: sensor.bedroom_aircon_plug_power
             - type: "custom:button-card"
-              template: card_light
+              template: custom_card_rairulyle_light
               entity: switch.bedroom_led_light_socket_1
               variables:
                 ulm_card_light_name: Led Light
                 ulm_card_light_icon: mdi:led-strip-variant
+                ulm_card_light_automation_lock_entity: input_boolean.bedroom_led_light_automation_lock
 
         # Bathroom
         - type: "custom:button-card"
