@@ -180,7 +180,7 @@ custom_card_rairulyle_light:
                 [[[
                   var automation_lock_label = "";
                   if(variables.ulm_card_light_automation_lock_entity){
-                    automation_lock_label = states[variables.ulm_card_light_automation_lock_entity].state === "on" ? " • " + variables.ulm_custom_card_rairulyle_card_locked : " • " + variables.ulm_custom_card_rairulyle_card_unlocked;
+                    automation_lock_label = states[variables.ulm_card_light_automation_lock_entity].state === "on" ? " • " + '<ha-icon icon="mdi:lock" style="width: 13px; height: 13px; vertical-align: 2px;"></ha-icon>' : " • " + '<ha-icon icon="mdi:lock-open-variant" style="width: 13px; height: 13px; vertical-align: 2px;"></ha-icon>' 
                   }
                   
                   if (entity.state !="unavailable"){
