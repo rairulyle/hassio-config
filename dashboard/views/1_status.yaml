@@ -1,5 +1,5 @@
 - title: "Status"
-  path: motions
+  path: status
   icon: "mdi:chart-box-outline"
   cards:
     - type: "vertical-stack"
