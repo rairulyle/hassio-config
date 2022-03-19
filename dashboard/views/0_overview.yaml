@@ -5,22 +5,37 @@
     - type: "vertical-stack"
       cards:
         #Overview
-        - type: "custom:auto-entities"
-          card:
-            type: "grid"
-            columns: 1
-            square: false
-          card_param: "cards"
-          sort:
-            count: 1
-          filter:
-            include:
-              - domain: "weather"
-                options:
-                  type: "custom:button-card"
-                  template: "custom_card_rairulyle_welcome_scenes"
-                  variables:
-                    ulm_weather: weather.openweathermap
+        - type: "custom:button-card"
+          template: "card_welcome_scenes"
+          entity: input_boolean.welcome_scene_toggle_state
+          variables:
+            ulm_card_welcome_scenes_collapse: input_boolean.welcome_scene_toggle_state
+            ulm_weather: weather.openweathermap
+            entity_1:
+              entity_id: scene.cleaning
+              name: Cleaning
+              icon:
+              color: purple
+            entity_2:
+              entity_id: scene.gaming
+              name: Gaming
+              icon:
+              color: red
+            entity_3:
+              entity_id: scene.morning
+              name: Morning
+              icon:
+              color: yellow
+            entity_4:
+              entity_id: scene.night
+              name: Night
+              icon:
+              color: blue
+            entity_5:
+              entity_id: scene.relax
+              name: Relax
+              icon:
+              color: green
         - type: "custom:button-card"
           template: custom_card_rairulyle_media_player
           entity: media_player.all_speakers
