@@ -43,6 +43,7 @@
           variables:
             ulm_card_media_player_enable_controls: true
             ulm_card_media_player_enable_art: true
+            ulm_card_media_player_more_info: true
         - type: "custom:button-card"
           template: card_title
           name: 🦊 What is up?!

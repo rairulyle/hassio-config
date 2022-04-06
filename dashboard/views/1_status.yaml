@@ -6,6 +6,37 @@
       cards:
         - type: "custom:button-card"
           template: card_title
+          name: ⚡ Electricity Consumption
+        - type: "custom:button-card"
+          template: card_graph
+          variables:
+            ulm_card_graph_color: "var(--google-yellow)"
+            ulm_card_graph_name: "Monthly Consumption"
+            ulm_card_graph_entity: sensor.total_monthly_energy_consumption
+            ulm_card_graph_type: fill
+            ulm_card_graph_hours: 730
+        - type: grid
+          square: false
+          columns: 2
+          cards:
+            - type: "custom:button-card"
+              template: card_graph
+              variables:
+                ulm_card_graph_color: "var(--google-yellow)"
+                ulm_card_graph_name: "Daily Consumption"
+                ulm_card_graph_entity: sensor.total_daily_energy_consumption
+                ulm_card_graph_type: fill
+                ulm_card_graph_hours: 24
+            - type: "custom:button-card"
+              template: card_graph
+              variables:
+                ulm_card_graph_color: "var(--google-yellow)"
+                ulm_card_graph_name: "Weekly Consumption"
+                ulm_card_graph_entity: sensor.total_weekly_energy_consumption
+                ulm_card_graph_type: fill
+                ulm_card_graph_hours: 168
+        - type: "custom:button-card"
+          template: card_title
           name: 🏃 Motions
         - type: "custom:auto-entities"
           card:
