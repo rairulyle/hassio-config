@@ -7,32 +7,32 @@
         #Overview
         - type: "custom:button-card"
           template: "card_welcome_scenes"
-          entity: input_boolean.welcome_scene_toggle_state
+          triggers_update: input_boolean.welcome_scene_toggle_state
           variables:
             ulm_card_welcome_scenes_collapse: input_boolean.welcome_scene_toggle_state
             ulm_weather: weather.openweathermap
             entity_1:
-              entity_id: scene.cleaning
-              name: Cleaning
+              entity_id: input_boolean.cleaning
+              name: Clean
               icon:
               color: purple
             entity_2:
-              entity_id: scene.gaming
-              name: Gaming
+              entity_id: input_boolean.gaming
+              name: Game
               icon:
               color: red
             entity_3:
-              entity_id: scene.morning
-              name: Morning
+              entity_id: input_boolean.morning
+              name: Day
               icon:
               color: yellow
             entity_4:
-              entity_id: scene.night
+              entity_id: input_boolean.night
               name: Night
               icon:
               color: blue
             entity_5:
-              entity_id: scene.relax
+              entity_id: input_boolean.relax
               name: Relax
               icon:
               color: green
@@ -44,6 +44,7 @@
             ulm_card_media_player_enable_controls: true
             ulm_card_media_player_enable_art: true
             ulm_card_media_player_more_info: true
+            ulm_card_media_player_enable_volume_slider: true
         - type: "custom:button-card"
           template: card_title
           name: 🦊 What is up?!
