@@ -16,6 +16,9 @@ Konnichiwassup! These are the [UI Lovelace Minimalist](https://ui-lovelace-minim
     <TD>
     <img src="https://raw.githubusercontent.com/rairulyle/HA_UI-Lovelace-Minimalist-Dashboard/master/preview/00_02_overview_light.png"
     </TD>
+     <TD>
+    <img src="https://raw.githubusercontent.com/rairulyle/HA_UI-Lovelace-Minimalist-Dashboard/master/preview/00_01_status_light.png"
+    </TD>
 </TR>
 </TABLE>
 
@@ -27,7 +30,10 @@ Konnichiwassup! These are the [UI Lovelace Minimalist](https://ui-lovelace-minim
     <img src="https://raw.githubusercontent.com/rairulyle/HA_UI-Lovelace-Minimalist-Dashboard/master/preview/00_01_overview_dark.png"
     </TD>
     <TD>
-    <img src="https://raw.githubusercontent.com/rairulyle/HA_UI-Lovelace-Minimalist-Dashboard/master/preview/00_01_overview_dark.png"
+    <img src="https://raw.githubusercontent.com/rairulyle/HA_UI-Lovelace-Minimalist-Dashboard/master/preview/00_02_overview_dark.png"
+    </TD>
+    <TD>
+    <img src="https://raw.githubusercontent.com/rairulyle/HA_UI-Lovelace-Minimalist-Dashboard/master/preview/00_01_status_dark.png"
     </TD>
 </TR>
 </TABLE>
