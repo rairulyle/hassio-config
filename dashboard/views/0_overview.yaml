@@ -37,7 +37,7 @@
               icon:
               color: green
         - type: "custom:button-card"
-          template: custom_card_rairulyle_media_player
+          template: card_media_player
           entity: media_player.all_speakers
           name: Media Player
           variables:
