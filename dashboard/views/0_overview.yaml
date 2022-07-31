@@ -75,6 +75,7 @@
           cards:
             - type: "custom:button-card"
               template: card_graph
+              entity: sensor.speedtest_ping
               variables:
                 ulm_card_graph_color: "var(--google-blue)"
                 ulm_card_graph_name: Ping
@@ -83,6 +84,7 @@
                 ulm_card_graph_hours: 24
             - type: "custom:button-card"
               template: card_graph
+              entity: sensor.speedtest_download
               variables:
                 ulm_card_graph_color: "var(--google-blue)"
                 ulm_card_graph_name: Download
@@ -91,6 +93,7 @@
                 ulm_card_graph_hours: 24
             - type: "custom:button-card"
               template: card_graph
+              entity: sensor.speedtest_upload
               variables:
                 ulm_card_graph_color: "var(--google-blue)"
                 ulm_card_graph_name: Upload
@@ -109,9 +112,9 @@
             - type: "custom:button-card"
               template: card_power_outlet
               entity: switch.main_room_aircon_plug_socket_1
-              icon: mdi:air-conditioner
-              name: Aircon
               variables:
+                ulm_card_power_outlet_name: Aircon
+                ulm_card_power_outlet_icon: mdi:air-conditioner
                 ulm_card_power_outlet_consumption_sensor: sensor.main_room_aircon_plug_power
             - type: "custom:button-card"
               template: custom_card_rairulyle_diffuser
@@ -160,9 +163,9 @@
             - type: "custom:button-card"
               template: card_power_outlet
               entity: switch.bedroom_aircon_plug_socket_1
-              icon: mdi:air-conditioner
-              name: Aircon
               variables:
+                ulm_card_power_outlet_name: Aircon
+                ulm_card_power_outlet_icon: mdi:air-conditioner
                 ulm_card_power_outlet_consumption_sensor: sensor.bedroom_aircon_plug_power
             - type: "custom:button-card"
               template: custom_card_rairulyle_light

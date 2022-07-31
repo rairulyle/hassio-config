@@ -2,7 +2,7 @@
 ### Card Light ###
 custom_card_rairulyle_light:
   template:
-    - "ulm_language_variables"
+    - "ulm_translation_engine"
     - "ulm_custom_card_rairulyle_light_language_variables"
   variables:
     ulm_card_light_name: "[[[ return entity.attributes.friendly_name ]]]"
@@ -178,25 +178,19 @@ custom_card_rairulyle_light:
                   entity_id: "[[[ return variables.ulm_card_light_automation_lock_entity; ]]]"
               label: >-
                 [[[
+                  var label = variables.ulm_translation_state;
                   var automation_lock_label = "";
+
                   if(variables.ulm_card_light_automation_lock_entity){
                     automation_lock_label = states[variables.ulm_card_light_automation_lock_entity].state === "on" ? " • " + '<ha-icon icon="mdi:lock" style="width: 13px; height: 13px; vertical-align: 2px;"></ha-icon>' : " • " + '<ha-icon icon="mdi:lock-open-variant" style="width: 13px; height: 13px; vertical-align: 2px;"></ha-icon>' 
                   }
                   
-                  if (entity.state !="unavailable"){
-                    if (entity.state =="off"){
-                      return variables.ulm_off + automation_lock_label;
-                    } else if (entity.state == "on"){
-                      if (entity.attributes.brightness != null){
-                        var bri = Math.round(entity.attributes.brightness / 2.55);
-                        return (bri ? bri : "0") + "%";
-                      } else {
-                        return variables.ulm_on + automation_lock_label;
-                      }
-                    }
-                  } else {
-                    return variables.ulm_unavailable;
+                  if (entity.state == "on" && entity.attributes.brightness != null){
+                    var bri = Math.round(entity.attributes.brightness / 2.55);
+                    return (bri ? bri : "0") + "%";
                   }
+
+                   return label + automation_lock_label;
                 ]]]
               state:
                 - value: "on"

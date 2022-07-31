@@ -4,7 +4,7 @@ custom_card_rairulyle_diffuser:
   template:
     - "icon_info_bg"
     - "yellow"
-    - "ulm_language_variables"
+    - "ulm_translation_engine"
   variables:
     ulm_card_toggle_service_data:
       entity_id: "[[[ return entity.entity_id ]]]"
@@ -41,7 +41,9 @@ custom_card_rairulyle_diffuser:
       ]]]
   label: |
     [[[
+      var label = variables.ulm_translation_state;
       var mode = entity.attributes.mode;
+      
       if (mode === "small") {
         mode = "weak"
       } else if (mode === "large") {
@@ -49,12 +51,8 @@ custom_card_rairulyle_diffuser:
       }
 
       if (entity.state === "on") {
-        return variables.ulm_on + " • " + mode;
-      } else if (entity.state === "off") {
-        return variables.ulm_off;
-      } else if (entity.state === "unavailable") {
-        return variables.ulm_unavailable;
-      } else {
-        return entity.state;
-      }
+        return label + " • " + mode;
+      } 
+      
+      return label;
     ]]]
