@@ -4,3 +4,5 @@ button_card_templates: !include_dir_merge_named "../../custom_components/ui_love
 title: "Home"
 background: "var(--background-image)"
 views: !include_dir_merge_list "views/"
+ha-card-border-width: "0px"
+ha-card-border-radius: "5px"

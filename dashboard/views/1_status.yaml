@@ -1,83 +1,83 @@
-- title: "Status"
-  path: status
-  icon: "mdi:chart-box-outline"
-  cards:
-    - type: "vertical-stack"
-      cards:
-        - type: "custom:button-card"
-          template: card_title
-          name: ⚡ Electricity Consumption
-        - type: "custom:button-card"
-          template: card_graph
-          entity: sensor.total_monthly_energy_consumption
-          variables:
-            ulm_card_graph_color: "var(--google-yellow)"
-            ulm_card_graph_name: "Monthly Consumption"
-            ulm_card_graph_entity: sensor.total_monthly_energy_consumption
-            ulm_card_graph_type: fill
-            ulm_card_graph_hours: 730
-        - type: grid
-          square: false
-          columns: 2
-          cards:
-            - type: "custom:button-card"
-              template: card_graph
-              entity: sensor.total_daily_energy_consumption
-              variables:
-                ulm_card_graph_color: "var(--google-yellow)"
-                ulm_card_graph_name: "Daily Consumption"
-                ulm_card_graph_entity: sensor.total_daily_energy_consumption
-                ulm_card_graph_type: fill
-                ulm_card_graph_hours: 24
-            - type: "custom:button-card"
-              template: card_graph
-              entity: sensor.total_weekly_energy_consumption
-              variables:
-                ulm_card_graph_color: "var(--google-yellow)"
-                ulm_card_graph_name: "Weekly Consumption"
-                ulm_card_graph_entity: sensor.total_weekly_energy_consumption
-                ulm_card_graph_type: fill
-                ulm_card_graph_hours: 168
-        - type: "custom:button-card"
-          template: card_title
-          name: 🏃 Motions
-        - type: "custom:auto-entities"
-          card:
-            type: "grid"
-            columns: 2
-            square: false
-          card_param: "cards"
-          filter:
-            include:
-              - domain: "binary_sensor"
-                attributes:
-                  device_class: "motion"
-                options:
-                  type: "custom:button-card"
-                  template: card_binary_sensor
-                  variables:
-                    - ulm_card_binary_sensor_alert: true
-                    - ulm_show_last_changed: true
-        - type: "custom:button-card"
-          template: card_title
-          name: 🔋 Batteries
-          label: Battery Level < 40%
-        - type: "custom:auto-entities"
-          card:
-            type: "grid"
-            columns: 2
-            square: false
-          card_param: "cards"
-          filter:
-            include:
-              - attributes:
-                  unit_of_measurement: "%"
-                  device_class: "battery"
-                state: "< 40"
-                options:
-                  type: "custom:button-card"
-                  template: "card_battery"
-                  variables:
-                    ulm_card_battery_battery_state_entity_id: "this.entity_id"
-                    ulm_card_battery_battery_level_danger: 30
-                    ulm_card_battery_battery_level_warning: 80
+# - title: "Status"
+#   path: status
+#   icon: "mdi:chart-box-outline"
+#   cards:
+#     - type: "vertical-stack"
+#       cards:
+#         - type: "custom:button-card"
+#           template: card_title
+#           name: ⚡ Electricity Consumption
+#         - type: "custom:button-card"
+#           template: card_graph
+#           entity: sensor.total_monthly_energy_consumption
+#           variables:
+#             ulm_card_graph_color: "var(--google-yellow)"
+#             ulm_card_graph_name: "Monthly Consumption"
+#             ulm_card_graph_entity: sensor.total_monthly_energy_consumption
+#             ulm_card_graph_type: fill
+#             ulm_card_graph_hours: 730
+#         - type: grid
+#           square: false
+#           columns: 2
+#           cards:
+#             - type: "custom:button-card"
+#               template: card_graph
+#               entity: sensor.total_daily_energy_consumption
+#               variables:
+#                 ulm_card_graph_color: "var(--google-yellow)"
+#                 ulm_card_graph_name: "Daily Consumption"
+#                 ulm_card_graph_entity: sensor.total_daily_energy_consumption
+#                 ulm_card_graph_type: fill
+#                 ulm_card_graph_hours: 24
+#             - type: "custom:button-card"
+#               template: card_graph
+#               entity: sensor.total_weekly_energy_consumption
+#               variables:
+#                 ulm_card_graph_color: "var(--google-yellow)"
+#                 ulm_card_graph_name: "Weekly Consumption"
+#                 ulm_card_graph_entity: sensor.total_weekly_energy_consumption
+#                 ulm_card_graph_type: fill
+#                 ulm_card_graph_hours: 168
+#         - type: "custom:button-card"
+#           template: card_title
+#           name: 🏃 Motions
+#         - type: "custom:auto-entities"
+#           card:
+#             type: "grid"
+#             columns: 2
+#             square: false
+#           card_param: "cards"
+#           filter:
+#             include:
+#               - domain: "binary_sensor"
+#                 attributes:
+#                   device_class: "motion"
+#                 options:
+#                   type: "custom:button-card"
+#                   template: card_binary_sensor
+#                   variables:
+#                     - ulm_card_binary_sensor_alert: true
+#                     - ulm_show_last_changed: true
+#         - type: "custom:button-card"
+#           template: card_title
+#           name: 🔋 Batteries
+#           label: Battery Level < 40%
+#         - type: "custom:auto-entities"
+#           card:
+#             type: "grid"
+#             columns: 2
+#             square: false
+#           card_param: "cards"
+#           filter:
+#             include:
+#               - attributes:
+#                   unit_of_measurement: "%"
+#                   device_class: "battery"
+#                 state: "< 40"
+#                 options:
+#                   type: "custom:button-card"
+#                   template: "card_battery"
+#                   variables:
+#                     ulm_card_battery_battery_state_entity_id: "this.entity_id"
+#                     ulm_card_battery_battery_level_danger: 30
+#                     ulm_card_battery_battery_level_warning: 80
