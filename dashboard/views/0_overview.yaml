@@ -69,27 +69,27 @@
         - type: "custom:button-card"
           template: card_title
           name: 🌡️ Room Thermostat
-        - type: "custom:button-card"
-          template: card_graph
-          entity: sensor.zhimi_vb4_00ae_pm25_density
-          variables:
-            ulm_card_graph_color: "var(--google-green)"
-            ulm_card_graph_name: Air Quality
-            ulm_card_graph_entity: sensor.zhimi_vb4_00ae_pm25_density
-            ulm_card_graph_type: fill
-            ulm_card_graph_hours: 24
-            ulm_card_graph_group_by: interval
         - type: grid
           square: false
-          columns: 2
+          columns: 3
           cards:
+            - type: "custom:button-card"
+              template: card_graph
+              entity: sensor.zhimi_vb4_00ae_pm25_density
+              variables:
+                ulm_card_graph_name: Air Quality
+                ulm_card_graph_entity: sensor.zhimi_vb4_00ae_pm25_density
+                ulm_card_graph_color: "var(--google-green)"
+                ulm_card_graph_type: fill
+                ulm_card_graph_hours: 24
+                ulm_card_graph_group_by: interval
             - type: "custom:button-card"
               template: card_graph
               entity: sensor.overall_room_temperature
               variables:
-                ulm_card_graph_color: "var(--google-green)"
                 ulm_card_graph_name: Temperature
                 ulm_card_graph_entity: sensor.overall_room_temperature
+                ulm_card_graph_color: "var(--google-green)"
                 ulm_card_graph_type: fill
                 ulm_card_graph_hours: 24
                 ulm_card_graph_group_by: interval
@@ -97,9 +97,9 @@
               template: card_graph
               entity: sensor.overall_room_humidity
               variables:
-                ulm_card_graph_color: "var(--google-green)"
                 ulm_card_graph_name: Humidity
                 ulm_card_graph_entity: sensor.overall_room_humidity
+                ulm_card_graph_color: "var(--google-green)"
                 ulm_card_graph_type: fill
                 ulm_card_graph_hours: 24
                 ulm_card_graph_group_by: interval
