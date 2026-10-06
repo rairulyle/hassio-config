@@ -3,9 +3,9 @@ secrets.yaml
 .storage/
 .cloud/
 .cache/
-.exports/
-.timeline/
-.vacuum/
+.exports
+.timeline
+.vacuum
 .vscode/
 .cleanup_trash_*/
 .HA_VERSION
@@ -28,7 +28,7 @@ custom_components/
 www/community/
 www/bubble/
 www/bubble-card.js
-blueprints/switch_manager/
+blueprints/
 themes/catppuccin/
 themes/minimalist-*/
 
