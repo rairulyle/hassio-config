@@ -1,0 +1,64 @@
+#
+# Room Card (adapted): chips row, overview row, device row.
+#
+# variables:
+#   - room_name, icon, navigation_path
+#   - entity: light group used for the icon colour
+#   - status: JS template string shown under the room name
+#   - temperature / humidity: JS templates or null
+#   - chips: list of button-cards for the top-left chip row
+#   - room_devices: list of button-cards (app_room_card_device)
+#
+room_card:
+  default:
+    - temperature: null
+    - humidity: null
+    - status: null
+    - chips: []
+  card:
+    type: custom:stack-in-card
+    cards:
+      - type: custom:mod-card
+        card_mod: !include /config/dashboards/templates/includes/card_mod/app_layout_card_mod.yaml
+        card:
+          type: custom:layout-card
+          layout_type: custom:grid-layout
+          layout:
+            grid-template-columns: 100%
+            margin: 0px 0px 0px 0px
+            padding: 20px 20px 0px 20px
+            card_margin: 0px
+          cards:
+            - type: custom:mod-card
+              card_mod:
+                style:
+                  hui-horizontal-stack-card$: |
+                    #root {
+                      gap: 5px !important;
+                      justify-content: flex-start;
+                    }
+                    #root > * {
+                      flex: 0 0 auto !important;
+                    }
+              card:
+                type: horizontal-stack
+                cards: '[[chips]]'
+
+      - type: custom:button-card
+        entity: '[[entity]]'
+        name: '[[room_name]]'
+        template: app_room_overview
+        icon: '[[icon]]'
+        variables:
+          temperature: '[[temperature]]'
+          humidity: '[[humidity]]'
+          status: '[[status]]'
+        tap_action:
+          action: navigate
+          navigation_path: '[[navigation_path]]'
+          haptic: light
+
+      - type: custom:stack-in-card
+        mode: horizontal
+        card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_horizontal_stack_room_devices.yaml
+        cards: '[[room_devices]]'
