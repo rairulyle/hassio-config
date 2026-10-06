@@ -1,0 +1,16 @@
+# Page toolbar: rendered in-flow (the Home Assistant header stays visible, no kiosk mode).
+style:
+  .: |
+    ha-card {
+      background: transparent !important;
+      box-shadow: none !important;
+      border: none !important;
+      padding: 0 0 6px 0 !important;
+      border-radius: 0 !important;
+    }
+
+  hui-horizontal-stack-card$: |
+    #root {
+      align-items: center;
+      justify-content: space-between;
+    }

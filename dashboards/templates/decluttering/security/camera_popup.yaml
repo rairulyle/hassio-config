@@ -1,0 +1,145 @@
+# 
+# Camera Popup
+# 
+camera_popup:
+  card:
+    type: custom:bubble-card
+    card_type: pop-up
+    hash: '[[hash]]'
+    close_by_clicking_outside: true
+    styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+    margin_top_mobile: calc(100vh - 850px)
+    margin_top_desktop: calc(100vh - 850px)
+
+    cards:
+      - type: custom:button-card
+        template: app_popup_page_title
+        name: '[[name]]'
+      
+      - type: horizontal-stack
+        cards:            
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: template
+                card_mod: !include /config/dashboards/templates/includes/app_chip_card_mod.yaml
+                content: "{{ 'On' if states(entity) == 'on' else 'Off' }}"
+                entity: '[[notifications_entity]]'
+                icon: >
+                  {% if states(entity) == 'on' %}
+                    mdi:bell
+                  {% else %}
+                    mdi:bell-off
+                  {% endif %}
+                icon_color: >
+                  {% if states(entity) == 'on' %}
+                    var(--primary-color)
+                  {% else %}
+                    #ED4747
+                  {% endif %}
+                tap_action:
+                  action: toggle
+
+              # 
+              # Snooze Timer
+              # 
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: '[[timer_entity]]'
+                    state: "active"
+                chip:
+                  type: template
+                  card_mod: !include /config/dashboards/templates/includes/app_chip_card_mod.yaml
+                  icon: mdi:rewind-15
+                  entity: '[[timer_entity]]'
+                  content: "{{ states['[[countdown_sensor]]'].state }}"
+                  icon_color: >
+                    {% if states(entity) == 'active' %}
+                      #06D6A0
+                    {% else %}
+                      #ADD2EB
+                    {% endif %}
+                  tap_action:
+                    action: more-info
+
+              # 
+              # Snooze Action
+              # 
+              - type: conditional
+                conditions:
+                  - condition: or
+                    conditions:
+                      - condition: state
+                        entity: '[[timer_entity]]'
+                        state: "idle"
+                      - condition: state
+                        entity: '[[timer_entity]]'
+                        state: "paused"
+                chip:
+                  type: template
+                  card_mod: !include /config/dashboards/templates/includes/app_chip_card_mod.yaml
+                  icon: mdi:alarm-snooze
+                  entity: '[[timer_entity]]'
+                  content: Snooze
+                  icon_color: var(--light-grey-color)
+                  tap_action:
+                    action: call-service
+                    service: timer.start
+                    service_data:
+                      entity_id: '[[timer_entity]]'
+
+
+      - type: custom:advanced-camera-card
+        cameras:
+          - name: '[[name]]'
+            camera_entity: '[[camera_entity]]'
+            live_provider: go2rtc
+            go2rtc:
+              url: http://go2rtc.local:1984
+              stream: '[[stream_id]]'
+              modes: [webrtc, mse]
+        live:
+          controls:
+            thumbnails:
+              mode: below
+              events_media_type: all
+              media_type: events
+              show_details: false
+              show_download_control: false
+              show_favorite_control: false
+              show_timeline_control: false
+        
+
+      - type: entities
+        card_mod: !include /config/dashboards/templates/includes/people/app_person_entities_layout.yaml
+        entities:
+          # Motion
+          - entity: '[[motion_entity]]'
+            icon: mdi:motion-sensor
+            name: Motion Detected
+            secondary_info: last-changed
+            state_color: true
+            card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+          # Person Detected
+          - entity: '[[person_entity]]'
+            icon: mdi:account-alert
+            name: Person Detected
+            secondary_info: last-changed
+            state_color: true
+            card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+          # Camera Notifications
+          - entity: '[[notifications_entity]]'
+            icon: app:app-notification
+            name: '[[name]] Notifications'
+            secondary_info: last-changed
+            state_color: true
+            card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
+          # Snooze Timer
+          - entity: '[[timer_entity]]'
+            icon: mdi:alarm-snooze
+            name: Snooze Timer
+            secondary_info: last-changed
+            state_color: true
+            card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+ 
+

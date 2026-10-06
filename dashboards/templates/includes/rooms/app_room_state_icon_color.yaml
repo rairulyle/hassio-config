@@ -1,0 +1,14 @@
+>
+  {% if states(entity) == 'DnD' %}
+    #ED4747
+  {% elif states(entity) == 'Off' %}
+    var(--light-grey-color)
+  {% elif states(entity) == "Bedtime" %}
+    #E36001
+  {% else %}
+    primary
+  {% endif %}
+
+
+
+  

@@ -1,0 +1,86 @@
+style:
+  .: |
+    hui-generic-entity-row {
+      padding: 0px !important;
+      direction: rtl !important;
+    }
+
+    ha-card #{
+      padding: 0px !important;
+    }
+
+    :host {
+      padding: 0px !important;
+    }
+
+  hui-entities-card$: |
+    ha-card,
+    ha-card #states {
+      padding: 0px !important;
+    }
+
+  
+
+  hui-generic-entity-row$: |
+      state-badge,
+      .info,
+      .secondary {
+        display: none !important;
+      }
+
+  hui-generic-entity-row:
+    .: |
+      ha-entity-toggle {
+        height: 32px !important;
+      }
+
+    ha-entity-toggle:
+      $:
+        ha-switch:
+          $: |
+            /* HA 2025+ frontend replaced the Material switch with a Web Awesome
+               component. Old .mdc-switch__* classes no longer exist. New DOM:
+               label[part=base].checked > input.input
+                 + span[part=control].switch > span[part=thumb].thumb */
+
+            [part="control"] {
+              width: 50px !important;
+              height: 32px !important;
+              border-radius: 16px !important;
+              background: var(--divider-color) !important;
+              border: none !important;
+              opacity: 1 !important;
+              padding: 0 !important;
+              box-sizing: border-box !important;
+              position: relative !important;
+            }
+
+            [part="thumb"] {
+              position: absolute !important;
+              top: 50% !important;
+              left: 2px !important;
+              height: 28px !important;
+              width: 28px !important;
+              border-radius: 14px !important;
+              background: #FFFFFF !important;
+              border: none !important;
+              box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.04),
+                          0px 3px 8px rgba(0, 0, 0, 0.15),
+                          0px 3px 1px rgba(0, 0, 0, 0.06) !important;
+              transform: translateY(-50%) !important;
+              transition: left 0.15s ease, background 0.15s ease !important;
+            }
+
+            .checked [part="control"] {
+              background: var(--primary-color) !important;
+            }
+
+            .checked [part="thumb"] {
+              left: 20px !important;
+            }
+          
+
+  ha-entity-toggle$: |
+    ha-switch {
+      padding: 0px !important;
+    }

@@ -1,0 +1,83 @@
+type: custom:navbar-card
+routes:
+  - url: /lovelace/home
+    icon: app:app-dashboard
+    label: Home
+
+  - url: /lovelace/rooms
+    icon: app:app-rooms
+    label: Rooms
+    selected: '[[[ return window.location.pathname.startsWith("/lovelace/rooms") ]]]'
+    hold_action:
+      action: open-popup
+    popup:
+      - url: /lovelace/rooms-living-room
+        icon: app:app-chair
+        label: Living Room
+      - url: /lovelace/rooms-master-bedroom
+        icon: app:app-bed-king
+        label: Master Bedroom
+      - url: /lovelace/rooms-bedroom
+        icon: app:app-bed-single
+        label: Bedroom
+      - url: /lovelace/rooms-master-bathroom
+        icon: mdi:shower-head
+        label: Master Bathroom
+
+  - url: /lovelace/climate
+    icon: app:app-climate
+    label: Climate
+
+  - url: /lovelace/pets
+    icon: mdi:cat
+    label: Pets
+
+  - icon: mdi:dots-horizontal
+    label: More
+    tap_action:
+      action: open-popup
+    popup:
+      - icon: mdi:account-circle
+        url: /lovelace/people
+        label: People
+      - icon: mdi:server
+        url: /lovelace/system
+        label: System
+      - icon: mdi:youtube-tv
+        url: /lovelace/home#upcoming_tv
+        label: Upcoming TV
+
+haptic:
+  url: true
+  tap_action: true
+  hold_action: true
+  double_tap_action: true
+mobile:
+  show_labels: true
+  show_popup_label_backgrounds: true
+styles: |
+  .navbar-card {
+    border: none;
+    background: rgba(var(--catppuccin-crust-rgb), 0.92);
+    backdrop-filter: blur(4px);
+    width: 100%;
+    max-width: 500px;
+    bottom: -1px;
+    padding-bottom: 40px;
+  }
+
+  .button.active {
+    background: transparent;
+  }
+
+  .icon {
+    fill: #AAAAAA !important;
+  }
+
+  .icon.active {
+    fill: white !important;
+  }
+
+  ha-ripple {
+    display: none !important;
+  }

@@ -1,0 +1,12 @@
+>
+  {% if states(entity) == 'Auto' %}
+    app:app-house-auto
+  {% elif states(entity) == 'Off' or states(entity) == 'Away' %}
+    app:app-house-away
+  {% elif states(entity) == 'DnD' %}
+    app:app-dnd-on
+  {% elif states(entity) == 'Quiet' or states(entity) == 'Bedtime' %}
+    app:app-house-quiet
+  {% elif states(entity) == 'Entertainment' %}
+    app:app-house-entertain
+  {% endif %}
