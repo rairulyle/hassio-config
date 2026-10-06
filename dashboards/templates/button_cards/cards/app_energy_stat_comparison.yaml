@@ -1,0 +1,85 @@
+#------------------------------------------------------------------------------
+# Energy Stat Comparison Card Template
+#
+# Extends: app_energy_stat_card
+# Adds: Value display (v) + Percentage comparison (c)
+#
+# Additional Variables:
+#   - comparison_type: 'daily' | 'weekly' | 'monthly'
+#   - comparison_label: Text after percentage (default: "vs avg")
+#------------------------------------------------------------------------------
+app_energy_stat_comparison:
+  template: app_energy_stat_card
+  variables:
+    comparison_type: 'daily'
+    comparison_label: 'vs avg'
+  styles:
+    grid:
+      - grid-template-areas: '"n" "v" "c"'
+      - grid-template-rows: auto auto auto
+    custom_fields:
+      v:
+        - justify-self: start
+      c:
+        - justify-self: start
+        - margin-top: 2px
+  custom_fields:
+    v: |
+      [[[
+        const value = parseFloat(entity?.state || 0);
+        const unit = variables.unit_label || 'kWh';
+        const type = variables.comparison_type || 'daily';
+        // Compact large numbers: 22198 -> 22.2k, 3000 -> 3,000, keep decimal for daily
+        const fmt = (n) => {
+          if (n >= 10000) return (n / 1000).toFixed(1) + 'k';
+          if (n >= 1000) return Math.round(n).toLocaleString();
+          return Math.ceil(n).toString();
+        };
+        const displayValue = (type === 'weekly' || type === 'monthly') ? fmt(value) : value.toFixed(1);
+        return `<span style="font-size:26px;font-weight:600;color:var(--primary-text-color);">${displayValue}</span><span style="font-size:12px;color:var(--secondary-text-color);margin-left:4px;">${unit}</span>`;
+      ]]]
+    c: |
+      [[[
+        const type = variables.comparison_type || 'daily';
+        const label = variables.comparison_label || 'vs avg';
+
+        // Use energy_expected_full_day as the baseline - this sums hourly baselines
+        // and is consistent with what the chart shows. DO NOT use whole_home_daily_energy_stats
+        // as that incorrectly averages intermediate utility meter values throughout each day.
+        const dailyBaseline = parseFloat(states['sensor.energy_expected_full_day']?.state || 0);
+
+        let actual = 0;
+        let expected = 0;
+        if (type === 'daily') {
+          // Compare today's forecast to the baseline expected for today
+          actual = parseFloat(states['sensor.energy_forecast_end_of_day']?.state || 0);
+          expected = dailyBaseline;
+        } else if (type === 'weekly') {
+          // Compare this week's usage to expected baseline for the same period.
+          // getDay(): 0=Sun..6=Sat; days elapsed since Monday reset: Mon=1..Sun=7
+          actual = parseFloat(states['sensor.whole_home_energy_weekly_usage']?.state || 0);
+          const dow = new Date().getDay();
+          expected = dailyBaseline * (dow === 0 ? 7 : dow);
+        } else if (type === 'monthly') {
+          actual = parseFloat(states['sensor.whole_home_energy_monthly_usage']?.state || 0);
+          expected = dailyBaseline * new Date().getDate();
+        }
+
+        const pct = expected > 0 ? Math.round((actual - expected) / expected * 100) : 0;
+        const delta = actual - expected;
+        const arrow = pct > 5 ? '↑' : pct < -5 ? '↓' : '→';
+        const color = pct > 10 ? 'var(--error-color)' : pct < -10 ? 'var(--success-color)' : 'var(--secondary-text-color)';
+        const sign = delta > 0 ? '+' : (delta < 0 ? '-' : '');
+
+        // When the % is extreme (e.g. a mis-reading meter), an absolute kWh delta reads
+        // far better than "+7036%". Otherwise show the percentage.
+        let magnitude;
+        if (Math.abs(pct) >= 200) {
+          const ad = Math.abs(delta);
+          const d = ad >= 10000 ? (ad / 1000).toFixed(1) + 'k' : (ad >= 1000 ? Math.round(ad).toLocaleString() : Math.round(ad));
+          magnitude = `${sign}${d} kWh`;
+        } else {
+          magnitude = `${sign}${Math.abs(pct)}%`;
+        }
+        return `<span style="font-size:11px;font-weight:500;color:${color};">${arrow} ${magnitude} ${label}</span>`;
+      ]]]

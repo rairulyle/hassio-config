@@ -1,0 +1,31 @@
+app_security_item:
+  show_state: true
+  styles:
+    card:
+      - background: transparent
+      - box-shadow: none
+      - padding: 20px 10px
+      - border: none
+      - backdrop-filter: none
+      - -webkit-backdrop-filter: none
+    icon:
+      # - color: >
+      #     [[[
+      #       return (entity.state === 'on'
+      #       || entity.state === 'armed_home'
+      #       || entity.state === 'armed'
+      #       || entity.state === 'locked'
+      #       || entity.state === 'closed'
+      #       ) ? '#06D6A0' : '#ED4747';
+      #     ]]]
+      - height: 24px
+      - margin-bottom: 15px
+    name:
+      - font-size: 11px
+      - color: var(--light-grey-color)
+    state:
+      - font-weight: bold
+      - color: var(--primary-text-color)
+      - font-size: 13px
+      - margin-top: 2px
+    

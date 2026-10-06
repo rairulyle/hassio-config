@@ -1,0 +1,21 @@
+#
+# Room card overview row: icon, room name, status line, temperature on the right.
+# Extends app_room_card_overview but without occupancy sensors.
+#
+app_room_overview:
+  template: app_room_card_overview
+  variables:
+    status: null
+  state_display: >
+    [[[
+      if (variables.status) return variables.status;
+      if (entity == null) return '';
+      return entity.state == 'on' ? 'Lights on' : 'Lights off';
+    ]]]
+  styles:
+    icon:
+      - color: >
+          [[[
+            if (entity && entity.state == 'on') return 'var(--accent-color)';
+            return 'var(--light-grey-color)';
+          ]]]

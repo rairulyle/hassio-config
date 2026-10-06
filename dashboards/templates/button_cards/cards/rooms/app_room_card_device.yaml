@@ -1,0 +1,30 @@
+app_room_card_device:
+  show_state: true
+  styles:
+    grid:
+      - grid-template-areas: '"n n n" "i i i" "s s s"'
+      # - grid-template-columns: 1fr 1fr 1fr
+      # - grid-template-rows: 1fr 1fr 1fr
+    card:
+      - background: transparent
+      - box-shadow: none
+      - padding: 20px 10px
+      - border: none
+      - backdrop-filter: none
+      - -webkit-backdrop-filter: none
+    icon:
+      - height: 30px;
+      - margin-top: 12px
+      - margin-bottom: 12px
+    name:
+      - color: var(--primary-text-color)
+      - font-size: 13px
+      - font-weight: 500
+    state:
+      - font-weight: 400
+      - color: var(--secondary-text-color)
+      - font-size: 11px;
+      # - margin-top: 2px;
+  tap_action:
+    haptic: light
+    

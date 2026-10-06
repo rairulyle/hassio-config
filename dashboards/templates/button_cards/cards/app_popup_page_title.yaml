@@ -1,0 +1,5 @@
+app_popup_page_title:
+  template: app_page_title
+  styles:
+    name:
+      - justify-self: center

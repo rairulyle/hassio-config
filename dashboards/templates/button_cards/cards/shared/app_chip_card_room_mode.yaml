@@ -1,0 +1,19 @@
+app_chip_card_room_mode:
+  template: app_chip_card
+  state:
+    - value: "Auto"
+      icon: app:app-house-auto
+      color: var(--primary-color)
+    - value: "Away"
+      icon: app:app-house-away
+      color: var(--light-grey-color)
+    - value: "Off"
+      icon: app:app-house-away
+      color: var(--light-grey-color)
+    - value: "Bedtime"
+      icon: app:app-house-quiet
+      color: var(--orange-color)
+    - value: "DnD"
+      icon: app:app-dnd-on
+      color: var(--error-color)
+    
