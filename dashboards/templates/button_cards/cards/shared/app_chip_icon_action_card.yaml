@@ -1,0 +1,11 @@
+app_chip_icon_action_card:
+  template: app_header_chip_card
+  show_state: false
+  show_name: false
+  show_icon: true
+  styles:
+    card:
+      - background: var(--darker-primary-color)
+      - justify-self: end
+  tap_action:
+    haptic: light

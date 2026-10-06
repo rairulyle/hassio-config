@@ -1,0 +1,47 @@
+app_person_entity:
+  show_state: false
+  show_name: false
+  show_entity_picture: true
+  size: 45px
+  icon: mdi:account
+  styles:
+    card:
+      - height: 45px
+      - width: 45px
+      - padding: 0
+      - background: transparent
+      - border: none
+      - border-radius: 0
+    img_cell:
+      - border-radius: 50%
+    custom_fields:
+      occupancy_state:
+        - background-color: >
+            [[[
+              if (variables.status) {
+                if (variables.status == "sleeping") {
+                  return "var(--warning-color)";
+                } else if (variables.status == "dnd") {
+                  return "var(--error-color)";
+                }
+              } else {
+                if (entity.state == "home") {
+                  return "var(--success-color)";
+                } else {
+                  return "var(--text-light-primary-color)";
+                }
+              }              
+            ]]]
+        - border-radius: 50%
+        - position: absolute
+        - bottom: 0
+        - right: 0
+        - height: 10px
+        - width: 10px
+        - box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.5)
+  custom_fields:
+    occupancy_state: >
+      [[[
+        return "";
+      ]]]
+

@@ -1,0 +1,5 @@
+security_overview_header:
+  template: app_stacked_card_top
+  styles:
+    grid:
+      - grid-template-areas: '"i n score" "i l score"'

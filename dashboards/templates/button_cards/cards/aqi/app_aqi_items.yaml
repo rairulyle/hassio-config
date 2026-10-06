@@ -1,0 +1,55 @@
+#
+# Air quality / climate items with fixed thresholds (no input_number helpers).
+#
+app_aqi_pm25_item:
+  template: app_aqi_item
+  name: PM2.5
+  state_display: |
+    [[[ return String(Math.round(parseFloat(entity.state))); ]]]
+  variables:
+    aqi_status: >
+      [[[
+        const p = parseFloat(entity.state);
+        if (p > 150) return 'Hazardous';
+        if (p > 55) return 'Poor';
+        if (p > 35) return 'Moderate';
+        if (p > 12) return 'Acceptable';
+        return 'Good';
+      ]]]
+  custom_fields:
+    unit: "µg/m³"
+
+app_aqi_temperature_item:
+  template: app_aqi_item
+  name: Outside
+  state_display: |
+    [[[ return String(Math.round(parseFloat(entity.state) * 10) / 10); ]]]
+  variables:
+    aqi_status: >
+      [[[
+        const t = parseFloat(entity.state);
+        if (t >= 36) return 'Hazardous';
+        if (t >= 33) return 'Poor';
+        if (t >= 30) return 'Moderate';
+        if (t >= 27) return 'Acceptable';
+        return 'Good';
+      ]]]
+  custom_fields:
+    unit: "°C"
+
+app_aqi_text_item:
+  template: app_aqi_item
+  name: Air
+  state_display: |
+    [[[ return entity.state.charAt(0).toUpperCase() + entity.state.slice(1); ]]]
+  variables:
+    aqi_status: >
+      [[[
+        const s = entity.state;
+        if (s == 'excellent' || s == 'good') return 'Good';
+        if (s == 'moderate' || s == 'fair') return 'Moderate';
+        if (s == 'poor') return 'Poor';
+        return 'Acceptable';
+      ]]]
+  custom_fields:
+    unit: "quality"

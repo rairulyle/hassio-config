@@ -1,0 +1,16 @@
+app_page_title:
+  styles:
+    card:
+      - height: 50px
+      - background: transparent
+      - border: none
+      - box-shadow: none
+      - margin: 0
+      - padding: 0
+    name:
+      - color: var(--primary-text-color)
+      # - font-size: 40px
+      - justify-self: start
+      - font-size: 26px
+      - font-weight: 500
+      - letter-spacing: -.7px

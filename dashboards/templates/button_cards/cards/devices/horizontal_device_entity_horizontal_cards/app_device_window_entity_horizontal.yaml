@@ -1,0 +1,10 @@
+app_device_window_entity_horizontal:
+  template: app_device_entity_horizontal
+  state_display: '[[[ return entity.state == "on" ? "Open" : "Closed" ]]]'
+  state:
+    - value: 'on'
+      icon: app:app-window-open
+      color: var(--error-color)
+    - value: 'off'
+      icon: app:app-window-closed
+      color: var(--success-color)

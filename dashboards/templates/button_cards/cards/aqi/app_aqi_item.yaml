@@ -1,0 +1,56 @@
+app_aqi_item:
+  extra_styles: |
+    #aqi img { max-height: 56px; }
+  show_state: true
+  show_icon: false
+  # variables:
+  #   aqi_status: null
+  styles:
+    grid:
+      - grid-template-areas: '"aqi aqi" "n n" "s s" "unit unit"'
+      - grid-template-rows: 1fr
+    card:
+      - background: transparent
+      - box-shadow: none
+      - padding: 10px 8px 12px 8px
+      - border: none
+      - backdrop-filter: none
+      - -webkit-backdrop-filter: none
+      - height: 132px
+    name:
+      - font-size: 11px
+      - font-weight: 500
+      - color: var(--light-grey-color)
+    state:
+      - font-weight: normal
+      - color: var(--primary-text-color)
+      - font-size: 16px;
+      - margin: 4px 0
+    custom_fields:
+      unit:
+        - font-size: 11px
+        - color: var(--light-grey-color)
+      # aqi:
+      #   - margin-bottom: 5px
+  custom_fields:
+    aqi: >
+      [[[  
+        if (variables.aqi_status === 'Good') {
+          return '<img src="/local/dashboard/images/aqi/good.png" alt="AQI Good" />'
+        }
+        if (variables.aqi_status === 'Acceptable') {
+          return '<img src="/local/dashboard/images/aqi/acceptable.png" alt="AQI Acceptable" />'
+        }
+        if (variables.aqi_status === 'Moderate') {
+          return '<img src="/local/dashboard/images/aqi/moderate.png" alt="AQI Moderate" />'
+        }
+        if (variables.aqi_status === 'Poor') {
+          return '<img src="/local/dashboard/images/aqi/unhealthy.png" alt="AQI Unhealthy" />'
+        }
+        return '<img src="/local/dashboard/images/aqi/hazardous.png" alt="AQI Hazardous" />'
+      ]]]
+    unit: >
+      [[[
+        return variables.unit;
+      ]]]
+    
