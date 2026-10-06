@@ -1,0 +1,36 @@
+# Home Assistant runtime / private data
+secrets.yaml
+.storage/
+.cloud/
+.cache/
+.exports/
+.timeline/
+.vacuum/
+.vscode/
+.cleanup_trash_*/
+.HA_VERSION
+.ha_run.lock
+.jwt_secret
+*.db
+*.db-shm
+*.db-wal
+*.log
+*.log.*
+home-assistant.log.fault
+deps/
+tts/
+image/
+zigbee2mqtt/
+dashboard_backups/
+
+# Managed by HACS / integrations (reinstall instead of versioning)
+custom_components/
+www/community/
+www/bubble/
+www/bubble-card.js
+blueprints/switch_manager/
+themes/catppuccin/
+themes/minimalist-*/
+
+# Binary assets not tracked here
+www/dashboard/images/

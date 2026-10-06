@@ -1,0 +1,36 @@
+turn_off_gaming_pc:
+  alias: Turn OFF SKULLPLUGGERY PC
+  sequence:
+  - service: hassio.addon_stdin
+    data:
+      addon: core_rpc_shutdown
+      input: SKULLPLUGGERY
+  mode: single
+  icon: mdi:youtube-gaming
+feed_cat:
+  alias: Feed Cats
+  sequence:
+  - parallel:
+    - metadata: {}
+      data:
+        value: '3'
+      action: number.set_value
+      target:
+        device_id: d8217263bafa5edf460aa12efac4bc6c
+    - metadata: {}
+      data:
+        value: '3'
+      action: number.set_value
+      target:
+        device_id: bb135344ea128abadf5ae2412e4c7612
+  mode: single
+  icon: mdi:cat
+turn_off_mosou_pc:
+  alias: Turn OFF MOSOU PC
+  sequence:
+  - service: hassio.addon_stdin
+    data:
+      addon: core_rpc_shutdown
+      input: MOSOU
+  mode: single
+  icon: mdi:youtube-gaming

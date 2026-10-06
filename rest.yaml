@@ -1,0 +1,32 @@
+- resource: !secret speedtest_url
+  headers:
+    Authorization: !secret speedtest_token
+  scan_interval: 1800
+  sensor:
+    - name: 'Speedtest - Ping'
+      unit_of_measurement: 'ms'
+      device_class: 'speed'
+      value_template: '{{ value_json.data.ping | round(0) }}'
+    - name: 'Speedtest - Download'
+      unit_of_measurement: 'Mbps'
+      device_class: 'data_rate'
+      value_template: '{{ value_json.data.download | round(2) }}'
+    - name: 'Speedtest - Upload'
+      unit_of_measurement: 'Mbps'
+      device_class: 'data_rate'
+      value_template: '{{ value_json.data.upload | round(2) }}'
+
+- resource: !secret upsnap_device_url
+  headers:
+    Authorization: !secret upsnap_token
+  scan_interval: 30
+  sensor:
+    - name: 'SKULLPLUGGERY PC - Status'
+      value_template: '{{ value_json.status }}'
+    - name: 'SKULLPLUGGERY PC - IP'
+      value_template: '{{ value_json.ip }}'
+    - name: 'SKULLPLUGGERY PC - MAC'
+      value_template: '{{ value_json.mac }}'
+    - name: 'SKULLPLUGGERY PC - Last Updated'
+      value_template: '{{ value_json.updated }}'
+      device_class: 'timestamp'

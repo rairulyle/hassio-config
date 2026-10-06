@@ -1,0 +1,4 @@
+# Climate platforms configured in YAML.
+# Aircons are MQTT entities defined in mqtt.yaml (see dashboards/README.md).
+# The old SmartIR/ZHA entry was removed (ZHA replaced by Zigbee2MQTT).
+[]

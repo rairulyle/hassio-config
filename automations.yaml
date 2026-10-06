@@ -1,0 +1,187 @@
+- id: '1677318411784'
+  alias: Feed Cats on a Schedule Basis
+  description: ''
+  triggers:
+  - at: 08:00:00
+    enabled: false
+    trigger: time
+  - at: 00:00:00
+    enabled: false
+    trigger: time
+  - at: '15:00:00'
+    enabled: false
+    trigger: time
+  - at: '12:00:00'
+    enabled: true
+    trigger: time
+  conditions: []
+  actions:
+  - data: {}
+    action: script.feed_cat
+  mode: single
+- id: '1703788077286'
+  alias: 'Notify: Check and lock Doors and Windows'
+  description: ''
+  triggers:
+  - at: 00:00:00
+    trigger: time
+    enabled: true
+  conditions: []
+  actions:
+  - action: conversation.process
+    metadata: {}
+    data:
+      text: You are an advanced smart home assistant named Fairy from Zenless Zone
+        Zero. Your response will be spoken out loud (so no emojis) and should be funny
+        and creative. If possible, include some Japanglish. When an English word closely
+        resembles its Katakana equivalent, use that word (e.g., Master = Masutā).
+        You may include Romaji as long as it is a common Japanese word (e.g., neko,
+        hayaku, etc...). Your task is to create a message reminding us to lock the
+        doors and windows. Say Oyasumi at the end of the sentence. At the moment,
+        I don't have any smart lock devices, so keep the message focused on reminding
+        us manually. You speak English in a Japanese accent so keep that in mind while
+        making a response. Keep it 2 sentences long. Call me master. Don't use word
+        "ne?"
+      agent_id: conversation.chatgpt
+    response_variable: agent
+  - data:
+      message: "\U0001F3E1 {{ agent.response.speech.plain.speech }} <@&DISCORD_ROLE_ID>"
+      target:
+      - 'DISCORD_CHANNEL_ID'
+    action: notify.home_assistant
+  - data:
+      cache: true
+      entity_id: media_player.google_home_mini
+      message: '{{ agent.response.speech.plain.speech }}'
+      language: ja
+    action: tts.google_translate_say
+  mode: single
+- id: '1730897112322'
+  alias: Auto Theme Switch
+  description: ''
+  triggers:
+  - trigger: homeassistant
+    event: start
+  conditions: []
+  actions:
+  - action: frontend.set_theme
+    metadata: {}
+    data:
+      mode: dark
+      name: Catppuccin Auto Latte Mocha
+  mode: single
+- id: '1732557076878'
+  alias: 'Notify: Feed Xiao and Lumine'
+  description: ''
+  triggers:
+  - at: '22:30:00'
+    trigger: time
+    enabled: true
+  conditions: []
+  actions:
+  - action: conversation.process
+    metadata: {}
+    data:
+      text: You are an advanced smart home assistant named Fairy from Zenless Zone
+        Zero. Your response will be spoken out loud (so no emojis) and should be funny
+        and creative. If possible, include some Japanglish. When an English word closely
+        resembles its Katakana equivalent, use that word (e.g., Master = Masutā).
+        You may include Romaji as long as it is a common Japanese word (e.g., neko,
+        hayaku, etc...). Your task is to create a message reminding us to feed Xiao
+        and Lumine (mention their names). You speak English in a Japanese accent,
+        so keep that in mind while crafting the response. Keep it 2 sentences long.
+        Call me Master. Do not use the word "ne?"
+    response_variable: agent
+    enabled: false
+  - data:
+      message: "\U0001F63B {{ agent.response.speech.plain.speech }} <@&DISCORD_ROLE_ID>"
+      target:
+      - 'DISCORD_CHANNEL_ID'
+    action: notify.home_assistant
+    enabled: false
+  - action: tts.google_translate_say
+    data:
+      cache: true
+      message: '{{ agent.response.speech.plain.speech }}'
+      language: ja
+      entity_id: media_player.google_home_mini
+    enabled: false
+  - action: tts.google_translate_say
+    data:
+      cache: true
+      message: Attention, Master! Don't forget to feed Xiao and Lumine, or they'll
+        turn into hungry little oni, moaning like they want snacku!
+      language: ja
+      entity_id: media_player.google_home_mini
+  mode: single
+- id: '1732558528812'
+  alias: 'Notify: Greetings!'
+  description: ''
+  triggers:
+  - at: 07:30:00
+    trigger: time
+    enabled: true
+  - at: '15:00:00'
+    trigger: time
+    enabled: true
+  - at: '20:00:00'
+    trigger: time
+    enabled: true
+  conditions: []
+  actions:
+  - action: conversation.process
+    metadata: {}
+    data:
+      text: "Time {{ now() }}\nOutside Weather  \nTemperature is {{ states('sensor.openweathermap_temperature')
+        }} {{ state_attr('sensor.openweathermap_temperature', 'unit_of_measurement')
+        }}\nCurrent Condition is {{ states('sensor.openweathermap_condition') }} \nWind
+        Speed is {{ states('sensor.openweathermap_wind_speed') }} {{ state_attr('sensor.openweathermap_wind_speed',
+        'unit_of_measurement') }}\n\nYou are an advanced smart home assistant named
+        Fairy from Zenless Zone Zero. Your response will be spoken out loud (so no
+        emojis) and should be funny and creative. If possible, include some Japanglish.
+        When an English word closely resembles its Katakana equivalent, use that word
+        (e.g., Master = Masutā). You may include Romaji as long as it is a common
+        Japanese word (e.g., neko, hayaku, etc...). Your task is to create a message
+        to greet us (Ohayou Gozaimus, Konnichiwa, Konbanwa. Depending on the time)
+        and provide how the weather outside feels. You speak English in a Japanese
+        accent, so keep that in mind while crafting the response. Keep it 2 sentences
+        long. Call me Master. Do not use the word \"ne?\"\n\nOutput in a json format.
+        {\n \"1\",\n \"2\"\n}\n\"1\" format uses the actual unit of measurement (e.g.,
+        degree celcius = °C, kilometer per hour = km/h) and numbers instead of English
+        word numbers. Example is 24 °C, 14.80 km/h.\n\"2\" format uses English word
+        for the numbers and unit of measurement (e.g., °C = degree celcius, km/h =
+        kilometer per hour). Example is twenty-eight point fifty-five degrees Celsius,
+        seventy-eight kilometers per hour.\nMake sure that they are the same response,
+        but with different format. Do not change the other word that I did not include
+        in the format."
+      agent_id: conversation.chatgpt
+    response_variable: agent
+    enabled: false
+  - action: conversation.process
+    metadata: {}
+    data:
+      text: "Time {{ now() }}\nOutside Weather  \nTemperature is {{ states('sensor.openweathermap_temperature')
+        }} {{ state_attr('sensor.openweathermap_temperature', 'unit_of_measurement')
+        }}\nCurrent Condition is {{ states('sensor.openweathermap_condition') }} \nWind
+        Speed is {{ states('sensor.openweathermap_wind_speed') }} {{ state_attr('sensor.openweathermap_wind_speed',
+        'unit_of_measurement') }}\n\nYou are an advanced smart home assistant. Your
+        response will be spoken out loud (so no emojis) and should be funny and creative.
+        Your task is to create a message to greet us (Good Morning, Good Afternoon,
+        Good Evening (Depending on the time). Provide how the weather outside feels.
+        Keep it 2 sentences long. Call me Master.\n\nUse the actual unit of measurement
+        (e.g., degree celcius = °C, kilometer per hour = km/h) and numbers instead
+        of English word numbers. Example is 24 °C, 14.80 km/h."
+      agent_id: conversation.chatgpt
+    response_variable: agent
+  - data:
+      message: "\U0001F3E1 {{ agent.response.speech.plain.speech }} <@&DISCORD_ROLE_ID>"
+      target:
+      - 'DISCORD_CHANNEL_ID'
+    action: notify.home_assistant
+  - action: tts.google_translate_say
+    data:
+      cache: true
+      message: '{{ agent.response.speech.plain.speech }}'
+      entity_id: media_player.google_home_mini
+      language: en-gb
+  mode: single
