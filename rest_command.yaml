@@ -1,4 +1,4 @@
-wake_skullpluggery_pc:
+wake_desktop1_pc:
   url: !secret upsnap_wake_url
   method: GET
   headers:

@@ -52,7 +52,7 @@ cards:
   #
   - type: custom:button-card
     template: section_title
-    name: Xiao & Lumine
+    name: Cat1 & Cat2
   - type: grid
     columns: 2
     square: false
@@ -178,7 +178,7 @@ cards:
             card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
             secondary_info: last-changed
             state_color: true
-          - entity: automation.notify_feed_xiao_and_lumine
+          - entity: automation.notify_feed_cat1_and_cat2
             name: Feeding Reminders
             icon: app:app-notification
             card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml

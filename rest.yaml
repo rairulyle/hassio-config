@@ -21,12 +21,12 @@
     Authorization: !secret upsnap_token
   scan_interval: 30
   sensor:
-    - name: 'SKULLPLUGGERY PC - Status'
+    - name: 'DESKTOP1 PC - Status'
       value_template: '{{ value_json.status }}'
-    - name: 'SKULLPLUGGERY PC - IP'
+    - name: 'DESKTOP1 PC - IP'
       value_template: '{{ value_json.ip }}'
-    - name: 'SKULLPLUGGERY PC - MAC'
+    - name: 'DESKTOP1 PC - MAC'
       value_template: '{{ value_json.mac }}'
-    - name: 'SKULLPLUGGERY PC - Last Updated'
+    - name: 'DESKTOP1 PC - Last Updated'
       value_template: '{{ value_json.updated }}'
       device_class: 'timestamp'

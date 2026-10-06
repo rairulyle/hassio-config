@@ -1,17 +1,17 @@
 - platform: wake_on_lan
-  name: SKULLPLUGGERY PC Wake on LAN
-  host: !secret skullpluggery_pc_ip
-  mac: !secret skullpluggery_pc_mac
+  name: DESKTOP1 PC Wake on LAN
+  host: !secret desktop1_pc_ip
+  mac: !secret desktop1_pc_mac
   broadcast_address: !secret lan_broadcast
   turn_off:
     service: script.turn_on
-    entity_id: script.turn_off_skullpluggery_pc
+    entity_id: script.turn_off_desktop1_pc
 
 - platform: wake_on_lan
-  name: MOSOU PC Wake on LAN
-  host: !secret mosou_pc_ip
-  mac: !secret mosou_pc_mac
+  name: DESKTOP2 PC Wake on LAN
+  host: !secret desktop2_pc_ip
+  mac: !secret desktop2_pc_mac
   broadcast_address: !secret lan_broadcast
   turn_off:
     service: script.turn_on
-    entity_id: script.turn_off_mosou_pc
+    entity_id: script.turn_off_desktop2_pc

@@ -1,10 +1,10 @@
 turn_off_gaming_pc:
-  alias: Turn OFF SKULLPLUGGERY PC
+  alias: Turn OFF DESKTOP1 PC
   sequence:
   - service: hassio.addon_stdin
     data:
       addon: core_rpc_shutdown
-      input: SKULLPLUGGERY
+      input: DESKTOP1
   mode: single
   icon: mdi:youtube-gaming
 feed_cat:
@@ -25,12 +25,12 @@ feed_cat:
         device_id: bb135344ea128abadf5ae2412e4c7612
   mode: single
   icon: mdi:cat
-turn_off_mosou_pc:
-  alias: Turn OFF MOSOU PC
+turn_off_desktop2_pc:
+  alias: Turn OFF DESKTOP2 PC
   sequence:
   - service: hassio.addon_stdin
     data:
       addon: core_rpc_shutdown
-      input: MOSOU
+      input: DESKTOP2
   mode: single
   icon: mdi:youtube-gaming

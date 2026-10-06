@@ -42,13 +42,13 @@
     - type: entities
       card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
       entities:
-        - entity: switch.skullpluggery_pc
+        - entity: switch.desktop1_pc
           name: Gaming PC
           icon: mdi:youtube-gaming
           secondary_info: last-changed
           state_color: true
           card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
-        - entity: sensor.skullpluggery_pc_status
+        - entity: sensor.desktop1_pc_status
           name: Status
           icon: mdi:lan-connect
           card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
@@ -97,7 +97,7 @@
     - type: entities
       card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
       entities:
-        - entity: switch.mosou_pc_wake_on_lan
+        - entity: switch.desktop2_pc_wake_on_lan
           name: Gaming PC
           icon: mdi:youtube-gaming
           secondary_info: last-changed
