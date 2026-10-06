@@ -34,3 +34,6 @@ themes/minimalist-*/
 
 # Binary assets not tracked here
 www/dashboard/images/
+
+# Local AI tooling (project skills)
+.claude/
