@@ -1,5 +1,4 @@
 * text=auto eol=lf
 *.png binary
 *.jpg binary
-automations.yaml filter=discord
-dashboards/mobile/** filter=personal
+*.yaml filter=personal

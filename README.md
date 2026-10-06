@@ -39,8 +39,10 @@ navbar-card, mini-graph-card, card-mod, Bubble Card, upcoming-media-card.
 | `rest.yaml`, `rest_command.yaml`, `switch.yaml` | Speedtest sensors, UpSnap wake-on-LAN, PC switches |
 | `xiaomi.yaml` | Xiaomi MIoT translations |
 
-Hosts, MAC addresses, URLs and tokens live in `secrets.yaml` (not committed). Discord ids in
-`automations.yaml` are replaced with placeholders in this repository.
+Hosts, MAC addresses, URLs and tokens live in `secrets.yaml` (not committed). Names of people,
+pets and PCs, phone trackers and Discord ids are replaced with generic placeholders
+(`person1`, `Cat1`, `DESKTOP1`, `DISCORD_CHANNEL_ID`, ...) by a git clean/smudge filter, so the
+files here differ from the live ones only in those identifiers.
 
 ## Credits
 
