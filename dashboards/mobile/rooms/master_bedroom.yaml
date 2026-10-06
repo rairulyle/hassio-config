@@ -1,0 +1,182 @@
+type: custom:vertical-layout
+title: Master Bedroom
+path: rooms-master-bedroom
+theme: Catppuccin Mocha Dashboard
+subview: true
+layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
+cards:
+  - type: custom:decluttering-card
+    template: room_page_top_toolbar
+    variables:
+      - name: Master Bedroom
+      - navigation_path: /lovelace/rooms
+      - settings_path: '#master_bedroom_settings'
+
+  #
+  # Chips
+  #
+  - type: custom:mod-card
+    style: !include /config/dashboards/templates/includes/card_mod/chips/page_chip_layout.yaml
+    card:
+      type: horizontal-stack
+      cards:
+        - type: custom:button-card
+          template: app_lights_chip
+          entity: light.master_bedroom_lights
+          variables:
+            lights:
+              - light.master_bedroom_main_left_light
+              - light.master_bedroom_main_center_light
+              - light.master_bedroom_main_right_light
+              - light.master_bedroom_window_light
+        - type: custom:button-card
+          template: app_ac_chip
+          entity: climate.master_bedroom_aircon
+        - type: custom:button-card
+          template: app_temperature_chip
+          entity: sensor.masterbedroom_aircon_ac_home
+
+  #
+  # Aircon
+  #
+  - type: custom:button-card
+    template: section_title
+    name: Aircon
+  - type: thermostat
+    entity: climate.master_bedroom_aircon
+    name: Aircon
+    features:
+      - type: climate-hvac-modes
+        style: icons
+        hvac_modes:
+          - cool
+          - dry
+          - fan_only
+          - heat_cool
+          - "off"
+      - type: climate-fan-modes
+        style: dropdown
+        fan_modes:
+          - auto
+          - Night
+          - low
+          - Low-Medium
+          - medium
+          - Medium-High
+          - high
+      - type: climate-swing-modes
+        style: dropdown
+        swing_modes:
+          - "off"
+          - vertical
+          - horizontal
+          - both
+          - Comfort
+
+  #
+  # Lights
+  #
+  - type: custom:button-card
+    template: section_title
+    name: Lights
+  - type: tile
+    entity: light.master_bedroom_main_lights
+    name: Main Lights
+    icon: mdi:ceiling-light-multiple
+    show_entity_picture: false
+    hide_state: false
+    features:
+      - type: light-brightness
+    features_position: inline
+    vertical: false
+  - type: tile
+    entity: light.master_bedroom_window_light
+    name: Window Light
+    icon: mdi:wall-sconce-flat
+    show_entity_picture: false
+    hide_state: false
+    features:
+      - type: light-brightness
+    features_position: inline
+    vertical: false
+
+  - type: grid
+    columns: 3
+    square: false
+    cards:
+      - type: tile
+        entity: light.master_bedroom_main_left_light
+        name: Left
+        icon: mdi:lightbulb
+        vertical: true
+        hide_state: true
+      - type: tile
+        entity: light.master_bedroom_main_center_light
+        name: Center
+        icon: mdi:lightbulb
+        vertical: true
+        hide_state: true
+      - type: tile
+        entity: light.master_bedroom_main_right_light
+        name: Right
+        icon: mdi:lightbulb
+        vertical: true
+        hide_state: true
+
+  #
+  # Devices
+  #
+  - type: custom:button-card
+    template: section_title
+    name: Devices
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: custom:button-card
+        entity: climate.master_bedroom_aircon
+        name: Aircon
+        template: app_ac_entity
+      - type: custom:button-card
+        entity: sensor.masterbedroom_aircon_outside
+        name: Outside
+        template: app_value_entity
+        icon: mdi:thermometer-lines
+
+  #
+  # Navbar
+  #
+  - !include /config/dashboards/templates/includes/navbar.yaml
+
+  #
+  # Settings popup
+  #
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#master_bedroom_settings'
+    close_by_clicking_outside: true
+    styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+    margin_top_mobile: calc(100vh - 760px)
+    margin_top_desktop: calc(100vh - 760px)
+    cards:
+      - type: custom:button-card
+        template: app_popup_page_title
+        name: Master Bedroom Settings
+      - type: custom:button-card
+        template: section_title
+        name: Aircon
+      - type: entities
+        card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
+        entities:
+          - entity: select.masterbedroom_aircon_demand_control
+            name: Demand Control
+            icon: mdi:speedometer
+            card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+          - entity: sensor.masterbedroom_aircon_lifetime_outside_energy
+            name: Lifetime Energy
+            icon: mdi:lightning-bolt
+            card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+          - entity: button.masterbedroom_aircon_restart
+            name: Restart Controller
+            icon: mdi:restart
+            card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml

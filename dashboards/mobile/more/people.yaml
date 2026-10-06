@@ -1,0 +1,118 @@
+type: custom:vertical-layout
+title: People
+path: people
+theme: Catppuccin Mocha Dashboard
+subview: true
+layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
+cards:
+  - type: custom:decluttering-card
+    template: top_toolbar
+    variables:
+      - cards:
+        - type: custom:button-card
+          template: app_header_chip_card
+          icon: mdi:arrow-left
+          tap_action:
+            action: navigate
+            navigation_path: /lovelace/home
+            haptic: light
+        - type: custom:button-card
+          template: app_header_page_title
+          name: People
+        - type: custom:button-card
+          template: empty_column
+
+  #
+  # Chips
+  #
+  - type: custom:mod-card
+    style: !include /config/dashboards/templates/includes/card_mod/chips/page_chip_layout.yaml
+    card:
+      type: horizontal-stack
+      cards:
+        - type: custom:button-card
+          template: app_chip_card
+          entity: person.person1
+          icon: mdi:home-account
+          state_display: >
+            [[[
+              const n = ['person.person1', 'person.person2'].filter(id => states[id] && states[id].state == 'home').length;
+              return n == 0 ? 'Nobody home' : (n == 1 ? '1 person home' : `${n} people home`);
+            ]]]
+          state:
+            - operator: template
+              value: "[[[ return ['person.person1','person.person2'].some(id => states[id] && states[id].state == 'home') ]]]"
+              color: var(--success-color)
+            - operator: default
+              color: var(--light-grey-color)
+
+  #
+  # People
+  #
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: custom:button-card
+        entity: person.person1
+        name: Person 1
+        template: app_device_entity
+        show_entity_picture: true
+        state_display: >
+          [[[
+            const b = states['sensor.person1_phone_battery_level'];
+            const loc = entity.state == 'home' ? 'Home' : (entity.state == 'not_home' ? 'Away' : entity.state);
+            return `${loc}${b ? ' · ' + b.state + '%' : ''}`;
+          ]]]
+        styles:
+          img_cell:
+            - border-radius: 50%
+            - overflow: hidden
+        tap_action:
+          action: navigate
+          navigation_path: '#person1'
+          haptic: light
+      - type: custom:button-card
+        entity: person.person2
+        name: Person 2
+        template: app_device_entity
+        show_entity_picture: true
+        state_display: >
+          [[[
+            const b = states['sensor.person2_phone_battery_level'];
+            const loc = entity.state == 'home' ? 'Home' : (entity.state == 'not_home' ? 'Away' : entity.state);
+            return `${loc}${b ? ' · ' + b.state + '%' : ''}`;
+          ]]]
+        styles:
+          img_cell:
+            - border-radius: 50%
+            - overflow: hidden
+        tap_action:
+          action: navigate
+          navigation_path: '#person2'
+          haptic: light
+
+  #
+  # Map
+  #
+  - type: custom:button-card
+    template: section_title
+    name: Map
+  - type: map
+    entities:
+      - device_tracker.person1_phone
+      - device_tracker.person2_phone
+    hours_to_show: 24
+    auto_fit: true
+    theme_mode: dark
+
+  #
+  # Navbar
+  #
+  - !include /config/dashboards/templates/includes/navbar.yaml
+
+  #
+  # Popups
+  #
+  - type: vertical-stack
+    cards: !include /config/dashboards/mobile/shared/person_popups.yaml

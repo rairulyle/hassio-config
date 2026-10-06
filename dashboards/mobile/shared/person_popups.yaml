@@ -1,0 +1,136 @@
+#
+# Person 1 popup
+#
+- type: custom:bubble-card
+  card_type: pop-up
+  hash: '#person1'
+  close_by_clicking_outside: true
+  styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+  margin_top_mobile: calc(100vh - 760px)
+  margin_top_desktop: calc(100vh - 760px)
+  cards:
+    - type: custom:button-card
+      template: app_popup_page_title
+      name: Person 1
+    - type: map
+      entities:
+        - device_tracker.person1_phone
+      hours_to_show: 24
+      default_zoom: 14
+      auto_fit: true
+      theme_mode: dark
+    - type: custom:button-card
+      template: section_title
+      name: Phone
+    - type: entities
+      card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
+      entities:
+        - entity: person.person1
+          name: Location
+          secondary_info: last-changed
+          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+        - entity: sensor.person1_phone_battery_level
+          name: Battery
+          secondary_info: last-changed
+          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+        - entity: sensor.person1_phone_battery_state
+          name: Charging
+          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+    - type: custom:button-card
+      template: section_title
+      name: Gaming PC
+    - type: entities
+      card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
+      entities:
+        - entity: switch.skullpluggery_pc
+          name: Gaming PC
+          icon: mdi:youtube-gaming
+          secondary_info: last-changed
+          state_color: true
+          card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
+        - entity: sensor.skullpluggery_pc_status
+          name: Status
+          icon: mdi:lan-connect
+          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+
+#
+# Person 2 popup
+#
+- type: custom:bubble-card
+  card_type: pop-up
+  hash: '#person2'
+  close_by_clicking_outside: true
+  styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+  margin_top_mobile: calc(100vh - 760px)
+  margin_top_desktop: calc(100vh - 760px)
+  cards:
+    - type: custom:button-card
+      template: app_popup_page_title
+      name: Person 2
+    - type: map
+      entities:
+        - device_tracker.person2_phone
+      hours_to_show: 24
+      default_zoom: 14
+      auto_fit: true
+      theme_mode: dark
+    - type: custom:button-card
+      template: section_title
+      name: Phone
+    - type: entities
+      card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
+      entities:
+        - entity: person.person2
+          name: Location
+          secondary_info: last-changed
+          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+        - entity: sensor.person2_phone_battery_level
+          name: Battery
+          secondary_info: last-changed
+          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+        - entity: sensor.person2_phone_battery_state
+          name: Charging
+          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+    - type: custom:button-card
+      template: section_title
+      name: Gaming PC
+    - type: entities
+      card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
+      entities:
+        - entity: switch.mosou_pc_wake_on_lan
+          name: Gaming PC
+          icon: mdi:youtube-gaming
+          secondary_info: last-changed
+          state_color: true
+          card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
+
+#
+# Upcoming TV popup
+#
+- type: custom:bubble-card
+  card_type: pop-up
+  hash: '#upcoming_tv'
+  close_by_clicking_outside: true
+  styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+  margin_top_mobile: calc(100vh - 760px)
+  margin_top_desktop: calc(100vh - 760px)
+  cards:
+    - type: custom:button-card
+      template: app_popup_page_title
+      name: Upcoming TV
+    - type: custom:upcoming-media-card
+      entity: sensor.sonarr_upcoming_media
+      image_style: fanart
+      all_shadows: false
+      hide_flagged: true
+      card_mod:
+        style: |
+          .sona_fanart {
+            background-position: center!important;
+            background-size: cover!important;
+            border-radius: 8px;
+          }
+          .sona_fan_fanart {
+            background: linear-gradient(to right, hsl(0deg 0% 0% / 50%) 48%, transparent 70%, #000 100%)!important;
+            box-shadow: none!important;
+          }

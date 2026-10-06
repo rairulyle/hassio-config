@@ -1,0 +1,267 @@
+type: custom:vertical-layout
+title: Rooms
+path: rooms
+theme: Catppuccin Mocha Dashboard
+subview: true
+layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
+cards:
+  #
+  # Page Header
+  #
+  - type: custom:decluttering-card
+    template: top_toolbar
+    variables:
+      - cards:
+        - type: custom:button-card
+          template: empty_column
+        - type: custom:button-card
+          template: app_header_page_title
+          name: Rooms
+        - type: custom:button-card
+          template: empty_column
+
+  #
+  # Overview chips
+  #
+  - type: custom:mod-card
+    style: !include /config/dashboards/templates/includes/card_mod/chips/page_chip_layout.yaml
+    card:
+      type: horizontal-stack
+      cards:
+        - type: custom:button-card
+          template: app_lights_chip
+          entity: light.all_lights
+          variables:
+            lights:
+              - light.master_bedroom_main_left_light
+              - light.master_bedroom_main_center_light
+              - light.master_bedroom_main_right_light
+              - light.master_bedroom_window_light
+              - light.bedroom_door_light
+              - light.bedroom_window_light
+              - light.bedroom_cabinet_left_light
+              - light.bedroom_cabinet_right_light
+              - light.master_bathroom_shower_light
+              - light.master_bathroom_door_light
+        - type: custom:button-card
+          template: app_ac_chip
+          entity: climate.master_bedroom_aircon
+        - type: custom:button-card
+          template: app_temperature_chip
+          entity: sensor.zhimi_vb4_00ae_temperature
+
+  #
+  # Living Room
+  #
+  - type: custom:decluttering-card
+    template: room_card
+    variables:
+      - room_name: Living Room
+      - entity: fan.zhimi_vb4_00ae_air_purifier
+      - icon: app:app-chair
+      - navigation_path: /lovelace/rooms-living-room
+      - temperature: "[[[ return states['sensor.zhimi_vb4_00ae_temperature'].state ]]]"
+      - humidity: "[[[ return states['sensor.zhimi_vb4_00ae_relative_humidity'].state ]]]"
+      - status: "[[[ const fan = states['fan.dmaker_p33_c4d3_fan'].state == 'on'; const pur = states['fan.zhimi_vb4_00ae_air_purifier'].state == 'on'; const air = states['sensor.zhimi_vb4_00ae_air_quality'].state; return `Air ${air}${pur ? ' · Purifier on' : ''}${fan ? ' · Fan on' : ''}`; ]]]"
+      - chips:
+        - type: custom:button-card
+          template: app_device_chip
+          entity: fan.dmaker_p33_c4d3_fan
+          icon: mdi:fan
+        - type: custom:button-card
+          template: app_device_chip
+          entity: fan.zhimi_vb4_00ae_air_purifier
+          icon: mdi:air-purifier
+      - room_devices:
+        - type: custom:button-card
+          entity: fan.dmaker_p33_c4d3_fan
+          name: Fan
+          template: app_room_card_device
+          icon: mdi:fan
+          tap_action:
+            action: toggle
+            haptic: light
+          hold_action:
+            action: more-info
+        - type: custom:button-card
+          entity: fan.zhimi_vb4_00ae_air_purifier
+          name: Purifier
+          template: app_room_card_device
+          icon: mdi:air-purifier
+          tap_action:
+            action: toggle
+            haptic: light
+          hold_action:
+            action: more-info
+        - type: custom:button-card
+          entity: media_player.living_room_tv_2
+          name: TV
+          template: app_room_card_device
+          icon: app:app-device-tv
+        - type: custom:button-card
+          entity: media_player.google_home_mini
+          name: Speaker
+          template: app_room_card_device
+          icon: app:app-device-speaker
+
+  #
+  # Master Bedroom
+  #
+  - type: custom:decluttering-card
+    template: room_card
+    variables:
+      - room_name: Master Bedroom
+      - entity: light.master_bedroom_lights
+      - icon: app:app-bed-king
+      - navigation_path: /lovelace/rooms-master-bedroom
+      - temperature: "[[[ return states['sensor.masterbedroom_aircon_ac_home'].state ]]]"
+      - status: "[[[ const ids = ['light.master_bedroom_main_left_light','light.master_bedroom_main_center_light','light.master_bedroom_main_right_light','light.master_bedroom_window_light']; const n = ids.filter(id => states[id] && states[id].state == 'on').length; const ac = states['climate.master_bedroom_aircon'].state; return `${n > 0 ? n + ' lights on' : 'Lights off'} · AC ${ac.replace('_', ' ')}`; ]]]"
+      - chips:
+        - type: custom:button-card
+          template: app_lights_chip
+          entity: light.master_bedroom_lights
+          variables:
+            lights:
+              - light.master_bedroom_main_left_light
+              - light.master_bedroom_main_center_light
+              - light.master_bedroom_main_right_light
+              - light.master_bedroom_window_light
+        - type: custom:button-card
+          template: app_ac_chip
+          entity: climate.master_bedroom_aircon
+      - room_devices:
+        - type: custom:button-card
+          entity: light.master_bedroom_main_lights
+          name: Lights
+          template: app_room_card_device
+          icon: app:app-device-lights
+          tap_action:
+            action: toggle
+            haptic: light
+          hold_action:
+            action: more-info
+        - type: custom:button-card
+          entity: light.master_bedroom_window_light
+          name: Window
+          template: app_room_card_device
+          icon: app:app-lamp
+          tap_action:
+            action: toggle
+            haptic: light
+          hold_action:
+            action: more-info
+        - type: custom:button-card
+          entity: climate.master_bedroom_aircon
+          name: Aircon
+          template: app_room_card_device
+          icon: mdi:air-conditioner
+          state_display: >
+            [[[ return entity.state == 'off' ? 'Off' : entity.state.replace('_', ' '); ]]]
+
+  #
+  # Bedroom
+  #
+  - type: custom:decluttering-card
+    template: room_card
+    variables:
+      - room_name: Bedroom
+      - entity: light.bedroom_all_lights
+      - icon: app:app-bed-single
+      - navigation_path: /lovelace/rooms-bedroom
+      - status: "[[[ const ids = ['light.bedroom_door_light','light.bedroom_window_light','light.bedroom_cabinet_left_light','light.bedroom_cabinet_right_light']; const n = ids.filter(id => states[id] && states[id].state == 'on').length; const fan = states['fan.dmaker_p15_03db_fan'].state == 'on'; return `${n > 0 ? n + ' lights on' : 'Lights off'}${fan ? ' · Fan on' : ''}`; ]]]"
+      - chips:
+        - type: custom:button-card
+          template: app_lights_chip
+          entity: light.bedroom_all_lights
+          variables:
+            lights:
+              - light.bedroom_door_light
+              - light.bedroom_window_light
+              - light.bedroom_cabinet_left_light
+              - light.bedroom_cabinet_right_light
+        - type: custom:button-card
+          template: app_device_chip
+          entity: fan.dmaker_p15_03db_fan
+          icon: mdi:fan
+      - room_devices:
+        - type: custom:button-card
+          entity: light.bedroom_main_lights
+          name: Lights
+          template: app_room_card_device
+          icon: app:app-device-lights
+          tap_action:
+            action: toggle
+            haptic: light
+          hold_action:
+            action: more-info
+        - type: custom:button-card
+          entity: light.bedroom_cabinet_lights
+          name: Cabinet
+          template: app_room_card_device
+          icon: app:app-lamp
+          tap_action:
+            action: toggle
+            haptic: light
+          hold_action:
+            action: more-info
+        - type: custom:button-card
+          entity: fan.dmaker_p15_03db_fan
+          name: Fan
+          template: app_room_card_device
+          icon: mdi:fan
+          tap_action:
+            action: toggle
+            haptic: light
+          hold_action:
+            action: more-info
+        - type: custom:button-card
+          entity: media_player.bedroom_tv
+          name: TV
+          template: app_room_card_device
+          icon: app:app-device-tv
+
+  #
+  # Master Bathroom
+  #
+  - type: custom:decluttering-card
+    template: room_card
+    variables:
+      - room_name: Master Bathroom
+      - entity: light.master_bathroom_lights
+      - icon: mdi:shower-head
+      - navigation_path: /lovelace/rooms-master-bathroom
+      - status: "[[[ const ids = ['light.master_bathroom_shower_light','light.master_bathroom_door_light']; const n = ids.filter(id => states[id] && states[id].state == 'on').length; return n > 0 ? `${n} lights on` : 'Lights off'; ]]]"
+      - chips:
+        - type: custom:button-card
+          template: app_lights_chip
+          entity: light.master_bathroom_lights
+          variables:
+            lights:
+              - light.master_bathroom_shower_light
+              - light.master_bathroom_door_light
+      - room_devices:
+        - type: custom:button-card
+          entity: light.master_bathroom_shower_light
+          name: Shower
+          template: app_room_card_device
+          icon: mdi:shower
+          tap_action:
+            action: toggle
+            haptic: light
+          hold_action:
+            action: more-info
+        - type: custom:button-card
+          entity: light.master_bathroom_door_light
+          name: Door
+          template: app_room_card_device
+          icon: mdi:door
+          tap_action:
+            action: toggle
+            haptic: light
+          hold_action:
+            action: more-info
+
+  #
+  # Navbar
+  #
+  - !include /config/dashboards/templates/includes/navbar.yaml

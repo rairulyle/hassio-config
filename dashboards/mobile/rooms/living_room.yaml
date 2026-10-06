@@ -1,0 +1,237 @@
+type: custom:vertical-layout
+title: Living Room
+path: rooms-living-room
+theme: Catppuccin Mocha Dashboard
+subview: true
+layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
+cards:
+  - type: custom:decluttering-card
+    template: room_page_top_toolbar
+    variables:
+      - name: Living Room
+      - navigation_path: /lovelace/rooms
+      - settings_path: '#living_room_settings'
+
+  #
+  # Chips
+  #
+  - type: custom:mod-card
+    style: !include /config/dashboards/templates/includes/card_mod/chips/page_chip_layout.yaml
+    card:
+      type: horizontal-stack
+      cards:
+        - type: custom:button-card
+          template: app_device_chip
+          entity: fan.dmaker_p33_c4d3_fan
+          icon: mdi:fan
+        - type: custom:button-card
+          template: app_device_chip
+          entity: fan.zhimi_vb4_00ae_air_purifier
+          icon: mdi:air-purifier
+        - type: custom:button-card
+          template: app_temperature_chip
+          entity: sensor.zhimi_vb4_00ae_temperature
+
+  #
+  # Climate
+  #
+  - type: custom:decluttering-card
+    template: climate_overview_simple
+    variables:
+      - title: Climate
+      - temperature_sensor: sensor.zhimi_vb4_00ae_temperature
+      - items:
+        - type: custom:button-card
+          entity: sensor.zhimi_vb4_00ae_relative_humidity
+          template: app_aqi_humidity_item
+        - type: custom:button-card
+          entity: sensor.zhimi_vb4_00ae_pm25_density
+          template: app_aqi_pm25_item
+        - type: custom:button-card
+          entity: sensor.zhimi_vb4_00ae_air_quality
+          template: app_aqi_text_item
+
+  #
+  # Devices
+  #
+  - type: custom:button-card
+    template: section_title
+    name: Devices
+
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: custom:button-card
+        entity: fan.dmaker_p33_c4d3_fan
+        name: Standing Fan
+        template: app_fan_entity
+        tap_action:
+          action: toggle
+          haptic: light
+        hold_action:
+          action: more-info
+      - type: custom:button-card
+        entity: fan.zhimi_vb4_00ae_air_purifier
+        name: Air Purifier
+        template: app_device_air_purifier_entity
+        tap_action:
+          action: toggle
+          haptic: light
+        hold_action:
+          action: more-info
+      - type: custom:button-card
+        entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
+        name: Pet Fountain 2
+        template: app_toggle_entity
+        icon: mdi:fountain
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: switch.mmgg_wi11_9352_pet_drinking_fountain
+            state_not: unavailable
+        card:
+          type: custom:button-card
+          entity: switch.mmgg_wi11_9352_pet_drinking_fountain
+          name: Pet Fountain 1
+          template: app_toggle_entity
+          icon: mdi:fountain
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: vacuum.ijai_v3_aaa0_robot_cleaner
+            state_not: unavailable
+        card:
+          type: custom:button-card
+          entity: vacuum.ijai_v3_aaa0_robot_cleaner
+          name: Robot Vacuum
+          template: app_device_entity
+          icon: mdi:robot-vacuum
+      - type: custom:button-card
+        entity: media_player.living_room_tv_2
+        name: TV
+        template: app_device_entity
+        icon: app:app-device-tv
+      - type: custom:button-card
+        entity: media_player.google_home_mini
+        name: Google Home Mini
+        template: app_device_entity
+        icon: app:app-device-speaker
+
+  #
+  # Fan controls
+  #
+  - type: custom:button-card
+    template: section_title
+    name: Fan
+  - type: tile
+    entity: fan.dmaker_p33_c4d3_fan
+    name: Standing Fan
+    icon: mdi:fan
+    features_position: inline
+    vertical: false
+    features:
+      - type: fan-speed
+  - type: entities
+    card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
+    entities:
+      - entity: switch.dmaker_p33_c4d3_horizontal_swing
+        name: Oscillation
+        icon: mdi:arrow-left-right
+        card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
+        secondary_info: last-changed
+        state_color: true
+      - entity: select.dmaker_p33_c4d3_horizontal_angle
+        name: Swing Angle
+        icon: mdi:angle-acute
+        card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+
+  #
+  # Media
+  #
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: media_player.living_room_tv_2
+        state_not: unavailable
+    card:
+      type: vertical-stack
+      cards:
+        - type: custom:button-card
+          template: section_title
+          name: Media
+        - type: media-control
+          entity: media_player.living_room_tv_2
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: media_player.google_home_mini
+        state_not: unavailable
+    card:
+      type: media-control
+      entity: media_player.google_home_mini
+
+  #
+  # Navbar
+  #
+  - !include /config/dashboards/templates/includes/navbar.yaml
+
+  #
+  # Settings popup
+  #
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#living_room_settings'
+    close_by_clicking_outside: true
+    styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+    margin_top_mobile: calc(100vh - 760px)
+    margin_top_desktop: calc(100vh - 760px)
+    cards:
+      - type: custom:button-card
+        template: app_popup_page_title
+        name: Living Room Settings
+      - type: custom:button-card
+        template: section_title
+        name: Air Purifier
+      - type: entities
+        card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
+        entities:
+          - entity: switch.zhimi_vb4_00ae_anion
+            name: Negative Ion
+            icon: mdi:atom-variant
+            card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
+            state_color: true
+          - entity: switch.zhimi_vb4_00ae_physical_control_locked
+            name: Child Lock
+            icon: mdi:lock-outline
+            card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
+            state_color: true
+          - entity: sensor.zhimi_vb4_00ae_filter_left_time
+            name: Filter Days Left
+            icon: mdi:air-filter
+            card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+          - entity: sensor.zhimi_vb4_00ae_filter_life_level
+            name: Filter Life
+            icon: mdi:air-filter
+            card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+      - type: custom:button-card
+        template: section_title
+        name: Standing Fan
+      - type: entities
+        card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
+        entities:
+          - entity: switch.dmaker_p33_c4d3_physical_control_locked
+            name: Child Lock
+            icon: mdi:lock-outline
+            card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
+            state_color: true
+          - entity: switch.dmaker_p33_c4d3_alarm
+            name: Beep
+            icon: mdi:volume-high
+            card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
+            state_color: true
+          - entity: light.dmaker_p33_c4d3_indicator_light
+            name: Indicator Light
+            icon: mdi:led-outline
+            card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
+            state_color: true
