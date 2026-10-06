@@ -1,0 +1,41 @@
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+frontend:
+  themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /hacsfiles/lovelace-card-mod/card-mod.js?hacstag=190927524421
+
+xiaomi_miot: !include xiaomi.yaml
+
+wake_on_lan:
+rest: !include rest.yaml
+rest_command: !include rest_command.yaml
+sensor: !include sensor.yaml
+switch: !include switch.yaml
+template: !include template.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+climate: !include climate.yaml
+light: !include light.yaml
+
+lovelace:
+  # Default dashboard (/lovelace) runs in UI/storage mode; HACS manages resources.
+  # The YAML files under dashboards/ stay the editable source and are exposed as a hidden
+  # dashboard. To publish YAML changes to the default dashboard: touch ui-lovelace.yaml,
+  # then copy the resolved config from /dashboard-source to /lovelace (see dashboards/README.md).
+  dashboards:
+    dashboard-source:
+      mode: yaml
+      filename: ui-lovelace.yaml
+      title: Dashboard Source
+      icon: mdi:file-code
+      show_in_sidebar: false
+      require_admin: true
+
+mqtt: !include mqtt.yaml

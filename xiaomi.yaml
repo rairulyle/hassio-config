@@ -1,0 +1,10 @@
+  language: en
+  translations:
+    # Global dictionary
+    '强劲': 'Turbo'
+    '标准': 'Standard'
+    '节能': 'Medium'
+    '关': 'Silent'
+    '低': 'Low'
+    '中': 'Medium'
+    '高': 'High'

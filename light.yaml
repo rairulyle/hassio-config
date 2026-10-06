@@ -1,0 +1,15 @@
+# Light groups (YAML). Reload with the group.reload action.
+- platform: group
+  name: All Lights
+  unique_id: all_lights
+  entities:
+    - light.master_bedroom_main_left_light
+    - light.master_bedroom_main_center_light
+    - light.master_bedroom_main_right_light
+    - light.master_bedroom_window_light
+    - light.bedroom_door_light
+    - light.bedroom_window_light
+    - light.bedroom_cabinet_left_light
+    - light.bedroom_cabinet_right_light
+    - light.master_bathroom_shower_light
+    - light.master_bathroom_door_light

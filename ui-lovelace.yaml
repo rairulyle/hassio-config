@@ -1,0 +1,17 @@
+# Default dashboard (/lovelace) - YAML mode. Views and templates live under dashboards/.
+# After editing any included file, run:  touch ui-lovelace.yaml
+title: Home
+button_card_templates: !include_dir_merge_named /config/dashboards/templates/button_cards
+decluttering_templates: !include_dir_merge_named /config/dashboards/templates/decluttering
+
+views:
+  - !include /config/dashboards/mobile/home/home.yaml
+  - !include /config/dashboards/mobile/rooms/rooms.yaml
+  - !include /config/dashboards/mobile/rooms/living_room.yaml
+  - !include /config/dashboards/mobile/rooms/master_bedroom.yaml
+  - !include /config/dashboards/mobile/rooms/bedroom.yaml
+  - !include /config/dashboards/mobile/rooms/master_bathroom.yaml
+  - !include /config/dashboards/mobile/climate/climate.yaml
+  - !include /config/dashboards/mobile/pets/pets.yaml
+  - !include /config/dashboards/mobile/more/people.yaml
+  - !include /config/dashboards/mobile/more/system.yaml

@@ -1,0 +1,5 @@
+wake_desktop1_pc:
+  url: !secret upsnap_wake_url
+  method: GET
+  headers:
+    Authorization: !secret upsnap_token
