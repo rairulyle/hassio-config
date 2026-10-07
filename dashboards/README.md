@@ -1,40 +1,32 @@
 # Dashboards
 
-The default dashboard (`/lovelace`, sidebar "Home") runs in **UI/storage mode**, so it is
-editable in the Home Assistant UI and HACS manages its resources.
+The default dashboard (`/lovelace`, sidebar "Home") runs in **YAML mode** and reads the files
+under this folder directly. HACS keeps managing the frontend resources.
 
-The YAML under this folder is the **source** it was built from:
+Layout:
 
 ```
 ui-lovelace.yaml            entry file (title, templates, view includes)
 dashboards/mobile/          views: home, rooms + room pages, climate, pets, more/people, more/system
 dashboards/templates/       button_cards/ (button-card templates), decluttering/ (decluttering templates),
                             includes/ (card_mod snippets, layouts, navbar)
-themes/catppuccin-dashboard/  "Catppuccin Mocha Dashboard" theme used by every view
+themes/catppuccin-dashboard/  "Catppuccin Auto Latte Mocha Dashboard" theme (light + dark modes) used by every view
 www/dashboard/              app_icons.js (icon set app:app-*) and fonts.js (Inter)
 ```
 
-The same YAML is also served as a hidden admin-only dashboard at `/dashboard-source`
-(defined in `configuration.yaml`), which is how Home Assistant resolves all the `!include`s.
+Home Assistant resolves all the `!include`s from `ui-lovelace.yaml`, the entry file named in
+`configuration.yaml`.
 
-## Publishing YAML changes to the default dashboard
+## Seeing YAML changes
+
+The default dashboard (`/lovelace`) runs in YAML mode and reads `ui-lovelace.yaml` directly.
 
 1. Edit the YAML files.
 2. `touch ui-lovelace.yaml` (Home Assistant only re-reads YAML dashboards when the entry file changes).
-3. Open `/dashboard-source` once to check it renders.
-4. Copy the resolved config to the default dashboard. From a browser console on the HA page:
+3. Refresh the page.
 
-```js
-const hass = document.querySelector('home-assistant').hass;
-const cfg = await hass.callWS({ type: 'lovelace/config', url_path: 'dashboard-source', force: true });
-await hass.callWS({ type: 'lovelace/config/save', url_path: null, config: cfg });
-location.reload();
-```
-
-Alternatively open `/dashboard-source`, use the raw configuration editor to copy the YAML,
-and paste it into the raw configuration editor of the default dashboard.
-
-Edits made directly in the UI on the default dashboard are **not** written back to these files.
+Frontend resources (HACS plugins and `www/dashboard/*.js`) are still managed by HACS in
+Settings > Dashboards > Resources; YAML mode applies to the dashboard only.
 
 ## Conventions
 
@@ -45,6 +37,17 @@ Edits made directly in the UI on the default dashboard are **not** written back 
 - In this repository the person and phone entity ids under `mobile/` are generic placeholders
   (`person.person1`, `device_tracker.person1_phone`, ...); a git clean/smudge filter maps them
   to the real ids on the Home Assistant host.
+
+## Tile and chip behaviour
+
+- Chip rows are plain `horizontal-stack`s styled with `card_mod` (flex, gap 10px, min-height 45px); `mod-card` wrappers paint seconds late, so avoid them for anything above the fold.
+- Every device tile obeys one rule: **tap acts** (toggle, or the entity's own dialog when a toggle would be
+  risky, e.g. all lights, the aircon, the door lock), **hold explains or navigates** (more-info or the page).
+- Chips navigate or open the entity dialog; they never toggle except the plain device chip.
+- State text is `<State> · <time> ago` with a middle dot everywhere; offline and unknown devices fade out.
+- Switches that can disable something important (feeding schedule, unlocking the door) ask for confirmation
+  or use the official card that asks for one.
+- `light.all_lights` (light.yaml) carries its members, so chips and tiles bound to it count bulbs without a list.
 
 ## Adding another Faikin (Daikin) aircon
 

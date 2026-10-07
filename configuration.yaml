@@ -25,17 +25,15 @@ climate: !include climate.yaml
 light: !include light.yaml
 
 lovelace:
-  # Default dashboard (/lovelace) runs in UI/storage mode; HACS manages resources.
-  # The YAML files under dashboards/ stay the editable source and are exposed as a hidden
-  # dashboard. To publish YAML changes to the default dashboard: touch ui-lovelace.yaml,
-  # then copy the resolved config from /dashboard-source to /lovelace (see dashboards/README.md).
+  # Default dashboard (/lovelace) reads the YAML directly: ui-lovelace.yaml and dashboards/.
+  # After editing any included file: touch ui-lovelace.yaml, then refresh the page.
+  # Frontend resources stay in storage mode so HACS keeps registering them itself.
   dashboards:
-    dashboard-source:
+    lovelace:
       mode: yaml
       filename: ui-lovelace.yaml
-      title: Dashboard Source
-      icon: mdi:file-code
-      show_in_sidebar: false
-      require_admin: true
+      title: Home
+      icon: mdi:view-dashboard
+      show_in_sidebar: true
 
 mqtt: !include mqtt.yaml
