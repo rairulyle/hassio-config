@@ -1,5 +1,0 @@
-style: |
-  :host {
-    --stack-card-gap: 0;
-    --vertical-stack-card-gap: 0;
-  }
