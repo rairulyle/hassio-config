@@ -15,3 +15,9 @@ views:
   - !include /config/dashboards/mobile/pets/pets.yaml
   - !include /config/dashboards/mobile/more/people.yaml
   - !include /config/dashboards/mobile/more/system.yaml
+
+# Swipe between views with a slide (hass-swipe-navigation); the navbar's taps get the card entry animation from the theme.
+swipe_nav:
+  animate: swipe
+  animate_duration: 250
+  wrap: false

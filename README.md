@@ -13,15 +13,15 @@ Hopefully it gives you some ideas for your own configuration.
 
 ## Dashboard
 
-The default dashboard runs in UI/storage mode but is generated from the YAML under
+The default dashboard runs in YAML mode straight from the files under
 [`dashboards/`](dashboards/). See [dashboards/README.md](dashboards/README.md) for the
-structure, the publish workflow and the conventions used.
+structure, how changes show up, and the conventions used.
 
 ```
 ui-lovelace.yaml              entry file (title, template includes, views)
 dashboards/mobile/            views: home, rooms + room pages, climate, pets, people, system
 dashboards/templates/         button_cards/, decluttering/, includes/ (card_mod, layouts, navbar)
-themes/catppuccin-dashboard/  "Catppuccin Mocha Dashboard" theme
+themes/catppuccin-dashboard/  "Catppuccin Auto Latte Mocha Dashboard" theme (light + dark modes)
 www/dashboard/                app_icons.js (custom icon set `app:`) and fonts.js (Inter)
 ```
 
