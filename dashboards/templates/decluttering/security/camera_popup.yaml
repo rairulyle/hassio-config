@@ -6,15 +6,15 @@ camera_popup:
     type: custom:bubble-card
     card_type: pop-up
     hash: '[[hash]]'
+    name: '[[name]]'
+    icon: mdi:cctv
+    show_header: true
     close_by_clicking_outside: true
     styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
-    margin_top_mobile: calc(100vh - 850px)
-    margin_top_desktop: calc(100vh - 850px)
+    margin_top_mobile: max(0px, calc(100vh - 850px))
+    margin_top_desktop: max(0px, calc(100vh - 850px))
 
     cards:
-      - type: custom:button-card
-        template: app_popup_page_title
-        name: '[[name]]'
       
       - type: horizontal-stack
         cards:            

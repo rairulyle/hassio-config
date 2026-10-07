@@ -3,16 +3,13 @@ light_popup:
     type: custom:bubble-card
     card_type: pop-up
     hash: '[[popup_hash]]'
+    name: '[[popup_title]]'
+    icon: mdi:lightbulb-group
+    show_header: true
     close_by_clicking_outside: false
     styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml 
 
     cards:
-      # 
-      # Light Popup Title
-      # 
-      - type: custom:button-card
-        template: app_popup_page_title
-        name: '[[popup_title]]'
 
       # 
       # Light More Info Card
@@ -25,9 +22,10 @@ light_popup:
       # 
       # Default Scene
       # 
-      - type: custom:button-card
+      - type: custom:decluttering-card
         template: section_title
-        name: Default
+        variables:
+          - title: Default
 
       # 
       # Default Scene Swipe Card
@@ -100,9 +98,10 @@ light_popup:
       # 
       # Cozy Scene
       # 
-      - type: custom:button-card
+      - type: custom:decluttering-card
         template: section_title
-        name: Cozy
+        variables:
+          - title: Cozy
 
       # 
       # Cozy Scene Swipe Card
@@ -143,9 +142,10 @@ light_popup:
       # 
       # Party Vibes Scene
       # 
-      - type: custom:button-card
+      - type: custom:decluttering-card
         template: section_title
-        name: Party Vibes
+        variables:
+          - title: Party Vibes
 
       # 
       # Party Vibes Scene Swipe Card
@@ -225,9 +225,10 @@ light_popup:
       # 
       # Serenity Scene
       # 
-      - type: custom:button-card
+      - type: custom:decluttering-card
         template: section_title
-        name: Serenity
+        variables:
+          - title: Serenity
 
       # 
       # Serenity Scene Swipe Card
@@ -284,9 +285,10 @@ light_popup:
       # 
       # Dreamy Scene
       # 
-      - type: custom:button-card
+      - type: custom:decluttering-card
         template: section_title
-        name: Dreamy
+        variables:
+          - title: Dreamy
 
       # 
       # Dreamy Scene Swipe Card
@@ -350,9 +352,10 @@ light_popup:
       # 
       # Sunrise Scene
       # 
-      - type: custom:button-card
+      - type: custom:decluttering-card
         template: section_title
-        name: Sunrise
+        variables:
+          - title: Sunrise
 
       # 
       # Sunrise Scene Swipe Card
@@ -425,9 +428,10 @@ light_popup:
       # 
       # Futuristic Scene
       # 
-      - type: custom:button-card
+      - type: custom:decluttering-card
         template: section_title
-        name: Futuristic
+        variables:
+          - title: Futuristic
 
       - type: custom:simple-swipe-card
         view_mode: carousel
@@ -488,9 +492,10 @@ light_popup:
       # 
       # Halloween Scene
       # 
-      - type: custom:button-card
+      - type: custom:decluttering-card
         template: section_title
-        name: Halloween
+        variables:
+          - title: Halloween
 
       # 
       # Halloween Scene Swipe Card
@@ -570,9 +575,10 @@ light_popup:
       # 
       # Winter Holidays Scene
       # 
-      - type: custom:button-card
+      - type: custom:decluttering-card
         template: section_title
-        name: Winter Holidays
+        variables:
+          - title: Winter Holidays
 
       # 
       # Winter Holidays Scene Swipe Card
