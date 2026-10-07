@@ -37,3 +37,8 @@ www/dashboard/images/
 
 # Local AI tooling (project skills)
 .claude/
+
+# Impeccable: local-only state
+.impeccable/config.local.json
+.impeccable/critique/
+.impeccable/hook.cache.json

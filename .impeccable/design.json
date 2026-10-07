@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T09:30:00Z",
+  "title": "Design System: Household Dashboard",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Mauve", "canonical": "light-dark(#8839ef, #cba6f7)", "tonalRamp": ["#2a1150", "#4a1e8f", "#6a2fc9", "#8839ef", "#a56ff4", "#be93f6", "#cba6f7", "#e6d3fb"] },
+      "light-on": { "role": "secondary", "displayName": "Light On (Catppuccin yellow)", "canonical": "light-dark(#df8e1d, #f9e2af)", "tonalRamp": ["#4a2e06", "#8a5610", "#b87417", "#df8e1d", "#e9ab4f", "#f1c57f", "#f9e2af", "#fcf0d7"] },
+      "cat-accent": { "role": "secondary", "displayName": "Cat Accent (goldenrod)", "canonical": "light-dark(#b8860b, #f9e2af)", "tonalRamp": ["#3d2c03", "#6e5006", "#946b09", "#b8860b", "#d4a52a", "#e6c15e", "#f3da95", "#faf0d2"] },
+      "idle": { "role": "neutral", "displayName": "Idle grey (Mushroom disabled)", "canonical": "light-dark(#7c7f93, #6f6f6f)", "tonalRamp": ["#2a2b33", "#45475a", "#5c5f77", "#7c7f93", "#9399b2", "#b0b4c6", "#ccd0da", "#e6e9ef"] },
+      "card": { "role": "neutral", "displayName": "Card (Catppuccin base)", "canonical": "light-dark(#eff1f5, #1e1e2e)", "tonalRamp": ["#11111b", "#181825", "#1e1e2e", "#313244", "#ccd0da", "#dce0e8", "#e6e9ef", "#eff1f5"] },
+      "page": { "role": "neutral", "displayName": "Page (Catppuccin mantle)", "canonical": "light-dark(#e6e9ef, #181825)", "tonalRamp": ["#11111b", "#181825", "#1e1e2e", "#313244", "#ccd0da", "#dce0e8", "#e6e9ef", "#eff1f5"] },
+      "text": { "role": "neutral", "displayName": "Text", "canonical": "light-dark(#4c4f69, #cdd6f4)", "tonalRamp": ["#4c4f69", "#5c5f77", "#6c6f85", "#7c7f93", "#9399b2", "#a6adc8", "#bac2de", "#cdd6f4"] },
+      "climate-cool": { "role": "tertiary", "displayName": "Cool", "canonical": "light-dark(#1e66f5, #89b4fa)" },
+      "climate-heat": { "role": "tertiary", "displayName": "Heat", "canonical": "light-dark(#d20f39, #f38ba8)" },
+      "climate-dry": { "role": "tertiary", "displayName": "Dry", "canonical": "light-dark(#0b78a8, #89dceb)" },
+      "climate-fan": { "role": "tertiary", "displayName": "Fan only", "canonical": "light-dark(#2b7a1d, #a6e3a1)" },
+      "climate-auto": { "role": "tertiary", "displayName": "Auto", "canonical": "light-dark(#179299, #94e2d5)" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Home greeting only." },
+      "headline": { "displayName": "Headline", "purpose": "Room names on the Rooms page." },
+      "title": { "displayName": "Title", "purpose": "Card, row, chip and tile names (Mushroom primary)." },
+      "body": { "displayName": "Body", "purpose": "The greeting's weather line." },
+      "label": { "displayName": "Label", "purpose": "States and secondary lines (Mushroom secondary)." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "view-swipe", "value": "slide 250ms (hass-swipe-navigation)", "purpose": "Only authored motion: sliding between views on swipe." }
+    ],
+    "breakpoints": [
+      { "name": "phone", "value": "430px" },
+      { "name": "navbar-desktop", "value": "768px" }
+    ],
+    "themeVariables": {
+      "ha-card-border-radius": "14px",
+      "bubble-border-radius": "var(--ha-card-border-radius)",
+      "bubble-sub-button-border-radius": "12px",
+      "bubble-icon-border-radius": "50%",
+      "bubble-icon-background-color": "color-mix(in srgb, currentColor 20%, transparent)",
+      "bubble-sub-button-background-color": "rgba(var(--rgb-primary-text-color), 0.05)",
+      "bubble-accent-color": "rgba(var(--rgb-primary-color), 0.2)",
+      "bubble-sub-button-light-background-color": "rgba(var(--rgb-primary-color), 0.2)",
+      "mush-rgb-state-entity": "mauve",
+      "mush-rgb-amber": "the light state colour",
+      "mush-rgb-grey / mush-rgb-disabled": "the idle grey",
+      "app-icon-shape-off-rgb": "the idle grey, as r, g, b"
+    }
+  },
+  "components": [
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Mushroom chip: icon plus short state, pill, no fill; the icon carries the colour.",
+      "html": "<span class=\"ds-chip\"><svg class=\"ds-chip-icon ds-on\" viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z\"/></svg>4 On ›</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 10px; border-radius: 18px; background: var(--card-background-color, #eff1f5); color: var(--primary-text-color, #4c4f69); font: 600 14px/1 Inter, system-ui, sans-serif; cursor: pointer; } .ds-chip-icon { width: 20px; height: 20px; color: #7c7f93; } .ds-chip-icon.ds-on { color: #df8e1d; } .ds-chip:hover { filter: brightness(0.97); } .ds-chip:focus-visible { outline: 2px solid #8839ef; outline-offset: 2px; }"
+    },
+    {
+      "name": "Status row",
+      "kind": "card",
+      "refersTo": "row-bubble",
+      "description": "Bubble button row: 42px icon disc at 20% of the icon colour, name over state, sub-buttons on the right.",
+      "html": "<div class=\"ds-row\"><span class=\"ds-disc ds-on\"><svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3l9-8z\"/></svg></span><span class=\"ds-row-text\"><span class=\"ds-row-name\">Inside</span><span class=\"ds-row-state\">27.6 °C</span></span><span class=\"ds-sub\">58%</span><span class=\"ds-sub ds-sub-on\">On</span></div>",
+      "css": ".ds-row { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; border-radius: 14px; background: var(--card-background-color, #eff1f5); color: var(--primary-text-color, #4c4f69); font-family: Inter, system-ui, sans-serif; } .ds-disc { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; color: #7c7f93; background: color-mix(in srgb, currentColor 20%, transparent); } .ds-disc.ds-on { color: #8839ef; } .ds-disc svg { width: 22px; height: 22px; } .ds-row-text { display: flex; flex-direction: column; flex: 1; } .ds-row-name { font-size: 14px; font-weight: 600; } .ds-row-state { font-size: 12px; color: #5c5f77; } .ds-sub { display: inline-flex; align-items: center; height: 36px; padding: 0 10px; border-radius: 12px; background: rgba(76, 79, 105, 0.05); font-size: 13px; font-weight: 600; } .ds-sub-on { background: rgba(136, 57, 239, 0.2); color: #8839ef; } .ds-sub:hover { filter: brightness(0.97); }"
+    },
+    {
+      "name": "Sub-button",
+      "kind": "button",
+      "refersTo": "sub-button",
+      "description": "Bubble sub-button / Mushroom control: 12px corners, text-at-5% idle, primary-at-20% when on with solid primary icon.",
+      "html": "<button class=\"ds-btn\">Off</button> <button class=\"ds-btn ds-btn-on\">On</button>",
+      "css": ".ds-btn { height: 36px; padding: 0 12px; border: 0; border-radius: 12px; background: rgba(76, 79, 105, 0.05); color: #4c4f69; font: 600 13px/1 Inter, system-ui, sans-serif; cursor: pointer; transition: background 150ms ease-out; } .ds-btn-on { background: rgba(136, 57, 239, 0.2); color: #8839ef; } .ds-btn:hover { background: rgba(76, 79, 105, 0.09); } .ds-btn-on:hover { background: rgba(136, 57, 239, 0.28); } .ds-btn:focus-visible { outline: 2px solid #8839ef; outline-offset: 2px; }"
+    },
+    {
+      "name": "Device tile",
+      "kind": "card",
+      "refersTo": "icon-disc",
+      "description": "Vertical Mushroom-style tile used in room cards: disc, name, state.",
+      "html": "<div class=\"ds-tile\"><span class=\"ds-tile-disc\"><svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M12 17a2 2 0 100-4 2 2 0 000 4zm0-15C9.8 2 8 4.2 8 6.5c0 1.3.6 2.4 1.5 3.2A5 5 0 0012 20a5 5 0 002.5-10.3c.9-.8 1.5-1.9 1.5-3.2C16 4.2 14.2 2 12 2z\"/></svg></span><span class=\"ds-tile-name\">Fan</span><span class=\"ds-tile-state\">Off</span></div>",
+      "css": ".ds-tile { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 8px; font-family: Inter, system-ui, sans-serif; color: #4c4f69; } .ds-tile-disc { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; color: #7c7f93; background: color-mix(in srgb, currentColor 20%, transparent); } .ds-tile-disc svg { width: 22px; height: 22px; } .ds-tile-name { font-size: 14px; font-weight: 600; } .ds-tile-state { font-size: 12px; color: #5c5f77; }"
+    },
+    {
+      "name": "Navigation bar",
+      "kind": "nav",
+      "refersTo": "nav-bar",
+      "description": "Floating navbar: card colour with blur, card radius, icon-only; the active icon is solid mauve with no fill.",
+      "html": "<nav class=\"ds-nav\"><span class=\"ds-nav-item ds-active\"><svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3l9-8z\"/></svg></span><span class=\"ds-nav-item\"><svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M4 4h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 10h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 16h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z\"/></svg></span><span class=\"ds-nav-item\"><svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M15 13V5a3 3 0 00-6 0v8a5 5 0 106 0zM12 4a1 1 0 011 1v3h-2V5a1 1 0 011-1z\"/></svg></span></nav>",
+      "css": ".ds-nav { display: inline-flex; gap: 8px; padding: 6px 8px; border-radius: 14px; background: rgba(239, 241, 245, 0.94); backdrop-filter: blur(12px); } .ds-nav-item { display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 52px; border-radius: 12px; color: #7c7f93; cursor: pointer; } .ds-nav-item svg { width: 26px; height: 26px; } .ds-nav-item.ds-active { color: #8839ef; background: transparent; } .ds-nav-item:hover { color: #4c4f69; }"
+    },
+    {
+      "name": "Section separator",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "Bubble separator used for every section title: label plus a faint rule.",
+      "html": "<div class=\"ds-sep\"><span>Devices</span><i></i></div>",
+      "css": ".ds-sep { display: flex; align-items: center; gap: 14px; padding: 18px 8px 6px; font: 600 17px/1 Inter, system-ui, sans-serif; color: #4c4f69; } .ds-sep i { flex: 1; height: 6px; border-radius: 3px; background: rgba(76, 79, 105, 0.08); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Control Panel",
+    "overview": "A phone dashboard for one household, read at a glance and worked with one thumb. It is an Operate surface: every view starts with a row of status chips, then the cards you act on. Nothing announces itself. State is carried by colour on an icon and a short line of text, and the only strong colour on a screen is the one that means something is on.\n\nThe visual language is borrowed, deliberately, from two stock card libraries. Bubble Card provides the status rows, sub-buttons, pop-ups and section separators; Mushroom provides climate, fan, light, entity, person, media and chip cards. Hand-built button-card templates survive only where no stock card fits, and they are styled to be indistinguishable from Mushroom. The theme is Catppuccin, Latte in light mode and Mocha in dark.",
+    "keyCharacteristics": [
+      "One font (Inter), one card colour, one page colour, one idle grey.",
+      "Icon discs and active fills are always the icon's own colour at 20%.",
+      "Chips first on every view; no page titles; sections named by Bubble separators.",
+      "Tap acts, hold opens the dialog, and status-only things open their dialog on tap.",
+      "Sentence case, middle-dot separators, short relative times."
+    ],
+    "rules": [
+      { "name": "The Twenty Percent Rule", "body": "A disc or active fill is never a new colour. It is the icon's colour at 20% opacity. Idle discs are the idle grey at 20%; idle sub-buttons are the text colour at 5%.", "section": "colors" },
+      { "name": "The Sensor Is Never On Rule", "body": "A sensor reading gets no fill behind its sub-button or chip. Fills mean a switchable thing is switched on.", "section": "colors" },
+      { "name": "The Three-to-One Rule", "body": "Every icon colour reaches 3:1 on the card background in both modes; the cat accent is the one recorded exception.", "section": "colors" },
+      { "name": "The Sentence Case Rule", "body": "Copy follows Home Assistant: \"Lunch tomorrow 12:00\", \"All off\", \"Schedule off\". Never title case for a state.", "section": "typography" },
+      { "name": "The Middle Dot Rule", "body": "Compound states join with \" · \". Episode details join with \" • \".", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Nothing casts a shadow. If a surface needs separation, change its tone, not its elevation.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do reach for Bubble Card or Mushroom first; add a button-card template only when no stock card can do the job.",
+      "Do start every view with the chip row and let the Home Assistant header be the title.",
+      "Do derive every disc and active fill from the icon colour at 20%, and keep sensors unfilled.",
+      "Do use the entity's default icon; override only when the icon encodes state (aircon mode, lock).",
+      "Do keep Devices sections to controls, grouped by type, and merge adjacent grids so columns fill.",
+      "Do give every control a tap and a hold: tap acts, hold opens the dialog; dangerous actions confirm first.",
+      "Do write states in sentence case with \" · \" between parts, and show \"—\" rather than NaN or 0.0 when a sensor is unavailable.",
+      "Do verify in the browser after a theme change, reload themes for theme edits, and touch ui-lovelace.yaml for dashboard edits."
+    ],
+    "donts": [
+      "Don't fill the active navbar item or show navbar labels; the navbar is the one exception to the control styling.",
+      "Don't paint a sub-button solid; the solid colour goes on the icon and text, the fill stays at 20%.",
+      "Don't use Bubble's horizontal-buttons-stack for inline rows; it is a fixed footer.",
+      "Don't add an entry animation to all cards via card-mod; it re-fires on every state update.",
+      "Don't repeat an entity on a page, put a page title above the chips, or put status rows in a Devices section.",
+      "Don't show more than one decimal on a temperature, or a unit on a chip when the degree sign will do.",
+      "Don't rely on colour alone for on/off where the icon is identical; add the state word."
+    ]
+  }
+}
