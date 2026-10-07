@@ -43,9 +43,6 @@ routes:
       - icon: mdi:server
         url: /lovelace/system
         label: System
-      - icon: mdi:youtube-tv
-        url: /lovelace/home#upcoming_tv
-        label: Upcoming TV
 
 haptic:
   url: true
@@ -53,17 +50,26 @@ haptic:
   hold_action: true
   double_tap_action: true
 mobile:
-  show_labels: true
+  show_labels: false
   show_popup_label_backgrounds: true
 styles: |
+  /* Floating bar styled like a Mushroom card: card colour, card radius, inset from the edges. */
   .navbar-card {
     border: none;
-    background: rgba(var(--catppuccin-crust-rgb), 0.92);
-    backdrop-filter: blur(4px);
-    width: 100%;
+    background: rgba(var(--rgb-card-background-color), 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--ha-card-border-radius, 14px);
+    width: calc(100% - 24px);
+    margin: 0 auto;
     max-width: 500px;
-    bottom: -1px;
-    padding-bottom: 40px;
+    bottom: calc(var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)) + 12px);
+    padding: 6px 8px;
+  }
+
+  /* Nav buttons are the one exception: no fill behind the active icon, no label; the mauve icon alone marks the view. */
+  .button {
+    border-radius: 12px;
   }
 
   .button.active {
@@ -71,13 +77,37 @@ styles: |
   }
 
   .icon {
-    fill: #AAAAAA !important;
+    fill: rgb(var(--app-icon-shape-off-rgb)) !important;
+    color: rgb(var(--app-icon-shape-off-rgb)) !important;
   }
 
   .icon.active {
-    fill: white !important;
+    fill: var(--primary-color) !important;
+    color: var(--primary-color) !important;
   }
+
+
 
   ha-ripple {
     display: none !important;
+  }
+
+  /* More menu: every item stretches to the widest one, and the pills match the cards. */
+  .navbar-popup.popuplabelbackground {
+    align-items: stretch;
+  }
+
+  .popup-item.popuplabelbackground {
+    width: auto;
+  }
+
+  .navbar-popup .popup-item .button {
+    background: var(--card-background-color);
+    border-radius: 14px;
+    box-shadow: none;
+  }
+
+  .navbar-popup .popup-item.active .button {
+    background: var(--card-background-color);
+    color: var(--primary-color);
   }

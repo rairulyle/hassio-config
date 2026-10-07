@@ -1,0 +1,6 @@
+# Section title: Bubble Card separator. variables: title
+section_title:
+  card:
+    type: custom:bubble-card
+    card_type: separator
+    name: '[[title]]'

@@ -8,3 +8,7 @@ style: |
   ha-card .header {
     padding-bottom: 2px;
   }
+  .graph__labels span,
+  .graph__labels--secondary span {
+    font-size: 12px !important;
+  }
