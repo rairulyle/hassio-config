@@ -1,9 +1,10 @@
 #
-# Room card overview row: icon, room name, status line, temperature on the right.
+# Room card overview row: icon, room name, temperature on the right (the chips above carry the status).
 # Extends app_room_card_overview but without occupancy sensors.
 #
 app_room_overview:
   template: app_room_card_overview
+  show_state: false
   variables:
     status: null
   state_display: >
@@ -13,9 +14,19 @@ app_room_overview:
       return entity.state == 'on' ? 'Lights on' : 'Lights off';
     ]]]
   styles:
+    img_cell:
+      - width: 42px
+      - height: 42px
+      - border-radius: 50%
+      - color: "[[[ return (entity && entity.state == 'on') ? 'var(--primary-color)' : 'rgb(var(--app-icon-shape-off-rgb))'; ]]]"
+      - background-color: color-mix(in srgb, currentColor 20%, transparent)
     icon:
-      - color: >
-          [[[
-            if (entity && entity.state == 'on') return 'var(--accent-color)';
-            return 'var(--light-grey-color)';
-          ]]]
+      - color: currentColor
+    # No status line under the name: centre the name (and the temperature when there is no humidity line).
+    name:
+      - grid-row: 1 / span 2
+      - align-self: center
+    custom_fields:
+      temperature:
+        - grid-row: "[[[ return (variables.humidity || variables.aqi) ? 'auto' : '1 / span 2'; ]]]"
+        - align-self: "[[[ return (variables.humidity || variables.aqi) ? 'end' : 'center'; ]]]"

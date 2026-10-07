@@ -1,54 +1,36 @@
 type: custom:vertical-layout
 title: Rooms
 path: rooms
-theme: Catppuccin Mocha Dashboard
+theme: Catppuccin Auto Latte Mocha Dashboard
 subview: true
 layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
 cards:
   #
-  # Page Header
-  #
-  - type: custom:decluttering-card
-    template: top_toolbar
-    variables:
-      - cards:
-        - type: custom:button-card
-          template: empty_column
-        - type: custom:button-card
-          template: app_header_page_title
-          name: Rooms
-        - type: custom:button-card
-          template: empty_column
-
-  #
   # Overview chips
   #
-  - type: custom:mod-card
-    style: !include /config/dashboards/templates/includes/card_mod/chips/page_chip_layout.yaml
-    card:
-      type: horizontal-stack
-      cards:
-        - type: custom:button-card
-          template: app_lights_chip
-          entity: light.all_lights
-          variables:
-            lights:
-              - light.master_bedroom_main_left_light
-              - light.master_bedroom_main_center_light
-              - light.master_bedroom_main_right_light
-              - light.master_bedroom_window_light
-              - light.bedroom_door_light
-              - light.bedroom_window_light
-              - light.bedroom_cabinet_left_light
-              - light.bedroom_cabinet_right_light
-              - light.master_bathroom_shower_light
-              - light.master_bathroom_door_light
-        - type: custom:button-card
-          template: app_ac_chip
-          entity: climate.master_bedroom_aircon
-        - type: custom:button-card
-          template: app_temperature_chip
-          entity: sensor.zhimi_vb4_00ae_temperature
+  - type: custom:mushroom-chips-card
+    card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
+    chips:
+      - type: template
+        entity: light.all_lights
+        icon: mdi:lightbulb-group
+        icon_color: "{{ 'amber' if (expand(['light.all_lights']) | selectattr('state','eq','on') | list | count) > 0 else 'grey' }}"
+        content: "{% set n = expand(['light.all_lights']) | selectattr('state','eq','on') | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }}"
+        tap_action:
+          action: more-info
+      - type: template
+        entity: climate.master_bedroom_aircon
+        icon: "{{ {'heat_cool':'mdi:sun-snowflake-variant','heat':'mdi:heat-wave','cool':'mdi:snowflake','dry':'mdi:water-percent','fan_only':'mdi:fan'}.get(states('climate.master_bedroom_aircon'), 'mdi:air-conditioner') }}"
+        icon_color: "{{ {'heat_cool':'teal','heat':'red','cool':'blue','dry':'cyan','fan_only':'green'}.get(states('climate.master_bedroom_aircon'), 'grey') }}"
+        content: "{% set s = states('climate.master_bedroom_aircon') %}{% set t = state_attr('climate.master_bedroom_aircon','temperature') or state_attr('climate.master_bedroom_aircon','current_temperature') %}{{ {'heat_cool':'Auto','heat':'Heat','cool':'Cool','dry':'Dry','fan_only':'Fan','off':'Off','unavailable':'Offline'}.get(s, s) }}{{ (' · ' ~ (t | round(0) | int) ~ '°') if (t and s not in ['off','unavailable']) else '' }}"
+        tap_action:
+          action: more-info
+      - type: template
+        entity: sensor.zhimi_vb4_00ae_temperature
+        icon: mdi:thermometer
+        content: "{% set v = states('sensor.zhimi_vb4_00ae_temperature') | float(none) %}{{ (v | round(1) ~ '°') if v is not none else '—' }}"
+        tap_action:
+          action: more-info
 
   #
   # Living Room
@@ -62,22 +44,26 @@ cards:
       - navigation_path: /lovelace/rooms-living-room
       - temperature: "[[[ return states['sensor.zhimi_vb4_00ae_temperature'].state ]]]"
       - humidity: "[[[ return states['sensor.zhimi_vb4_00ae_relative_humidity'].state ]]]"
-      - status: "[[[ const fan = states['fan.dmaker_p33_c4d3_fan'].state == 'on'; const pur = states['fan.zhimi_vb4_00ae_air_purifier'].state == 'on'; const air = states['sensor.zhimi_vb4_00ae_air_quality'].state; return `Air ${air}${pur ? ' · Purifier on' : ''}${fan ? ' · Fan on' : ''}`; ]]]"
       - chips:
-        - type: custom:button-card
-          template: app_device_chip
+        - type: entity
           entity: fan.dmaker_p33_c4d3_fan
-          icon: mdi:fan
-        - type: custom:button-card
-          template: app_device_chip
+          content_info: state
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+        - type: entity
           entity: fan.zhimi_vb4_00ae_air_purifier
-          icon: mdi:air-purifier
+          content_info: state
+          tap_action:
+            action: more-info
+          hold_action:
+            action: more-info
       - room_devices:
         - type: custom:button-card
           entity: fan.dmaker_p33_c4d3_fan
           name: Fan
           template: app_room_card_device
-          icon: mdi:fan
           tap_action:
             action: toggle
             haptic: light
@@ -87,9 +73,8 @@ cards:
           entity: fan.zhimi_vb4_00ae_air_purifier
           name: Purifier
           template: app_room_card_device
-          icon: mdi:air-purifier
           tap_action:
-            action: toggle
+            action: more-info
             haptic: light
           hold_action:
             action: more-info
@@ -97,12 +82,10 @@ cards:
           entity: media_player.living_room_tv_2
           name: TV
           template: app_room_card_device
-          icon: app:app-device-tv
         - type: custom:button-card
           entity: media_player.google_home_mini
           name: Speaker
           template: app_room_card_device
-          icon: app:app-device-speaker
 
   #
   # Master Bedroom
@@ -114,27 +97,34 @@ cards:
       - entity: light.master_bedroom_lights
       - icon: app:app-bed-king
       - navigation_path: /lovelace/rooms-master-bedroom
-      - temperature: "[[[ return states['sensor.masterbedroom_aircon_ac_home'].state ]]]"
-      - status: "[[[ const ids = ['light.master_bedroom_main_left_light','light.master_bedroom_main_center_light','light.master_bedroom_main_right_light','light.master_bedroom_window_light']; const n = ids.filter(id => states[id] && states[id].state == 'on').length; const ac = states['climate.master_bedroom_aircon'].state; return `${n > 0 ? n + ' lights on' : 'Lights off'} · AC ${ac.replace('_', ' ')}`; ]]]"
+      - temperature: "[[[ return states['sensor.master_bedroom_aircon_ac_home'].state ]]]"
       - chips:
-        - type: custom:button-card
-          template: app_lights_chip
+        - type: template
           entity: light.master_bedroom_lights
-          variables:
-            lights:
-              - light.master_bedroom_main_left_light
-              - light.master_bedroom_main_center_light
-              - light.master_bedroom_main_right_light
-              - light.master_bedroom_window_light
-        - type: custom:button-card
-          template: app_ac_chip
+          icon: mdi:lightbulb-group
+          icon_color: "{{ 'amber' if (expand(['light.master_bedroom_main_left_light', 'light.master_bedroom_main_center_light', 'light.master_bedroom_main_right_light', 'light.master_bedroom_window_light']) | selectattr('state','eq','on') | list | count) > 0 else 'grey' }}"
+          content: "{% set n = expand(['light.master_bedroom_main_left_light', 'light.master_bedroom_main_center_light', 'light.master_bedroom_main_right_light', 'light.master_bedroom_window_light']) | selectattr('state','eq','on') | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }}"
+          tap_action:
+            action: more-info
+        - type: template
           entity: climate.master_bedroom_aircon
+          icon: "{{ {'heat_cool':'mdi:sun-snowflake-variant','heat':'mdi:heat-wave','cool':'mdi:snowflake','dry':'mdi:water-percent','fan_only':'mdi:fan'}.get(states('climate.master_bedroom_aircon'), 'mdi:air-conditioner') }}"
+          icon_color: "{{ {'heat_cool':'teal','heat':'red','cool':'blue','dry':'cyan','fan_only':'green'}.get(states('climate.master_bedroom_aircon'), 'grey') }}"
+          content: "{% set s = states('climate.master_bedroom_aircon') %}{% set t = state_attr('climate.master_bedroom_aircon','temperature') or state_attr('climate.master_bedroom_aircon','current_temperature') %}{{ {'heat_cool':'Auto','heat':'Heat','cool':'Cool','dry':'Dry','fan_only':'Fan','off':'Off','unavailable':'Offline'}.get(s, s) }}{{ (' · ' ~ (t | round(0) | int) ~ '°') if (t and s not in ['off','unavailable']) else '' }}"
+          tap_action:
+            action: more-info
+        - type: template
+          entity: lock.master_bedroom_door
+          icon: "{{ 'mdi:lock' if is_state('lock.master_bedroom_door','locked') else ('mdi:lock-question' if is_state('lock.master_bedroom_door','unavailable') else 'mdi:lock-open-variant') }}"
+          icon_color: "{{ {'locked':'green','jammed':'red','unavailable':'grey'}.get(states('lock.master_bedroom_door'), 'amber') }}"
+          content: "{{ {'locked':'Locked','unlocked':'Unlocked','locking':'Locking…','unlocking':'Unlocking…','jammed':'Jammed','open':'Open'}.get(states('lock.master_bedroom_door'), 'Offline') }}"
+          tap_action:
+            action: more-info
       - room_devices:
         - type: custom:button-card
           entity: light.master_bedroom_main_lights
-          name: Lights
+          name: Main
           template: app_room_card_device
-          icon: app:app-device-lights
           tap_action:
             action: toggle
             haptic: light
@@ -144,7 +134,6 @@ cards:
           entity: light.master_bedroom_window_light
           name: Window
           template: app_room_card_device
-          icon: app:app-lamp
           tap_action:
             action: toggle
             haptic: light
@@ -154,9 +143,24 @@ cards:
           entity: climate.master_bedroom_aircon
           name: Aircon
           template: app_room_card_device
-          icon: mdi:air-conditioner
+          icon: "[[[ return { heat_cool: 'mdi:sun-snowflake-variant', heat: 'mdi:heat-wave', cool: 'mdi:snowflake', dry: 'mdi:water-percent', fan_only: 'mdi:fan' }[entity.state] || 'mdi:air-conditioner'; ]]]"
           state_display: >
-            [[[ return entity.state == 'off' ? 'Off' : entity.state.replace('_', ' '); ]]]
+            [[[ const m = { off: 'Off', cool: 'Cool', heat: 'Heat', dry: 'Dry', fan_only: 'Fan', heat_cool: 'Auto', unavailable: 'Offline' }; return m[entity.state] || entity.state; ]]]
+          styles:
+            img_cell:
+              - color: "[[[ return { cool: 'var(--state-climate-cool-color)', heat: 'var(--state-climate-heat-color)', dry: 'var(--state-climate-dry-color)', fan_only: 'var(--state-climate-fan_only-color)', heat_cool: 'var(--state-climate-heat_cool-color)' }[entity.state] || 'rgb(var(--app-icon-shape-off-rgb))'; ]]]"
+        - type: custom:button-card
+          entity: lock.master_bedroom_door
+          name: Door
+          template: app_room_card_device
+          icon: "[[[ return entity.state == 'locked' ? 'mdi:lock' : 'mdi:lock-open-variant'; ]]]"
+          state_display: "[[[ return entity.state == 'locked' ? 'Locked' : entity.state.charAt(0).toUpperCase() + entity.state.slice(1); ]]]"
+          styles:
+            img_cell:
+              - color: "[[[ return entity.state == 'locked' ? 'var(--success-color)' : 'var(--warning-color)'; ]]]"
+          tap_action:
+            action: more-info
+            haptic: light
 
   #
   # Bedroom
@@ -168,27 +172,26 @@ cards:
       - entity: light.bedroom_all_lights
       - icon: app:app-bed-single
       - navigation_path: /lovelace/rooms-bedroom
-      - status: "[[[ const ids = ['light.bedroom_door_light','light.bedroom_window_light','light.bedroom_cabinet_left_light','light.bedroom_cabinet_right_light']; const n = ids.filter(id => states[id] && states[id].state == 'on').length; const fan = states['fan.dmaker_p15_03db_fan'].state == 'on'; return `${n > 0 ? n + ' lights on' : 'Lights off'}${fan ? ' · Fan on' : ''}`; ]]]"
       - chips:
-        - type: custom:button-card
-          template: app_lights_chip
+        - type: template
           entity: light.bedroom_all_lights
-          variables:
-            lights:
-              - light.bedroom_door_light
-              - light.bedroom_window_light
-              - light.bedroom_cabinet_left_light
-              - light.bedroom_cabinet_right_light
-        - type: custom:button-card
-          template: app_device_chip
+          icon: mdi:lightbulb-group
+          icon_color: "{{ 'amber' if (expand(['light.bedroom_door_light', 'light.bedroom_window_light', 'light.bedroom_cabinet_left_light', 'light.bedroom_cabinet_right_light']) | selectattr('state','eq','on') | list | count) > 0 else 'grey' }}"
+          content: "{% set n = expand(['light.bedroom_door_light', 'light.bedroom_window_light', 'light.bedroom_cabinet_left_light', 'light.bedroom_cabinet_right_light']) | selectattr('state','eq','on') | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }}"
+          tap_action:
+            action: more-info
+        - type: entity
           entity: fan.dmaker_p15_03db_fan
-          icon: mdi:fan
+          content_info: state
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
       - room_devices:
         - type: custom:button-card
           entity: light.bedroom_main_lights
-          name: Lights
+          name: Main
           template: app_room_card_device
-          icon: app:app-device-lights
           tap_action:
             action: toggle
             haptic: light
@@ -198,7 +201,6 @@ cards:
           entity: light.bedroom_cabinet_lights
           name: Cabinet
           template: app_room_card_device
-          icon: app:app-lamp
           tap_action:
             action: toggle
             haptic: light
@@ -208,7 +210,6 @@ cards:
           entity: fan.dmaker_p15_03db_fan
           name: Fan
           template: app_room_card_device
-          icon: mdi:fan
           tap_action:
             action: toggle
             haptic: light
@@ -218,7 +219,6 @@ cards:
           entity: media_player.bedroom_tv
           name: TV
           template: app_room_card_device
-          icon: app:app-device-tv
 
   #
   # Master Bathroom
@@ -230,21 +230,19 @@ cards:
       - entity: light.master_bathroom_lights
       - icon: mdi:shower-head
       - navigation_path: /lovelace/rooms-master-bathroom
-      - status: "[[[ const ids = ['light.master_bathroom_shower_light','light.master_bathroom_door_light']; const n = ids.filter(id => states[id] && states[id].state == 'on').length; return n > 0 ? `${n} lights on` : 'Lights off'; ]]]"
       - chips:
-        - type: custom:button-card
-          template: app_lights_chip
+        - type: template
           entity: light.master_bathroom_lights
-          variables:
-            lights:
-              - light.master_bathroom_shower_light
-              - light.master_bathroom_door_light
+          icon: mdi:lightbulb-group
+          icon_color: "{{ 'amber' if (expand(['light.master_bathroom_shower_light', 'light.master_bathroom_door_light']) | selectattr('state','eq','on') | list | count) > 0 else 'grey' }}"
+          content: "{% set n = expand(['light.master_bathroom_shower_light', 'light.master_bathroom_door_light']) | selectattr('state','eq','on') | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }}"
+          tap_action:
+            action: more-info
       - room_devices:
         - type: custom:button-card
           entity: light.master_bathroom_shower_light
           name: Shower
           template: app_room_card_device
-          icon: mdi:shower
           tap_action:
             action: toggle
             haptic: light
@@ -254,7 +252,6 @@ cards:
           entity: light.master_bathroom_door_light
           name: Door
           template: app_room_card_device
-          icon: mdi:door
           tap_action:
             action: toggle
             haptic: light

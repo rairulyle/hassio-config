@@ -1,153 +1,142 @@
 type: custom:vertical-layout
 title: Living Room
 path: rooms-living-room
-theme: Catppuccin Mocha Dashboard
+theme: Catppuccin Auto Latte Mocha Dashboard
 subview: true
 layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
 cards:
-  - type: custom:decluttering-card
-    template: room_page_top_toolbar
-    variables:
-      - name: Living Room
-      - navigation_path: /lovelace/rooms
-      - settings_path: '#living_room_settings'
-
   #
   # Chips
   #
-  - type: custom:mod-card
-    style: !include /config/dashboards/templates/includes/card_mod/chips/page_chip_layout.yaml
-    card:
-      type: horizontal-stack
-      cards:
-        - type: custom:button-card
-          template: app_device_chip
-          entity: fan.dmaker_p33_c4d3_fan
-          icon: mdi:fan
-        - type: custom:button-card
-          template: app_device_chip
-          entity: fan.zhimi_vb4_00ae_air_purifier
-          icon: mdi:air-purifier
-        - type: custom:button-card
-          template: app_temperature_chip
-          entity: sensor.zhimi_vb4_00ae_temperature
+  - type: custom:mushroom-chips-card
+    card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
+    chips:
+      - type: entity
+        entity: fan.dmaker_p33_c4d3_fan
+        content_info: state
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+      - type: entity
+        entity: fan.zhimi_vb4_00ae_air_purifier
+        content_info: state
+        tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+      - type: template
+        entity: sensor.zhimi_vb4_00ae_temperature
+        icon: mdi:thermometer
+        content: "{% set v = states('sensor.zhimi_vb4_00ae_temperature') | float(none) %}{{ (v | round(1) ~ '°') if v is not none else '—' }}"
+        tap_action:
+          action: more-info
+      - type: action
+        icon: mdi:dots-horizontal
+        icon_color: grey
+        tap_action:
+          action: navigate
+          navigation_path: '#living_room_settings'
 
   #
   # Climate
   #
-  - type: custom:decluttering-card
-    template: climate_overview_simple
-    variables:
-      - title: Climate
-      - temperature_sensor: sensor.zhimi_vb4_00ae_temperature
-      - items:
-        - type: custom:button-card
-          entity: sensor.zhimi_vb4_00ae_relative_humidity
-          template: app_aqi_humidity_item
-        - type: custom:button-card
-          entity: sensor.zhimi_vb4_00ae_pm25_density
-          template: app_aqi_pm25_item
-        - type: custom:button-card
-          entity: sensor.zhimi_vb4_00ae_air_quality
-          template: app_aqi_text_item
+  - type: custom:bubble-card
+    card_type: button
+    button_type: state
+    entity: sensor.zhimi_vb4_00ae_temperature
+    name: Climate
+    icon: mdi:home-thermometer
+    show_state: true
+    tap_action:
+      action: more-info
+    sub_button:
+      - entity: sensor.zhimi_vb4_00ae_relative_humidity
+        state_background: false
+        icon: mdi:water-percent
+        show_state: true
+        tap_action:
+          action: more-info
+      - entity: sensor.zhimi_vb4_00ae_pm25_density
+        state_background: false
+        icon: mdi:blur
+        show_state: true
+        tap_action:
+          action: more-info
+      - entity: sensor.zhimi_vb4_00ae_air_quality
+        state_background: false
+        icon: mdi:leaf
+        show_state: true
+        tap_action:
+          action: more-info
+    styles: |
+      .bubble-icon { color: var(--primary-color) !important; }
+      .bubble-icon-container { background-color: color-mix(in srgb, var(--primary-color) 20%, transparent) !important; }
+      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
 
   #
   # Devices
   #
-  - type: custom:button-card
+  - type: custom:decluttering-card
     template: section_title
-    name: Devices
-
+    variables:
+      - title: Devices
   - type: grid
     columns: 2
     square: false
     cards:
-      - type: custom:button-card
+      - type: custom:mushroom-fan-card
         entity: fan.dmaker_p33_c4d3_fan
         name: Standing Fan
-        template: app_fan_entity
+        icon_animation: true
+        show_percentage_control: true
+        collapsible_controls: true
+        fill_container: true
         tap_action:
           action: toggle
-          haptic: light
         hold_action:
           action: more-info
-      - type: custom:button-card
+        features:
+          - type: fan-preset-modes
+            style: dropdown
+      - type: custom:mushroom-entity-card
         entity: fan.zhimi_vb4_00ae_air_purifier
         name: Air Purifier
-        template: app_device_air_purifier_entity
+        secondary_info: state
+        fill_container: true
         tap_action:
-          action: toggle
-          haptic: light
+          action: more-info
         hold_action:
           action: more-info
-      - type: custom:button-card
+      - type: custom:mushroom-entity-card
         entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
-        name: Pet Fountain 2
-        template: app_toggle_entity
-        icon: mdi:fountain
-      - type: conditional
-        conditions:
-          - condition: state
-            entity: switch.mmgg_wi11_9352_pet_drinking_fountain
-            state_not: unavailable
-        card:
-          type: custom:button-card
-          entity: switch.mmgg_wi11_9352_pet_drinking_fountain
-          name: Pet Fountain 1
-          template: app_toggle_entity
-          icon: mdi:fountain
+        name: Pet Fountain
+        fill_container: true
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
       - type: conditional
         conditions:
           - condition: state
             entity: vacuum.ijai_v3_aaa0_robot_cleaner
             state_not: unavailable
+          - condition: state
+            entity: vacuum.ijai_v3_aaa0_robot_cleaner
+            state_not: unknown
         card:
-          type: custom:button-card
+          type: custom:mushroom-vacuum-card
           entity: vacuum.ijai_v3_aaa0_robot_cleaner
           name: Robot Vacuum
-          template: app_device_entity
-          icon: mdi:robot-vacuum
-      - type: custom:button-card
-        entity: media_player.living_room_tv_2
-        name: TV
-        template: app_device_entity
-        icon: app:app-device-tv
-      - type: custom:button-card
-        entity: media_player.google_home_mini
-        name: Google Home Mini
-        template: app_device_entity
-        icon: app:app-device-speaker
+          fill_container: true
+          commands:
+            - start_pause
+            - return_home
+          tap_action:
+            action: more-info
 
   #
-  # Fan controls
-  #
-  - type: custom:button-card
-    template: section_title
-    name: Fan
-  - type: tile
-    entity: fan.dmaker_p33_c4d3_fan
-    name: Standing Fan
-    icon: mdi:fan
-    features_position: inline
-    vertical: false
-    features:
-      - type: fan-speed
-  - type: entities
-    card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
-    entities:
-      - entity: switch.dmaker_p33_c4d3_horizontal_swing
-        name: Oscillation
-        icon: mdi:arrow-left-right
-        card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
-        secondary_info: last-changed
-        state_color: true
-      - entity: select.dmaker_p33_c4d3_horizontal_angle
-        name: Swing Angle
-        icon: mdi:angle-acute
-        card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
-
-  #
-  # Media
+  # Media: only while a player is reachable
   #
   - type: conditional
     conditions:
@@ -157,19 +146,40 @@ cards:
     card:
       type: vertical-stack
       cards:
-        - type: custom:button-card
+        - type: custom:decluttering-card
           template: section_title
-          name: Media
-        - type: media-control
+          variables:
+            - title: Media
+        - type: custom:mushroom-media-player-card
           entity: media_player.living_room_tv_2
+          name: TV
+          use_media_info: true
+          collapsible_controls: true
+          media_controls:
+            - play_pause_stop
+            - previous
+            - next
+          volume_controls:
+            - volume_mute
+            - volume_set
   - type: conditional
     conditions:
       - condition: state
         entity: media_player.google_home_mini
         state_not: unavailable
     card:
-      type: media-control
+      type: custom:mushroom-media-player-card
       entity: media_player.google_home_mini
+      name: Google Home Mini
+      use_media_info: true
+      collapsible_controls: true
+      media_controls:
+        - play_pause_stop
+        - previous
+        - next
+      volume_controls:
+        - volume_mute
+        - volume_set
 
   #
   # Navbar
@@ -182,56 +192,84 @@ cards:
   - type: custom:bubble-card
     card_type: pop-up
     hash: '#living_room_settings'
+    name: Living Room Settings
+    icon: mdi:sofa
+    show_header: true
     close_by_clicking_outside: true
     styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
-    margin_top_mobile: calc(100vh - 760px)
-    margin_top_desktop: calc(100vh - 760px)
+    margin_top_mobile: max(0px, calc(100vh - 760px))
+    margin_top_desktop: max(0px, calc(100vh - 760px))
     cards:
-      - type: custom:button-card
-        template: app_popup_page_title
-        name: Living Room Settings
-      - type: custom:button-card
+      - type: custom:decluttering-card
         template: section_title
-        name: Air Purifier
-      - type: entities
-        card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
-        entities:
-          - entity: switch.zhimi_vb4_00ae_anion
+        variables:
+          - title: Air Purifier
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: switch.zhimi_vb4_00ae_anion
             name: Negative Ion
-            icon: mdi:atom-variant
-            card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
-            state_color: true
-          - entity: switch.zhimi_vb4_00ae_physical_control_locked
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.zhimi_vb4_00ae_physical_control_locked
             name: Child Lock
-            icon: mdi:lock-outline
-            card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
-            state_color: true
-          - entity: sensor.zhimi_vb4_00ae_filter_left_time
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: sensor.zhimi_vb4_00ae_filter_left_time
             name: Filter Days Left
-            icon: mdi:air-filter
-            card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
-          - entity: sensor.zhimi_vb4_00ae_filter_life_level
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: sensor.zhimi_vb4_00ae_filter_life_level
             name: Filter Life
-            icon: mdi:air-filter
-            card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
-      - type: custom:button-card
+            fill_container: true
+            tap_action:
+              action: more-info
+      - type: custom:decluttering-card
         template: section_title
-        name: Standing Fan
-      - type: entities
-        card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
-        entities:
-          - entity: switch.dmaker_p33_c4d3_physical_control_locked
+        variables:
+          - title: Standing Fan
+      - type: grid
+        columns: 3
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: switch.dmaker_p33_c4d3_physical_control_locked
             name: Child Lock
-            icon: mdi:lock-outline
-            card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
-            state_color: true
-          - entity: switch.dmaker_p33_c4d3_alarm
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.dmaker_p33_c4d3_alarm
             name: Beep
-            icon: mdi:volume-high
-            card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
-            state_color: true
-          - entity: light.dmaker_p33_c4d3_indicator_light
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: light.dmaker_p33_c4d3_indicator_light
             name: Indicator Light
-            icon: mdi:led-outline
-            card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
-            state_color: true
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info

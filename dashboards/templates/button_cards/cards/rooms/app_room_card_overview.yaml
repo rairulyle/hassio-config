@@ -1,5 +1,5 @@
 app_room_card_overview:
-  size: 100%
+  size: 22px
   show_icon: true
   show_state: true
   state_display: >
@@ -29,12 +29,12 @@ app_room_card_overview:
   styles:
     grid:
       - grid-template-areas: '"i n temperature" "i s secondary_climate"'
-      - grid-template-columns: 40px 1fr 100px
+      - grid-template-columns: 42px 1fr 100px
       - grid-template-rows: 1fr 1fr
     card:
       - --mdc-ripple-color: transparent
       - --mdc-ripple-press-opacity: 0
-      - padding: 0 20px 0 20px
+      - padding: 12px 20px
       - background: transparent
       - backdrop-filter: none
       - -webkit-backdrop-filter: none
@@ -75,8 +75,8 @@ app_room_card_overview:
   custom_fields:
     temperature: >
       [[[ 
-        if (variables.temperature) {
-          return Math.round(variables.temperature * 10) / 10 + "°";
+        if (variables.temperature != null) {
+          const t = parseFloat(variables.temperature); return isNaN(t) ? "—" : Math.round(t * 10) / 10 + "°";
         }
       ]]]
     secondary_climate: >
@@ -84,8 +84,8 @@ app_room_card_overview:
         if (variables.aqi) {
           return "AQI - " + variables.aqi;
         }
-        else if (variables.humidity) {
-          return Math.round(variables.humidity * 10) / 10 + "% Humidity";
+        else if (variables.humidity != null) {
+          const h = parseFloat(variables.humidity); return isNaN(h) ? "" : Math.round(h) + "% Humidity";
         }
       ]]]
   card_mod:

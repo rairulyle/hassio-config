@@ -1,30 +1,50 @@
+# Room card device tile, themed like a vertical Mushroom entity card:
+# tinted icon circle on top, name (14/600) and state (12/400) below.
+# The icon colour lives on img_cell; the icon inherits it and the disc is that colour at 20%.
+# A card can override the colour with styles.img_cell.color (see the lock and aircon tiles).
 app_room_card_device:
   show_state: true
+  size: 22px
+  variables:
+    active_states: ['on', 'playing', 'paused', 'heat', 'cool', 'dry', 'fan_only', 'heat_cool', 'auto', 'locked', 'cleaning', 'open']
   styles:
     grid:
-      - grid-template-areas: '"n n n" "i i i" "s s s"'
-      # - grid-template-columns: 1fr 1fr 1fr
-      # - grid-template-rows: 1fr 1fr 1fr
+      - grid-template-areas: '"i" "n" "s"'
+      - grid-template-rows: min-content min-content min-content
+      - row-gap: 6px
     card:
       - background: transparent
       - box-shadow: none
-      - padding: 20px 10px
+      - padding: 14px 8px
       - border: none
       - backdrop-filter: none
       - -webkit-backdrop-filter: none
+      # neutral press/hover feedback, not the icon colour
+      - --ha-ripple-color: var(--primary-text-color)
+      - --ha-ripple-hover-opacity: 0.04
+      - --ha-ripple-pressed-opacity: 0.08
+      - --mdc-ripple-color: var(--primary-text-color)
+      - --mdc-ripple-hover-opacity: 0.04
+    img_cell:
+      - justify-self: center
+      - width: 42px
+      - height: 42px
+      - border-radius: 50%
+      - color: >
+          [[[ if (!variables.active_states.includes(entity.state)) return 'rgb(var(--app-icon-shape-off-rgb))'; return entity.entity_id.startsWith('light.') ? 'var(--state-light-active-color)' : 'var(--primary-color)'; ]]]
+      - background-color: color-mix(in srgb, currentColor 20%, transparent)
     icon:
-      - height: 30px;
-      - margin-top: 12px
-      - margin-bottom: 12px
+      - color: currentColor
     name:
       - color: var(--primary-text-color)
-      - font-size: 13px
-      - font-weight: 500
+      - font-size: 14px
+      - font-weight: 600
+      - line-height: 16px
     state:
       - font-weight: 400
       - color: var(--secondary-text-color)
-      - font-size: 11px;
-      # - margin-top: 2px;
+      - font-size: 12px
+      - line-height: 14px
   tap_action:
+    action: more-info
     haptic: light
-    
