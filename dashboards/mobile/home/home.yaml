@@ -1,280 +1,487 @@
 type: custom:vertical-layout
 title: Home
 path: home
-theme: Catppuccin Mocha Dashboard
-layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
+theme: Catppuccin Auto Latte Mocha Dashboard
+layout: !include /config/dashboards/templates/includes/layouts/app_homepage_layout.yaml
 cards:
   #
-  # Page Header
+  # Household header: the glance chips, then the two residents
   #
-  - type: custom:decluttering-card
-    template: top_toolbar
-    variables:
-      - cards:
-        - type: custom:button-card
-          template: empty_column
-        - type: custom:button-card
-          template: app_header_page_title
-          name: Home
-        - type: custom:button-card
-          template: app_header_chip_card
-          icon: mdi:youtube-tv
-          icon_color: var(--secondary-text-color)
-          tap_action:
-            action: navigate
-            navigation_path: '#upcoming_tv'
-            haptic: light
+  - type: custom:mushroom-chips-card
+    card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
+    chips:
+      - type: template
+        entity: climate.master_bedroom_aircon
+        icon: "{{ {'heat_cool':'mdi:sun-snowflake-variant','heat':'mdi:heat-wave','cool':'mdi:snowflake','dry':'mdi:water-percent','fan_only':'mdi:fan'}.get(states('climate.master_bedroom_aircon'), 'mdi:air-conditioner') }}"
+        icon_color: "{{ {'heat_cool':'teal','heat':'red','cool':'blue','dry':'cyan','fan_only':'green'}.get(states('climate.master_bedroom_aircon'), 'grey') }}"
+        content: "{% set s = states('climate.master_bedroom_aircon') %}{% set t = state_attr('climate.master_bedroom_aircon','temperature') or state_attr('climate.master_bedroom_aircon','current_temperature') %}{{ {'heat_cool':'Auto','heat':'Heat','cool':'Cool','dry':'Dry','fan_only':'Fan','off':'Off','unavailable':'Offline'}.get(s, s) }}{{ (' · ' ~ (t | round(0) | int) ~ '°') if (t and s not in ['off','unavailable']) else '' }} ›"
+        tap_action:
+          action: navigate
+          navigation_path: /lovelace/climate
+        hold_action:
+          action: more-info
+      - type: template
+        entity: light.all_lights
+        icon: mdi:lightbulb-group
+        icon_color: "{{ 'amber' if (expand('light.all_lights') | selectattr('state','eq','on') | list | count) > 0 else 'grey' }}"
+        content: "{% set n = expand('light.all_lights') | selectattr('state','eq','on') | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }} ›"
+        tap_action:
+          action: navigate
+          navigation_path: /lovelace/rooms
+        hold_action:
+          action: more-info
+      - type: template
+        entity: lock.master_bedroom_door
+        icon: "{{ 'mdi:lock' if is_state('lock.master_bedroom_door','locked') else ('mdi:lock-question' if is_state('lock.master_bedroom_door','unavailable') else 'mdi:lock-open-variant') }}"
+        icon_color: "{{ {'locked':'green','jammed':'red','unavailable':'grey'}.get(states('lock.master_bedroom_door'), 'amber') }}"
+        content: "{{ {'locked':'Locked','unlocked':'Unlocked','locking':'Locking…','unlocking':'Unlocking…','jammed':'Jammed','open':'Open'}.get(states('lock.master_bedroom_door'), 'Offline') }}"
+        tap_action:
+          action: more-info
 
   #
-  # Quick overview: aircon + lights chips, people on the right
+  # Greeting: time of day, the signed-in resident, the weather outside, and a Meteocons illustration on the right (www/dashboard/weather, MIT)
   #
-  - type: custom:mod-card
-    card_mod: !include /config/dashboards/templates/includes/card_mod/app_layout_card_mod.yaml
-    card:
-      type: custom:layout-card
-      layout_type: custom:grid-layout
-      layout:
-        grid-template-columns: 65% 35%
-        margin: 0px 0px 0px 0px
-        padding: 0px
-        card_margin: 0px
-        gap: 5px
-      cards:
-        - type: custom:mod-card
-          card_mod:
-            style:
-              hui-horizontal-stack-card$: |
-                #root {
-                  gap: 5px !important;
-                }
-          card:
-            type: horizontal-stack
-            cards:
-              - type: custom:button-card
-                template: app_ac_chip
-                entity: climate.master_bedroom_aircon
-                tap_action:
-                  action: navigate
-                  navigation_path: /lovelace/climate
-                  haptic: light
-              - type: custom:button-card
-                template: app_lights_chip
-                entity: light.all_lights
-                variables:
-                  lights:
-                    - light.master_bedroom_main_left_light
-                    - light.master_bedroom_main_center_light
-                    - light.master_bedroom_main_right_light
-                    - light.master_bedroom_window_light
-                    - light.bedroom_door_light
-                    - light.bedroom_window_light
-                    - light.bedroom_cabinet_left_light
-                    - light.bedroom_cabinet_right_light
-                    - light.master_bathroom_shower_light
-                    - light.master_bathroom_door_light
-                tap_action:
-                  action: navigate
-                  navigation_path: /lovelace/rooms
-                  haptic: light
+  - type: markdown
+    content: |
+      {%- set h = now().hour -%}
+      {%- set g = 'Good night' if h < 5 or h >= 22 else ('Good morning' if h < 12 else ('Good afternoon' if h < 18 else 'Good evening')) -%}
+      {%- set w = states('weather.openweathermap') -%}
+      {%- set words = {'sunny': 'Sunny', 'clear-night': 'Clear skies', 'partlycloudy': 'Partly cloudy', 'cloudy': 'Cloudy', 'rainy': 'Rainy', 'pouring': 'Pouring rain', 'lightning': 'Stormy', 'lightning-rainy': 'Stormy', 'fog': 'Foggy', 'windy': 'Windy', 'windy-variant': 'Windy', 'snowy': 'Snowy', 'snowy-rainy': 'Sleet', 'hail': 'Hail'} -%}
+      {%- set night = is_state('sun.sun', 'below_horizon') -%}
+      {%- set art = {'sunny': 'clear-day', 'clear-night': 'clear-night', 'partlycloudy': ('partly-cloudy-night' if night else 'partly-cloudy-day'), 'cloudy': 'overcast', 'rainy': 'rain', 'pouring': 'extreme-rain', 'lightning': 'thunderstorms', 'lightning-rainy': 'thunderstorms-rain', 'fog': 'fog', 'windy': 'wind', 'windy-variant': 'wind', 'snowy': 'snow', 'snowy-rainy': 'sleet', 'hail': 'hail'} -%}
+      {%- set t = states('sensor.master_bedroom_aircon_outside') | float(none) -%}
+      {% if w in art %}<img src="/local/dashboard/weather/{{ art[w] }}.svg" alt="">{% endif %}
 
-        - type: custom:mod-card
-          card_mod:
-            style:
-              hui-horizontal-stack-card$: |
-                #root {
-                  display: flex;
-                  justify-content: flex-end;
-                  align-items: start;
-                  gap: 6px;
-                }
-              .: |
-                ha-card {
-                  height: 100% !important;
-                  align-self: center !important;
-                }
-          card:
-            type: horizontal-stack
-            cards:
-              - type: custom:button-card
-                entity: person.person1
-                template: app_person_entity
-                tap_action:
-                  action: navigate
-                  navigation_path: '#person1'
-                  haptic: light
-              - type: custom:button-card
-                entity: person.person2
-                template: app_person_entity
-                tap_action:
-                  action: navigate
-                  navigation_path: '#person2'
-                  haptic: light
+      # {{ g }},<br>{{ user }}
 
-  #
-  # Climate overview (living room sensors + outside temperature)
-  #
-  - type: custom:decluttering-card
-    template: climate_overview_simple
-    variables:
-      - title: Indoor Climate
-      - temperature_sensor: sensor.zhimi_vb4_00ae_temperature
-      - items:
-        - type: custom:button-card
-          entity: sensor.zhimi_vb4_00ae_relative_humidity
-          template: app_aqi_humidity_item
-        - type: custom:button-card
-          entity: sensor.zhimi_vb4_00ae_pm25_density
-          template: app_aqi_pm25_item
-        - type: custom:button-card
-          entity: sensor.zhimi_vb4_00ae_air_quality
-          template: app_aqi_text_item
-        - type: custom:button-card
-          entity: sensor.masterbedroom_aircon_outside
-          template: app_aqi_temperature_item
-
-  #
-  # Overview
-  #
-  - type: custom:button-card
-    template: section_title
-    name: Overview
+      {% if w in words %}{{ words[w] }}{% if t is not none %} and {{ t | round(0) | int }}° outside{% endif %}.{% elif t is not none %}{{ t | round(0) | int }}° outside.{% endif %}
+    card_mod:
+      style:
+        .: |
+          ha-card { background: none; box-shadow: none; border: none; padding: 12px 0 0 0; position: relative; }
+          ha-markdown { padding: 0 !important; }
+        ha-markdown$: |
+          h1 { font-size: 30px; line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; color: var(--primary-text-color); margin: 0 0 6px 0; padding-right: 72px; }
+          p { font-size: 15px; color: var(--secondary-text-color); margin: 0; }
+          ha-markdown-element h1 { font-size: 30px; line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; color: var(--primary-text-color); margin: 0 0 6px 0; padding-right: 72px; }
+          ha-markdown-element p { font-size: 15px; color: var(--secondary-text-color); margin: 0; }
+          img { position: absolute; right: 0; top: 6px; width: 96px; height: 96px; margin: 0; }
 
   - type: grid
     columns: 2
     square: false
     cards:
-      - type: custom:button-card
-        entity: light.master_bedroom_lights
-        name: Lights
-        template: app_light_entity
-        state_display: >
-          [[[
-            const ids = ['light.master_bedroom_main_left_light','light.master_bedroom_main_center_light','light.master_bedroom_main_right_light','light.master_bedroom_window_light','light.bedroom_door_light','light.bedroom_window_light','light.bedroom_cabinet_left_light','light.bedroom_cabinet_right_light','light.master_bathroom_shower_light','light.master_bathroom_door_light'];
-            const n = ids.filter(id => states[id] && states[id].state == 'on').length;
-            return n > 0 ? `${n} Lights On` : 'Off';
-          ]]]
-        styles:
-          icon:
-            - color: >
-                [[[
-                  const ids = ['light.master_bedroom_main_left_light','light.master_bedroom_main_center_light','light.master_bedroom_main_right_light','light.master_bedroom_window_light','light.bedroom_door_light','light.bedroom_window_light','light.bedroom_cabinet_left_light','light.bedroom_cabinet_right_light','light.master_bathroom_shower_light','light.master_bathroom_door_light'];
-                  return ids.some(id => states[id] && states[id].state == 'on') ? 'var(--accent-color)' : 'var(--light-grey-color)';
-                ]]]
+      - type: custom:mushroom-person-card
+        entity: person.person1
+        name: Person 1
+        use_entity_picture: true
+        fill_container: true
         tap_action:
           action: navigate
-          navigation_path: /lovelace/rooms
-          haptic: light
+          navigation_path: '#person1'
+        hold_action:
+          action: more-info
+      - type: custom:mushroom-person-card
+        entity: person.person2
+        name: Person 2
+        use_entity_picture: true
+        fill_container: true
+        tap_action:
+          action: navigate
+          navigation_path: '#person2'
+        hold_action:
+          action: more-info
 
-      - type: custom:button-card
-        entity: climate.master_bedroom_aircon
-        name: Aircon
-        template: app_ac_entity
+  #
+  # Upcoming TV: the next Sonarr episode as one row (time · show · episode · SxxExx)
+  #
+  - type: custom:bubble-card
+    card_type: button
+    button_type: state
+    entity: sensor.sonarr_upcoming_media
+    name: Upcoming TV Show
+    icon: mdi:youtube-tv
+    show_state: true
+    scrolling_effect: true
+    tap_action:
+      action: more-info
+    button_action:
+      tap_action:
+        action: navigate
+        navigation_path: '#upcoming_tv'
+    styles: |
+      ${(() => {
+        const d = hass.states['sensor.sonarr_upcoming_media']?.attributes?.data || [];
+        const e = d[1];
+        let text = 'No episodes coming up';
+        if (e) {
+          const when = e.airdate ? new Date(e.airdate).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
+          text = [when, e.title, e.episode, e.number].filter(Boolean).join(' • ');
+        }
+        card.querySelector('.bubble-state').innerText = text;
+        return '';
+      })()}
+      .bubble-icon { color: var(--primary-color) !important; }
+      .bubble-icon-container { background-color: color-mix(in srgb, var(--primary-color) 20%, transparent) !important; }
+      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
+
+  #
+  # Needs attention: only present when something is wrong
+  #
+  - type: conditional
+    conditions:
+      - condition: or
+        conditions:
+          - condition: state
+            entity: lock.master_bedroom_door
+            state: unlocked
+          - condition: state
+            entity: lock.master_bedroom_door
+            state: jammed
+          - condition: state
+            entity: lock.master_bedroom_door
+            state: unavailable
+          - condition: numeric_state
+            entity: sensor.master_bedroom_door_battery
+            below: 20
+          - condition: state
+            entity: climate.master_bedroom_aircon
+            state: unavailable
+          - condition: state
+            entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
+            state: unavailable
+    card:
+      type: vertical-stack
+      card_mod:
+        style: |
+          :host { --vertical-stack-card-gap: 8px; }
+      cards:
+        - type: custom:decluttering-card
+          template: section_title
+          variables:
+            - title: Needs attention
+        - type: conditional
+          conditions:
+            - condition: state
+              entity: lock.master_bedroom_door
+              state: unlocked
+          card:
+            type: custom:button-card
+            template: app_attention_row
+            entity: lock.master_bedroom_door
+            name: Bedroom door
+            icon: mdi:lock-open-variant
+            variables:
+              message: Unlocked. Tap to lock it.
+            tap_action:
+              action: perform-action
+              perform_action: lock.lock
+              target:
+                entity_id: lock.master_bedroom_door
+              haptic: medium
+              confirmation:
+                text: Lock the bedroom door?
+        - type: conditional
+          conditions:
+            - condition: state
+              entity: lock.master_bedroom_door
+              state: jammed
+          card:
+            type: custom:button-card
+            template: app_attention_row
+            entity: lock.master_bedroom_door
+            name: Bedroom door
+            icon: mdi:lock-alert
+            variables:
+              message: Lock jammed. Check the door.
+        - type: conditional
+          conditions:
+            - condition: state
+              entity: lock.master_bedroom_door
+              state: unavailable
+          card:
+            type: custom:button-card
+            template: app_attention_row
+            entity: lock.master_bedroom_door
+            name: Door lock
+            icon: mdi:lock-question
+            variables:
+              message: Offline. Check its Wi-Fi or battery.
+        - type: conditional
+          conditions:
+            - condition: numeric_state
+              entity: sensor.master_bedroom_door_battery
+              below: 20
+          card:
+            type: custom:button-card
+            template: app_attention_row
+            entity: sensor.master_bedroom_door_battery
+            name: Door lock battery
+            icon: mdi:battery-alert
+            variables:
+              message: Low. Replace the batteries soon.
+        - type: conditional
+          conditions:
+            - condition: state
+              entity: climate.master_bedroom_aircon
+              state: unavailable
+          card:
+            type: custom:button-card
+            template: app_attention_row
+            entity: climate.master_bedroom_aircon
+            name: Aircon
+            icon: mdi:air-conditioner
+            variables:
+              message: Controller offline. Check the Faikin on the unit.
+        - type: conditional
+          conditions:
+            - condition: state
+              entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
+              state: unavailable
+          card:
+            type: custom:button-card
+            template: app_attention_row
+            entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
+            name: Pet fountain
+            icon: mdi:fountain
+            variables:
+              message: Offline. Check its power.
+
+  #
+  # Cats: last feed, next lunch, feed now, water
+  #
+  - type: custom:bubble-card
+    card_type: button
+    button_type: state
+    entity: script.feed_cat
+    name: Cat1, Cat2, & Cat3
+    icon: mdi:cat
+    show_state: true
+    tap_action:
+      action: navigate
+      navigation_path: /lovelace/pets
+    sub_button:
+      # Tap opens the script dialog (its Run button is the confirmation); hold feeds straight away.
+      - name: Feed
+        entity: script.feed_cat
+        icon: mdi:bowl-mix
+        show_name: true
+        tap_action:
+          action: more-info
+        hold_action:
+          action: perform-action
+          perform_action: script.feed_cat
+      - entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
+        show_state: true
+        icon: mdi:fountain
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+    styles: |
+      .bubble-icon { color: var(--accent-color) !important; }
+      .bubble-icon-container { background-color: color-mix(in srgb, var(--accent-color) 20%, transparent) !important; }
+      ${(() => {
+        const now = Date.now();
+        const lt = hass.states['script.feed_cat']?.attributes?.last_triggered;
+        let fed = 'Not fed yet';
+        if (lt) {
+          const diff = Math.floor((now - new Date(lt)) / 1000);
+          fed = diff < 120 ? 'Fed just now'
+            : 'Fed ' + (diff < 3600 ? Math.floor(diff / 60) + 'm' : (diff < 86400 ? Math.floor(diff / 3600) + 'h' : Math.floor(diff / 86400) + 'd')) + ' ago';
+        }
+        const sch = hass.states['automation.feed_cats'];
+        let next = '';
+        if (sch && sch.state === 'on') {
+          const lunch = new Date(); lunch.setHours(12, 0, 0, 0);
+          if (lunch.getTime() <= now) lunch.setDate(lunch.getDate() + 1);
+          const mins = Math.round((lunch.getTime() - now) / 60000);
+          next = mins <= 60 ? ' · Lunch in ' + mins + 'm' : (lunch.getDate() !== new Date().getDate() ? ' · Lunch tomorrow 12:00' : ' · Lunch at 12:00');
+        } else if (sch) {
+          next = ' · Schedule off';
+        }
+        card.querySelector('.bubble-state').innerText = fed + next;
+        return '';
+      })()}
+      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
+
+  #
+  # Climate: one Bubble row with sub-buttons (details live on the Climate page)
+  #
+  - type: custom:bubble-card
+    card_type: button
+    button_type: state
+    entity: sensor.zhimi_vb4_00ae_temperature
+    name: Inside
+    icon: mdi:home-thermometer
+    show_state: true
+    tap_action:
+      action: navigate
+      navigation_path: /lovelace/climate
+    sub_button:
+      - entity: sensor.zhimi_vb4_00ae_relative_humidity
+        state_background: false
+        icon: mdi:water-percent
+        show_state: true
+        tap_action:
+          action: more-info
+      - entity: sensor.zhimi_vb4_00ae_air_quality
+        state_background: false
+        icon: mdi:blur
+        show_state: true
         tap_action:
           action: navigate
           navigation_path: /lovelace/climate
-          haptic: light
-
-      - type: custom:button-card
-        entity: fan.zhimi_vb4_00ae_air_purifier
-        name: Air Purifier
-        template: app_device_air_purifier_entity
+      - entity: sensor.master_bedroom_aircon_outside
+        state_background: false
+        icon: mdi:weather-partly-cloudy
+        show_state: true
         tap_action:
-          action: navigate
-          navigation_path: /lovelace/rooms-living-room
-          haptic: light
-
-      - type: custom:button-card
-        entity: fan.dmaker_p33_c4d3_fan
-        name: Living Room Fan
-        template: app_fan_entity
-
-      - type: custom:button-card
-        entity: fan.dmaker_p15_03db_fan
-        name: Bedroom Fan
-        template: app_fan_entity
-
-      - type: custom:button-card
-        entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
-        name: Pet Fountain
-        template: app_toggle_entity
-        icon: mdi:fountain
-        state_display: >
-          [[[
-            const st = states['sensor.xiaomi_iv02_f7b6_status'];
-            const s = st ? st.state : entity.state;
-            return s.charAt(0).toUpperCase() + s.slice(1) + ` - ${variables.last_changed}`;
-          ]]]
-        tap_action:
-          action: navigate
-          navigation_path: /lovelace/pets
-          haptic: light
-
-      - type: custom:button-card
-        entity: sensor.speedtest_download
-        name: Internet
-        template: app_device_entity
-        icon: app:app-wifi
-        state_display: >
-          [[[
-            const ping = states['sensor.speedtest_ping'] ? states['sensor.speedtest_ping'].state : '?';
-            return `${Math.round(parseFloat(entity.state))} Mbps · ${ping} ms`;
-          ]]]
-        tap_action:
-          action: navigate
-          navigation_path: /lovelace/system
-          haptic: light
-
-      - type: conditional
-        conditions:
-          - condition: state
-            entity: vacuum.ijai_v3_aaa0_robot_cleaner
-            state_not: unavailable
-        card:
-          type: custom:button-card
-          entity: vacuum.ijai_v3_aaa0_robot_cleaner
-          name: Robot Vacuum
-          template: app_device_entity
-          icon: mdi:robot-vacuum
+          action: more-info
+    styles: |
+      .bubble-icon { color: var(--primary-color) !important; }
+      .bubble-icon-container { background-color: color-mix(in srgb, var(--primary-color) 20%, transparent) !important; }
+      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
 
   #
-  # Quick Settings
+  # Devices: overview rows. The row shows the count or state; sub-buttons are the quick switches.
   #
-  - type: custom:button-card
+  - type: custom:decluttering-card
     template: section_title
-    name: Quick Settings
-  - type: entities
-    card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
-    entities:
-      - entity: automation.feed_cats
-        name: Scheduled Feeding
-        icon: mdi:cat
-        card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
-        secondary_info: last-changed
-        state_color: true
-      - entity: automation.notify_feed_cat1_and_cat2
+    variables:
+      - title: Devices
+  - type: custom:bubble-card
+    card_type: button
+    button_type: state
+    entity: light.all_lights
+    name: Lights
+    icon: mdi:lightbulb-group
+    show_state: true
+    tap_action:
+      action: more-info
+    button_action:
+      tap_action:
+        action: navigate
+        navigation_path: '#lights'
+    sub_button:
+      - entity: light.all_lights
+        icon: mdi:power
+        tap_action:
+          action: toggle
+    styles: |
+      ${(() => {
+        const ids = hass.states['light.all_lights']?.attributes?.entity_id || [];
+        const n = ids.filter(id => hass.states[id]?.state === 'on').length;
+        card.querySelector('.bubble-state').innerText = n ? `${n} on` : 'All off';
+        return '';
+      })()}
+      ${(() => { const c = hass.states['light.all_lights']?.state === 'on' ? 'var(--state-light-active-color)' : 'rgb(var(--app-icon-shape-off-rgb))'; return `.bubble-icon { color: ${c} !important; } .bubble-icon-container { background-color: color-mix(in srgb, ${c} 20%, transparent) !important; }`; })()}
+      .bubble-sub-button.background-on { background-color: color-mix(in srgb, var(--state-light-active-color) 20%, transparent) !important; }
+      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--state-light-active-color) !important; }
+  - type: custom:bubble-card
+    card_type: button
+    button_type: state
+    entity: fan.dmaker_p33_c4d3_fan
+    name: Fans
+    icon: mdi:fan
+    show_state: true
+    tap_action:
+      action: none
+    button_action:
+      tap_action:
+        action: navigate
+        navigation_path: '#fans'
+    styles: |
+      ${(() => {
+        const ids = ['fan.dmaker_p33_c4d3_fan', 'fan.dmaker_p15_03db_fan'];
+        const n = ids.filter(id => hass.states[id]?.state === 'on').length;
+        card.querySelector('.bubble-state').innerText = n ? `${n} on` : 'All off';
+        return '';
+      })()}
+      ${(() => { const c = ['fan.dmaker_p33_c4d3_fan', 'fan.dmaker_p15_03db_fan'].some(id => hass.states[id]?.state === 'on') ? 'var(--primary-color)' : 'rgb(var(--app-icon-shape-off-rgb))'; return `.bubble-icon { color: ${c} !important; } .bubble-icon-container { background-color: color-mix(in srgb, ${c} 20%, transparent) !important; }`; })()}
+      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: vacuum.ijai_v3_aaa0_robot_cleaner
+        state_not: unavailable
+      - condition: state
+        entity: vacuum.ijai_v3_aaa0_robot_cleaner
+        state_not: unknown
+    card:
+      type: custom:bubble-card
+      card_type: button
+      button_type: state
+      entity: vacuum.ijai_v3_aaa0_robot_cleaner
+      name: Robot Vacuum
+      icon: mdi:robot-vacuum
+      show_state: true
+      tap_action:
+        action: more-info
+      sub_button:
+        - entity: vacuum.ijai_v3_aaa0_robot_cleaner
+          icon: mdi:play
+          state_background: false
+          tap_action:
+            action: perform-action
+            perform_action: vacuum.start
+            target:
+              entity_id: vacuum.ijai_v3_aaa0_robot_cleaner
+        - entity: vacuum.ijai_v3_aaa0_robot_cleaner
+          icon: mdi:home-import-outline
+          state_background: false
+          tap_action:
+            action: perform-action
+            perform_action: vacuum.return_to_base
+            target:
+              entity_id: vacuum.ijai_v3_aaa0_robot_cleaner
+      styles: |
+        ${(() => { const c = ['on', 'cleaning', 'returning'].includes(hass.states['vacuum.ijai_v3_aaa0_robot_cleaner']?.state) ? 'var(--primary-color)' : 'rgb(var(--app-icon-shape-off-rgb))'; return `.bubble-icon { color: ${c} !important; } .bubble-icon-container { background-color: color-mix(in srgb, ${c} 20%, transparent) !important; }`; })()}
+        .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
+
+  #
+  # Routines
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Routines
+  - type: tile
+    entity: automation.feed_cats
+    name: Scheduled Feeding
+    icon: mdi:cat
+    vertical: false
+    state_content:
+      - state
+      - last_triggered
+    tap_action:
+      action: toggle
+      confirmation:
+        text: Turn scheduled feeding on or off? While it is on, both feeders dispense at 12:00 every day.
+    icon_tap_action:
+      action: more-info
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: automation.notify_feed_cat1_and_cat2
         name: Feeding Reminders
-        icon: app:app-notification
-        card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
         secondary_info: last-changed
-        state_color: true
-      - entity: automation.notify_ohayou_gozaimasu
+        fill_container: true
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+      - type: custom:mushroom-entity-card
+        entity: automation.notify_ohayou_gozaimasu
         name: Morning Greeting
-        icon: app:app-announcement
-        card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
         secondary_info: last-changed
-        state_color: true
-      - entity: automation.auto_theme_switch
-        name: Auto Theme Switch
-        icon: mdi:theme-light-dark
-        card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
-        secondary_info: last-changed
-        state_color: true
-      - entity: switch.cloud_remote
-        name: Remote Access
-        icon: mdi:cloud-outline
-        card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
-        secondary_info: last-changed
-        state_color: true
+        fill_container: true
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
 
   #
   # Navbar

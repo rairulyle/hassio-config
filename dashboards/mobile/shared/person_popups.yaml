@@ -4,14 +4,16 @@
 - type: custom:bubble-card
   card_type: pop-up
   hash: '#person1'
+  entity: person.person1
+  name: Person 1
+  button_type: state
+  show_state: true
+  show_header: true
   close_by_clicking_outside: true
   styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
-  margin_top_mobile: calc(100vh - 760px)
-  margin_top_desktop: calc(100vh - 760px)
+  margin_top_mobile: max(0px, calc(100vh - 760px))
+  margin_top_desktop: max(0px, calc(100vh - 760px))
   cards:
-    - type: custom:button-card
-      template: app_popup_page_title
-      name: Person 1
     - type: map
       entities:
         - device_tracker.person1_phone
@@ -19,39 +21,29 @@
       default_zoom: 14
       auto_fit: true
       theme_mode: dark
-    - type: custom:button-card
+    - type: custom:decluttering-card
       template: section_title
-      name: Phone
-    - type: entities
-      card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
-      entities:
-        - entity: person.person1
-          name: Location
-          secondary_info: last-changed
-          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
-        - entity: sensor.person1_phone_battery_level
+      variables:
+        - title: Devices
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+        - type: custom:mushroom-entity-card
+          entity: sensor.person1_phone_battery_level
           name: Battery
-          secondary_info: last-changed
-          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
-        - entity: sensor.person1_phone_battery_state
-          name: Charging
-          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
-    - type: custom:button-card
-      template: section_title
-      name: Gaming PC
-    - type: entities
-      card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
-      entities:
-        - entity: switch.desktop1_pc
+          fill_container: true
+          tap_action:
+            action: more-info
+        - type: custom:mushroom-entity-card
+          entity: switch.desktop1_pc
           name: Gaming PC
-          icon: mdi:youtube-gaming
           secondary_info: last-changed
-          state_color: true
-          card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
-        - entity: sensor.desktop1_pc_status
-          name: Status
-          icon: mdi:lan-connect
-          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
+          fill_container: true
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
 
 #
 # Person 2 popup
@@ -59,14 +51,16 @@
 - type: custom:bubble-card
   card_type: pop-up
   hash: '#person2'
+  entity: person.person2
+  name: Person 2
+  button_type: state
+  show_state: true
+  show_header: true
   close_by_clicking_outside: true
   styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
-  margin_top_mobile: calc(100vh - 760px)
-  margin_top_desktop: calc(100vh - 760px)
+  margin_top_mobile: max(0px, calc(100vh - 760px))
+  margin_top_desktop: max(0px, calc(100vh - 760px))
   cards:
-    - type: custom:button-card
-      template: app_popup_page_title
-      name: Person 2
     - type: map
       entities:
         - device_tracker.person2_phone
@@ -74,50 +68,44 @@
       default_zoom: 14
       auto_fit: true
       theme_mode: dark
-    - type: custom:button-card
+    - type: custom:decluttering-card
       template: section_title
-      name: Phone
-    - type: entities
-      card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
-      entities:
-        - entity: person.person2
-          name: Location
-          secondary_info: last-changed
-          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
-        - entity: sensor.person2_phone_battery_level
+      variables:
+        - title: Devices
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+        - type: custom:mushroom-entity-card
+          entity: sensor.person2_phone_battery_level
           name: Battery
-          secondary_info: last-changed
-          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
-        - entity: sensor.person2_phone_battery_state
-          name: Charging
-          card_mod: !include /config/dashboards/templates/includes/card_mod/entities/entity_generic_styles.yaml
-    - type: custom:button-card
-      template: section_title
-      name: Gaming PC
-    - type: entities
-      card_mod: !include /config/dashboards/templates/includes/card_mod/base/app_vertical_stack.yaml
-      entities:
-        - entity: switch.desktop2_pc_wake_on_lan
+          fill_container: true
+          tap_action:
+            action: more-info
+        - type: custom:mushroom-entity-card
+          entity: switch.desktop2_pc_wake_on_lan
           name: Gaming PC
-          icon: mdi:youtube-gaming
           secondary_info: last-changed
-          state_color: true
-          card_mod: !include /config/dashboards/templates/includes/app_boolean_entity_layout.yaml
+          fill_container: true
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
 
 #
-# Upcoming TV popup
+# Upcoming TV popup: the full Sonarr list with fanart
 #
 - type: custom:bubble-card
   card_type: pop-up
   hash: '#upcoming_tv'
+  name: Upcoming TV
+  icon: mdi:youtube-tv
+  show_header: true
   close_by_clicking_outside: true
   styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
-  margin_top_mobile: calc(100vh - 760px)
-  margin_top_desktop: calc(100vh - 760px)
+  margin_top_mobile: max(0px, calc(100vh - 760px))
+  margin_top_desktop: max(0px, calc(100vh - 760px))
   cards:
-    - type: custom:button-card
-      template: app_popup_page_title
-      name: Upcoming TV
     - type: custom:upcoming-media-card
       entity: sensor.sonarr_upcoming_media
       image_style: fanart
@@ -134,3 +122,177 @@
             background: linear-gradient(to right, hsl(0deg 0% 0% / 50%) 48%, transparent 70%, #000 100%)!important;
             box-shadow: none!important;
           }
+
+#
+# Lights popup: the all-lights group, grouped by floor then room (auto-entities per room)
+#
+- type: custom:bubble-card
+  card_type: pop-up
+  hash: '#lights'
+  entity: light.all_lights
+  name: Lights
+  icon: mdi:lightbulb-group
+  button_type: state
+  show_state: true
+  show_header: true
+  close_by_clicking_outside: true
+  styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+  margin_top_mobile: max(0px, calc(100vh - 760px))
+  margin_top_desktop: max(0px, calc(100vh - 760px))
+  cards:
+    - type: custom:decluttering-card
+      template: section_title
+      variables:
+        - title: Second Floor
+    - type: custom:mushroom-title-card
+      subtitle: Master Bedroom
+    - type: custom:auto-entities
+      show_empty: false
+      card:
+        type: grid
+        columns: 1
+        square: false
+      card_param: cards
+      filter:
+        include:
+          - group: light.all_lights
+            area: master_bedroom
+            options:
+              type: custom:mushroom-light-card
+              show_brightness_control: true
+              collapsible_controls: true
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+        exclude:
+          - state: unavailable
+    - type: custom:mushroom-title-card
+      subtitle: Bedroom
+    - type: custom:auto-entities
+      show_empty: false
+      card:
+        type: grid
+        columns: 1
+        square: false
+      card_param: cards
+      filter:
+        include:
+          - group: light.all_lights
+            area: bedroom
+            options:
+              type: custom:mushroom-light-card
+              show_brightness_control: true
+              collapsible_controls: true
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+        exclude:
+          - state: unavailable
+    - type: custom:mushroom-title-card
+      subtitle: Master Bathroom
+    - type: custom:auto-entities
+      show_empty: false
+      card:
+        type: grid
+        columns: 1
+        square: false
+      card_param: cards
+      filter:
+        include:
+          - group: light.all_lights
+            area: bathroom
+            options:
+              type: custom:mushroom-light-card
+              show_brightness_control: true
+              collapsible_controls: true
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+        exclude:
+          - state: unavailable
+
+#
+# Fans popup: the standing fans by floor then room (the purifier has its own place)
+#
+- type: custom:bubble-card
+  card_type: pop-up
+  hash: '#fans'
+  name: Fans
+  icon: mdi:fan
+  show_header: true
+  close_by_clicking_outside: true
+  styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+  margin_top_mobile: max(0px, calc(100vh - 760px))
+  margin_top_desktop: max(0px, calc(100vh - 760px))
+  cards:
+    - type: custom:decluttering-card
+      template: section_title
+      variables:
+        - title: First Floor
+    - type: custom:mushroom-title-card
+      subtitle: Living Room
+    - type: custom:auto-entities
+      show_empty: false
+      card:
+        type: grid
+        columns: 1
+        square: false
+      card_param: cards
+      filter:
+        include:
+          - domain: fan
+            area: main_room
+            options:
+              type: custom:mushroom-fan-card
+              icon_animation: true
+              show_percentage_control: true
+              collapsible_controls: true
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+              features:
+                - type: fan-preset-modes
+                  style: dropdown
+        exclude:
+          - entity_id: fan.zhimi_vb4_00ae_air_purifier
+          - state: unavailable
+      sort:
+        method: name
+    - type: custom:decluttering-card
+      template: section_title
+      variables:
+        - title: Second Floor
+    - type: custom:mushroom-title-card
+      subtitle: Bedroom
+    - type: custom:auto-entities
+      show_empty: false
+      card:
+        type: grid
+        columns: 1
+        square: false
+      card_param: cards
+      filter:
+        include:
+          - domain: fan
+            area: bedroom
+            options:
+              type: custom:mushroom-fan-card
+              icon_animation: true
+              show_percentage_control: true
+              collapsible_controls: true
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+              features:
+                - type: fan-preset-modes
+                  style: dropdown
+        exclude:
+          - entity_id: fan.zhimi_vb4_00ae_air_purifier
+          - state: unavailable
+      sort:
+        method: name
