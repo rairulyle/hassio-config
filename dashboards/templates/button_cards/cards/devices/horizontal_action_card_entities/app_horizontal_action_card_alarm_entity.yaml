@@ -1,9 +1,0 @@
-app_horizontal_action_card_alarm_entity:
-  template: app_horizontal_action_card_entity
-  state:
-    - value: 'disarmed'
-      icon: app:app-alarm-disarmed
-    - value: 'armed_home'
-      icon: app:app-alarm-armed-home
-    - value: 'armed_away'
-      icon: app:app-alarm-armed-away
