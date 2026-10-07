@@ -1,0 +1,10 @@
+# Chip row (Mushroom chips card): chips never wrap; the row scrolls sideways with no visible scrollbar.
+style: |
+  .chip-container {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .chip-container::-webkit-scrollbar { display: none; }

@@ -26,23 +26,12 @@ room_card:
           layout:
             grid-template-columns: 100%
             margin: 0px 0px 0px 0px
-            padding: 20px 20px 0px 20px
+            padding: 16px 20px 0px 20px
             card_margin: 0px
           cards:
-            - type: custom:mod-card
-              card_mod:
-                style:
-                  hui-horizontal-stack-card$: |
-                    #root {
-                      gap: 5px !important;
-                      justify-content: flex-start;
-                    }
-                    #root > * {
-                      flex: 0 0 auto !important;
-                    }
-              card:
-                type: horizontal-stack
-                cards: '[[chips]]'
+            - type: custom:mushroom-chips-card
+              card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
+              chips: '[[chips]]'
 
       - type: custom:button-card
         entity: '[[entity]]'
