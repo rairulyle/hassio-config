@@ -71,7 +71,7 @@
       name: Catppuccin Auto Latte Mocha
   mode: single
 - id: '1732557076878'
-  alias: 'Notify: Feed Cat1 and Cat2'
+  alias: 'Notify: Feed Cat1, Cat2, and Cat3'
   description: ''
   triggers:
   - at: '22:30:00'
@@ -109,7 +109,7 @@
   - action: tts.google_translate_say
     data:
       cache: true
-      message: Attention, Master! Don't forget to feed Cat1 and Cat2, or they'll
+      message: Attention, Master! Don't forget to feed Cat1, Cat2, and Cat3, or they'll
         turn into hungry little oni, moaning like they want snacku!
       language: ja
       entity_id: media_player.google_home_mini
