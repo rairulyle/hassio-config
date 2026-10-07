@@ -6,7 +6,6 @@
 - climate:
     name: __NAME__
     unique_id: faikin___UID__
-    icon: mdi:air-conditioner
     device:
       identifiers:
         - __UID__

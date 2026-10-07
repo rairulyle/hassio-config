@@ -10,7 +10,6 @@
 - climate:
     name: Master Bedroom Aircon
     unique_id: faikin_D4059248504C
-    icon: mdi:air-conditioner
     device:
       identifiers:
         - D4059248504C
