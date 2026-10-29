@@ -14,7 +14,7 @@ cards:
       - type: template
         entity: person.person1
         icon: mdi:home-account
-        icon_color: "{{ 'green' if (['person.person1','person.person2'] | map('states') | select('eq','home') | list | count) > 0 else 'grey' }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('person.home', 'home' if (['person.person1','person.person2'] | map('states') | select('eq','home') | list | count) > 0 else 'not_home') }}"
         content: "{% set n = ['person.person1','person.person2'] | map('states') | select('eq','home') | list | count %}{{ 'Nobody home' if n == 0 else ('1 person home' if n == 1 else n ~ ' people home') }}"
         tap_action:
           action: more-info
@@ -26,22 +26,20 @@ cards:
     columns: 2
     square: false
     cards:
-      - type: custom:mushroom-person-card
-        entity: person.person1
-        use_entity_picture: true
-        name: Person 1
-        fill_container: true
-        tap_action:
-          action: navigate
-          navigation_path: '#person1'
-      - type: custom:mushroom-person-card
-        entity: person.person2
-        use_entity_picture: true
-        name: Person 2
-        fill_container: true
-        tap_action:
-          action: navigate
-          navigation_path: '#person2'
+      - type: custom:decluttering-card
+        template: person_tile
+        variables:
+          - person: person.person1
+          - location: sensor.person1_location
+          - name: Person 1
+          - hash: '#person1'
+      - type: custom:decluttering-card
+        template: person_tile
+        variables:
+          - person: person.person2
+          - location: sensor.person2_location
+          - name: Person 2
+          - hash: '#person2'
 
   #
   # Map
@@ -52,8 +50,8 @@ cards:
       - title: Map
   - type: map
     entities:
-      - device_tracker.person1_phone
-      - device_tracker.person2_phone
+      - device_tracker.person1_galaxy_z_fold8_ultra_person1_z_fold8_ultra
+      - device_tracker.person2_galaxy_z_fold8_person2_z_fold8
     hours_to_show: 24
     auto_fit: true
     theme_mode: dark

@@ -12,10 +12,10 @@ cards:
     card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
     chips:
       - type: template
-        entity: binary_sensor.zigbee2mqtt_bridge_connection_state
+        entity: binary_sensor.slzb_mr4u_ethernet
         icon: mdi:zigbee
-        icon_color: "{{ 'green' if is_state('binary_sensor.zigbee2mqtt_bridge_connection_state','on') else 'red' }}"
-        content: "{{ 'Zigbee OK' if is_state('binary_sensor.zigbee2mqtt_bridge_connection_state','on') else 'Zigbee down' }}"
+        icon_color: "{{ 'green' if is_state('binary_sensor.slzb_mr4u_ethernet','on') else 'red' }}"
+        content: "{{ 'Zigbee OK' if is_state('binary_sensor.slzb_mr4u_ethernet','on') else 'Zigbee down' }}"
         tap_action:
           action: more-info
       - type: template
@@ -23,13 +23,6 @@ cards:
         icon: mdi:shield-check
         icon_color: "{{ 'green' if is_state('binary_sensor.adguard_home_running','on') else 'red' }}"
         content: "{{ 'AdGuard OK' if is_state('binary_sensor.adguard_home_running','on') else 'AdGuard down' }}"
-        tap_action:
-          action: more-info
-      - type: template
-        entity: sensor.speedtest_download
-        icon: mdi:wifi
-        icon_color: purple
-        content: "{{ states('sensor.speedtest_download') | float(0) | round(0) | int }} Mbps"
         tap_action:
           action: more-info
 
@@ -52,7 +45,7 @@ cards:
           action: more-info
       - type: custom:mushroom-entity-card
         entity: sensor.system_monitor_processor_temperature
-        name: CPU Temperature
+        name: CPU Temp
         fill_container: true
         tap_action:
           action: more-info
@@ -70,36 +63,6 @@ cards:
           action: more-info
 
   #
-  # Network
-  #
-  - type: custom:decluttering-card
-    template: section_title
-    variables:
-      - title: Network
-  - type: grid
-    columns: 3
-    square: false
-    cards:
-      - type: custom:mushroom-entity-card
-        entity: sensor.speedtest_download
-        name: Download
-        fill_container: true
-        tap_action:
-          action: more-info
-      - type: custom:mushroom-entity-card
-        entity: sensor.speedtest_upload
-        name: Upload
-        fill_container: true
-        tap_action:
-          action: more-info
-      - type: custom:mushroom-entity-card
-        entity: sensor.speedtest_ping
-        name: Ping
-        fill_container: true
-        tap_action:
-          action: more-info
-
-  #
   # Infrastructure
   #
   - type: custom:decluttering-card
@@ -111,20 +74,20 @@ cards:
     square: false
     cards:
       - type: custom:mushroom-entity-card
-        entity: binary_sensor.zigbee2mqtt_bridge_connection_state
-        name: Zigbee2MQTT
+        entity: binary_sensor.slzb_mr4u_ethernet
+        name: Zigbee Coordinator
         fill_container: true
         tap_action:
           action: more-info
       - type: custom:mushroom-entity-card
-        entity: sensor.slzb_06m_zigbee_chip_temp
-        name: SLZB-06M Zigbee Chip
+        entity: sensor.slzb_mr4u_zigbee_chip_temp
+        name: Zigbee Chip
         fill_container: true
         tap_action:
           action: more-info
       - type: custom:mushroom-entity-card
         entity: binary_sensor.adguard_home_running
-        name: AdGuard Home
+        name: AdGuard
         fill_container: true
         tap_action:
           action: more-info
@@ -149,16 +112,7 @@ cards:
     cards:
       - type: custom:mushroom-entity-card
         entity: automation.auto_theme_switch
-        name: Auto Light/Dark Theme
-        secondary_info: last-changed
-        fill_container: true
-        tap_action:
-          action: toggle
-        hold_action:
-          action: more-info
-      - type: custom:mushroom-entity-card
-        entity: automation.notify_check_and_lock_doors_and_windows
-        name: Lock-up Reminder
+        name: Auto Theme
         secondary_info: last-changed
         fill_container: true
         tap_action:
@@ -178,14 +132,14 @@ cards:
     square: false
     cards:
       - type: custom:mushroom-entity-card
-        entity: sensor.person1_phone_battery_level
-        name: Person 1's Phone
+        entity: sensor.person1_galaxy_z_fold8_ultra_person1_z_fold8_ultra_battery_level
+        name: Person 1
         fill_container: true
         tap_action:
           action: more-info
       - type: custom:mushroom-entity-card
-        entity: sensor.person2_phone_battery_level
-        name: Person 2's Phone
+        entity: sensor.person2_galaxy_z_fold8_person2_z_fold8_battery_level
+        name: Person 2
         fill_container: true
         tap_action:
           action: more-info
@@ -197,7 +151,7 @@ cards:
           action: more-info
       - type: custom:mushroom-entity-card
         entity: sensor.ijai_v3_aaa0_battery_level
-        name: Robot Vacuum
+        name: Vacuum
         fill_container: true
         tap_action:
           action: more-info
@@ -215,37 +169,37 @@ cards:
     cards:
       - type: custom:mushroom-entity-card
         entity: sensor.zhimi_vb4_00ae_filter_left_time
-        name: Air Purifier Filter
+        name: Purifier
         fill_container: true
         tap_action:
           action: more-info
       - type: custom:mushroom-entity-card
         entity: sensor.xiaomi_iv02_f7b6_filter_left_time
-        name: Fountain Filter
+        name: Fountain
         fill_container: true
         tap_action:
           action: more-info
       - type: custom:mushroom-entity-card
         entity: sensor.ijai_v3_aaa0_main_brush_life
-        name: Vacuum Main Brush
+        name: Main Brush
         fill_container: true
         tap_action:
           action: more-info
       - type: custom:mushroom-entity-card
         entity: sensor.ijai_v3_aaa0_side_brush_life
-        name: Vacuum Side Brush
+        name: Side Brush
         fill_container: true
         tap_action:
           action: more-info
       - type: custom:mushroom-entity-card
         entity: sensor.ijai_v3_aaa0_hypa_life
-        name: Vacuum HEPA
+        name: HEPA Filter
         fill_container: true
         tap_action:
           action: more-info
       - type: custom:mushroom-entity-card
         entity: sensor.ijai_v3_aaa0_mop_life
-        name: Vacuum Mop Pad
+        name: Mop Pad
         fill_container: true
         tap_action:
           action: more-info
@@ -275,13 +229,13 @@ cards:
           action: more-info
       - type: custom:mushroom-entity-card
         entity: sensor.meralco_generation_charge
-        name: Generation Charge
+        name: Generation
         fill_container: true
         tap_action:
           action: more-info
       - type: custom:mushroom-entity-card
         entity: sensor.master_bedroom_aircon_lifetime_outside_energy
-        name: Aircon Lifetime Energy
+        name: Aircon Energy
         fill_container: true
         tap_action:
           action: more-info

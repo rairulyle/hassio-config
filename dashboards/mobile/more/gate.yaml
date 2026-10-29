@@ -1,0 +1,180 @@
+type: custom:vertical-layout
+title: Gate
+path: gate
+theme: Catppuccin Auto Latte Mocha Dashboard
+subview: true
+layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
+cards:
+  # Pedestrian gate doorbell "call" page, opened by the Doorbell ring notification (/lovelace/gate).
+  # A black full-screen call screen like a phone app: caller and status at the top, the video in the
+  # middle, round call buttons at the bottom. card_mod pins the card over the whole screen, which
+  # also covers the HA header. No navbar; Android back leaves.
+  # Live video and two-way talk both go through Frigate's go2rtc via the Frigate integration's
+  # proxy (no go2rtc url set, so the card builds it from the Frigate camera). The mic needs HTTPS.
+  # The buttons are button-card elements (templates in button_cards/cards/call/gate_call.yaml)
+  # shown per call phase; they fire the card's own call/microphone actions.
+  - type: custom:stack-in-card
+    # Fast wrapper: it renders at once, so its card_mod covers the screen (and the HA header)
+    # before the camera card has finished starting. The styling is scoped to this card only.
+    mode: vertical
+    card_mod:
+      style: |
+        ha-card {
+          position: fixed !important;
+          inset: 0;
+          z-index: 100;
+          border-radius: 0 !important;
+          border: none !important;
+          box-shadow: none !important;
+          background: #000 !important;
+          overflow: hidden;
+        }
+    cards:
+      - type: custom:advanced-camera-card
+        cameras:
+          - camera_entity: camera.doorbell_camera # Frigate camera, never the Reolink ones
+            title: Pedestrian Gate
+            live_provider: go2rtc
+            go2rtc:
+              modes: [webrtc, mse] # mse keeps video if the WebRTC media path is blocked
+              metadata_fetch_timeout_seconds: 5
+            layout:
+              fit: contain # whole picture, centred, black above and below
+            triggers:
+              entities:
+                - binary_sensor.doorbell_visitor
+              reviews:
+                severities: [] # Frigate alerts must not ring the card, only the button
+                description: false
+        dimensions:
+          aspect_ratio_mode: unconstrained
+          height: 100dvh
+        view:
+          default: live
+          triggers:
+            actions:
+              interaction_mode: all
+              trigger: call # a Visitor press rings this screen while it is open
+              untrigger: none
+          theme:
+            themes: [dark]
+            overrides:
+              --advanced-camera-card-background: '#000'
+        status_bar:
+          style: none
+        menu:
+          style: none
+        live:
+          controls:
+            builtin: false
+            call:
+              enabled: false # the buttons below drive the call
+              unanswered_timeout_seconds: 60
+              ringtone:
+                type: none # the phones already rang
+          microphone:
+            always_connected: false # the mic only opens once a call is answered or started
+            auto_unmute: [call] # like a phone: answering opens the mic, Mute closes it
+            audio_processing:
+              echo_cancellation: true
+              noise_suppression: true
+              channel_count: 1
+        elements:
+          #
+          # Top: caller and call status
+          #
+          - type: custom:button-card
+            template: gate_call_text
+            name: Pedestrian Gate
+            variables: { size: 28px, weight: 500, opacity: 1 }
+            style: { top: 'calc(env(safe-area-inset-top) + 28px)', left: 24px, transform: none }
+          - type: custom:advanced-camera-card-conditional
+            conditions: [{ condition: call, call: idle }]
+            elements:
+              - type: custom:button-card
+                template: gate_call_text
+                name: Live
+                style: { top: 'calc(env(safe-area-inset-top) + 68px)', left: 24px, transform: none }
+          - type: custom:advanced-camera-card-conditional
+            conditions: [{ condition: call, call: ringing }]
+            elements:
+              - type: custom:button-card
+                template: gate_call_text
+                name: Ringing…
+                style: { top: 'calc(env(safe-area-inset-top) + 68px)', left: 24px, transform: none }
+          - type: custom:advanced-camera-card-conditional
+            conditions: [{ condition: call, call: answered }]
+            elements:
+              - type: custom:button-card
+                template: gate_call_text
+                name: In call
+                style: { top: 'calc(env(safe-area-inset-top) + 68px)', left: 24px, transform: none }
+
+          #
+          # Quick replies, above the call buttons: only while no call is running (idle or ringing).
+          # Tap "Quick reply", then a message: it plays at the gate right away.
+          #
+          - type: custom:advanced-camera-card-conditional
+            conditions: [{ condition: call, call: [idle, ringing] }]
+            elements:
+              - type: custom:button-card
+                template: gate_quick_reply
+                style: { top: auto, bottom: 'calc(env(safe-area-inset-bottom) + 160px)', left: 50%, transform: translateX(-50%), width: 'min(88vw, 420px)' }
+
+          #
+          # Bottom: call buttons for each phase
+          #
+          # Idle: start talking to the gate.
+          - type: custom:advanced-camera-card-conditional
+            conditions: [{ condition: call, call: idle }]
+            elements:
+              - type: custom:button-card
+                template: gate_call_button
+                name: Talk
+                icon: mdi:phone
+                variables: { background: '#34c759', card_action: call_start }
+                style: &call_center { top: auto, bottom: 'calc(env(safe-area-inset-bottom) + 40px)', left: 50%, transform: translateX(-50%) }
+          # Ringing: decline or answer.
+          - type: custom:advanced-camera-card-conditional
+            conditions: [{ condition: call, call: ringing }]
+            elements:
+              - type: custom:button-card
+                template: gate_call_button
+                name: Decline
+                icon: mdi:phone-hangup
+                variables: { background: '#ff453a', card_action: call_end }
+                style: &call_left { top: auto, bottom: 'calc(env(safe-area-inset-bottom) + 40px)', left: 28%, transform: translateX(-50%) }
+              - type: custom:button-card
+                template: gate_call_button
+                name: Answer
+                icon: mdi:phone
+                variables: { background: '#34c759', pulse: true, card_action: call_answer }
+                style: &call_right { top: auto, bottom: 'calc(env(safe-area-inset-bottom) + 40px)', left: 72%, transform: translateX(-50%) }
+          # In call: mute the mic, hang up.
+          - type: custom:advanced-camera-card-conditional
+            conditions: [{ condition: call, call: answered }, { condition: microphone, muted: false }]
+            elements:
+              - type: custom:button-card
+                template: gate_call_button
+                name: Mute
+                icon: mdi:microphone
+                variables: { card_action: microphone_mute }
+                style: *call_left
+          - type: custom:advanced-camera-card-conditional
+            conditions: [{ condition: call, call: answered }, { condition: microphone, muted: true }]
+            elements:
+              - type: custom:button-card
+                template: gate_call_button
+                name: Unmute
+                icon: mdi:microphone-off
+                variables: { background: '#ffffff', color: '#000000', card_action: microphone_unmute }
+                style: *call_left
+          - type: custom:advanced-camera-card-conditional
+            conditions: [{ condition: call, call: answered }]
+            elements:
+              - type: custom:button-card
+                template: gate_call_button
+                name: End
+                icon: mdi:phone-hangup
+                variables: { background: '#ff453a', card_action: call_end }
+                style: *call_right

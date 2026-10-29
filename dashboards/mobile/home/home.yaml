@@ -12,28 +12,24 @@ cards:
     chips:
       - type: template
         entity: climate.master_bedroom_aircon
-        icon: "{{ {'heat_cool':'mdi:sun-snowflake-variant','heat':'mdi:heat-wave','cool':'mdi:snowflake','dry':'mdi:water-percent','fan_only':'mdi:fan'}.get(states('climate.master_bedroom_aircon'), 'mdi:air-conditioner') }}"
-        icon_color: "{{ {'heat_cool':'teal','heat':'red','cool':'blue','dry':'cyan','fan_only':'green'}.get(states('climate.master_bedroom_aircon'), 'grey') }}"
-        content: "{% set s = states('climate.master_bedroom_aircon') %}{% set t = state_attr('climate.master_bedroom_aircon','temperature') or state_attr('climate.master_bedroom_aircon','current_temperature') %}{{ {'heat_cool':'Auto','heat':'Heat','cool':'Cool','dry':'Dry','fan_only':'Fan','off':'Off','unavailable':'Offline'}.get(s, s) }}{{ (' · ' ~ (t | round(0) | int) ~ '°') if (t and s not in ['off','unavailable']) else '' }} ›"
+        icon: "{% from 'aircon.jinja' import aircon_icon %}{{ aircon_icon('climate.master_bedroom_aircon') }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('climate.master_bedroom_aircon') }}"
+        content: "{% from 'aircon.jinja' import aircon_label %}{{ aircon_label('climate.master_bedroom_aircon') }} ›"
         tap_action:
           action: navigate
-          navigation_path: /lovelace/climate
+          navigation_path: /lovelace/rooms-master-bedroom
         hold_action:
           action: more-info
-      - type: template
-        entity: light.all_lights
+      - type: action
         icon: mdi:lightbulb-group
-        icon_color: "{{ 'amber' if (expand('light.all_lights') | selectattr('state','eq','on') | list | count) > 0 else 'grey' }}"
-        content: "{% set n = expand('light.all_lights') | selectattr('state','eq','on') | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }} ›"
+        icon_color: amber
         tap_action:
           action: navigate
-          navigation_path: /lovelace/rooms
-        hold_action:
-          action: more-info
+          navigation_path: "#lights"
       - type: template
         entity: lock.master_bedroom_door
         icon: "{{ 'mdi:lock' if is_state('lock.master_bedroom_door','locked') else ('mdi:lock-question' if is_state('lock.master_bedroom_door','unavailable') else 'mdi:lock-open-variant') }}"
-        icon_color: "{{ {'locked':'green','jammed':'red','unavailable':'grey'}.get(states('lock.master_bedroom_door'), 'amber') }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('lock.master_bedroom_door') }}"
         content: "{{ {'locked':'Locked','unlocked':'Unlocked','locking':'Locking…','unlocking':'Unlocking…','jammed':'Jammed','open':'Open'}.get(states('lock.master_bedroom_door'), 'Offline') }}"
         tap_action:
           action: more-info
@@ -71,26 +67,20 @@ cards:
     columns: 2
     square: false
     cards:
-      - type: custom:mushroom-person-card
-        entity: person.person1
-        name: Person 1
-        use_entity_picture: true
-        fill_container: true
-        tap_action:
-          action: navigate
-          navigation_path: '#person1'
-        hold_action:
-          action: more-info
-      - type: custom:mushroom-person-card
-        entity: person.person2
-        name: Person 2
-        use_entity_picture: true
-        fill_container: true
-        tap_action:
-          action: navigate
-          navigation_path: '#person2'
-        hold_action:
-          action: more-info
+      - type: custom:decluttering-card
+        template: person_tile
+        variables:
+          - person: person.person1
+          - location: sensor.person1_location
+          - name: Person 1
+          - hash: '#person1'
+      - type: custom:decluttering-card
+        template: person_tile
+        variables:
+          - person: person.person2
+          - location: sensor.person2_location
+          - name: Person 2
+          - hash: '#person2'
 
   #
   # Upcoming TV: the next Sonarr episode as one row (time · show · episode · SxxExx)
@@ -121,9 +111,6 @@ cards:
         card.querySelector('.bubble-state').innerText = text;
         return '';
       })()}
-      .bubble-icon { color: var(--primary-color) !important; }
-      .bubble-icon-container { background-color: color-mix(in srgb, var(--primary-color) 20%, transparent) !important; }
-      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
 
   #
   # Needs attention: only present when something is wrong
@@ -265,22 +252,21 @@ cards:
       - name: Feed
         entity: script.feed_cat
         icon: mdi:bowl-mix
-        show_name: true
+        show_name: false
         tap_action:
           action: more-info
         hold_action:
           action: perform-action
           perform_action: script.feed_cat
       - entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
-        show_state: true
         icon: mdi:fountain
         tap_action:
           action: toggle
         hold_action:
           action: more-info
+    app_style:
+      color: var(--accent-color)
     styles: |
-      .bubble-icon { color: var(--accent-color) !important; }
-      .bubble-icon-container { background-color: color-mix(in srgb, var(--accent-color) 20%, transparent) !important; }
       ${(() => {
         const now = Date.now();
         const lt = hass.states['script.feed_cat']?.attributes?.last_triggered;
@@ -296,17 +282,16 @@ cards:
           const lunch = new Date(); lunch.setHours(12, 0, 0, 0);
           if (lunch.getTime() <= now) lunch.setDate(lunch.getDate() + 1);
           const mins = Math.round((lunch.getTime() - now) / 60000);
-          next = mins <= 60 ? ' · Lunch in ' + mins + 'm' : (lunch.getDate() !== new Date().getDate() ? ' · Lunch tomorrow 12:00' : ' · Lunch at 12:00');
+          next = mins <= 60 ? ' · Lunch in ' + mins + 'm' : (lunch.getDate() !== new Date().getDate() ? ' · Lunch tomorrow' : ' · Lunch at 12:00');
         } else if (sch) {
           next = ' · Schedule off';
         }
         card.querySelector('.bubble-state').innerText = fed + next;
         return '';
       })()}
-      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
 
   #
-  # Climate: one Bubble row with sub-buttons (details live on the Climate page)
+  # Climate: one Bubble row with sub-buttons (the air purifier's readings)
   #
   - type: custom:bubble-card
     card_type: button
@@ -316,8 +301,7 @@ cards:
     icon: mdi:home-thermometer
     show_state: true
     tap_action:
-      action: navigate
-      navigation_path: /lovelace/climate
+      action: more-info
     sub_button:
       - entity: sensor.zhimi_vb4_00ae_relative_humidity
         state_background: false
@@ -330,21 +314,10 @@ cards:
         icon: mdi:blur
         show_state: true
         tap_action:
-          action: navigate
-          navigation_path: /lovelace/climate
-      - entity: sensor.master_bedroom_aircon_outside
-        state_background: false
-        icon: mdi:weather-partly-cloudy
-        show_state: true
-        tap_action:
           action: more-info
-    styles: |
-      .bubble-icon { color: var(--primary-color) !important; }
-      .bubble-icon-container { background-color: color-mix(in srgb, var(--primary-color) 20%, transparent) !important; }
-      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
 
   #
-  # Devices: overview rows. The row shows the count or state; sub-buttons are the quick switches.
+  # Devices: Lights and Fans open their popups (defined at the bottom of this file)
   #
   - type: custom:decluttering-card
     template: section_title
@@ -353,91 +326,66 @@ cards:
   - type: custom:bubble-card
     card_type: button
     button_type: state
-    entity: light.all_lights
+    entity: sensor.home_lights_on_count
     name: Lights
     icon: mdi:lightbulb-group
     show_state: true
-    tap_action:
-      action: more-info
     button_action:
       tap_action:
         action: navigate
         navigation_path: '#lights'
-    sub_button:
-      - entity: light.all_lights
-        icon: mdi:power
-        tap_action:
-          action: toggle
-    styles: |
-      ${(() => {
-        const ids = hass.states['light.all_lights']?.attributes?.entity_id || [];
-        const n = ids.filter(id => hass.states[id]?.state === 'on').length;
-        card.querySelector('.bubble-state').innerText = n ? `${n} on` : 'All off';
-        return '';
-      })()}
-      ${(() => { const c = hass.states['light.all_lights']?.state === 'on' ? 'var(--state-light-active-color)' : 'rgb(var(--app-icon-shape-off-rgb))'; return `.bubble-icon { color: ${c} !important; } .bubble-icon-container { background-color: color-mix(in srgb, ${c} 20%, transparent) !important; }`; })()}
-      .bubble-sub-button.background-on { background-color: color-mix(in srgb, var(--state-light-active-color) 20%, transparent) !important; }
-      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--state-light-active-color) !important; }
+    tap_action:
+      action: navigate
+      navigation_path: '#lights'
+    app_style:
+      count_entity: sensor.home_lights_on_count
   - type: custom:bubble-card
     card_type: button
-    button_type: state
-    entity: fan.dmaker_p33_c4d3_fan
+    button_type: name
     name: Fans
     icon: mdi:fan
-    show_state: true
-    tap_action:
-      action: none
     button_action:
       tap_action:
         action: navigate
         navigation_path: '#fans'
-    styles: |
-      ${(() => {
-        const ids = ['fan.dmaker_p33_c4d3_fan', 'fan.dmaker_p15_03db_fan'];
-        const n = ids.filter(id => hass.states[id]?.state === 'on').length;
-        card.querySelector('.bubble-state').innerText = n ? `${n} on` : 'All off';
-        return '';
-      })()}
-      ${(() => { const c = ['fan.dmaker_p33_c4d3_fan', 'fan.dmaker_p15_03db_fan'].some(id => hass.states[id]?.state === 'on') ? 'var(--primary-color)' : 'rgb(var(--app-icon-shape-off-rgb))'; return `.bubble-icon { color: ${c} !important; } .bubble-icon-container { background-color: color-mix(in srgb, ${c} 20%, transparent) !important; }`; })()}
-      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
+    tap_action:
+      action: navigate
+      navigation_path: '#fans'
   - type: conditional
     conditions:
       - condition: state
-        entity: vacuum.ijai_v3_aaa0_robot_cleaner
+        entity: vacuum.hallway_robot_vacuum_vacuum
         state_not: unavailable
       - condition: state
-        entity: vacuum.ijai_v3_aaa0_robot_cleaner
+        entity: vacuum.hallway_robot_vacuum_vacuum
         state_not: unknown
     card:
       type: custom:bubble-card
       card_type: button
       button_type: state
-      entity: vacuum.ijai_v3_aaa0_robot_cleaner
+      entity: vacuum.hallway_robot_vacuum_vacuum
       name: Robot Vacuum
       icon: mdi:robot-vacuum
       show_state: true
       tap_action:
         action: more-info
       sub_button:
-        - entity: vacuum.ijai_v3_aaa0_robot_cleaner
+        - entity: vacuum.hallway_robot_vacuum_vacuum
           icon: mdi:play
           state_background: false
           tap_action:
             action: perform-action
             perform_action: vacuum.start
             target:
-              entity_id: vacuum.ijai_v3_aaa0_robot_cleaner
-        - entity: vacuum.ijai_v3_aaa0_robot_cleaner
+              entity_id: vacuum.hallway_robot_vacuum_vacuum
+        - entity: vacuum.hallway_robot_vacuum_vacuum
           icon: mdi:home-import-outline
           state_background: false
           tap_action:
             action: perform-action
             perform_action: vacuum.return_to_base
             target:
-              entity_id: vacuum.ijai_v3_aaa0_robot_cleaner
-      styles: |
-        ${(() => { const c = ['on', 'cleaning', 'returning'].includes(hass.states['vacuum.ijai_v3_aaa0_robot_cleaner']?.state) ? 'var(--primary-color)' : 'rgb(var(--app-icon-shape-off-rgb))'; return `.bubble-icon { color: ${c} !important; } .bubble-icon-container { background-color: color-mix(in srgb, ${c} 20%, transparent) !important; }`; })()}
-        .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
+              entity_id: vacuum.hallway_robot_vacuum_vacuum
 
   #
   # Routines
@@ -461,7 +409,7 @@ cards:
     icon_tap_action:
       action: more-info
   - type: grid
-    columns: 2
+    columns: 1
     square: false
     cards:
       - type: custom:mushroom-entity-card
@@ -493,3 +441,250 @@ cards:
   #
   - type: vertical-stack
     cards: !include /config/dashboards/mobile/shared/person_popups.yaml
+
+  #
+  # Lights popup: the room lights, same rows as the room pages
+  #
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#lights'
+    name: Lights
+    icon: mdi:lightbulb-group
+    show_header: true
+    close_by_clicking_outside: true
+    styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+    margin_top_mobile: max(0px, calc(100vh - 760px))
+    margin_top_desktop: max(0px, calc(100vh - 760px))
+    cards:
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Master Bedroom
+          - sub_button:
+            - entity: switch.master_bedroom_adaptive_lighting
+              icon: mdi:theme-light-dark
+              show_name: false
+              color_domain: light
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.master_bedroom_all_lights
+          - name: All lights
+          - icon: mdi:lightbulb-group
+          - count_entity: sensor.master_bedroom_lights_on_count
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.master_bedroom_main_lights
+          - name: Main Lights
+          - icon: mdi:lightbulb-group
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.master_bedroom_window_light
+          - name: Window Light
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Hobby Room
+          - sub_button:
+            - entity: switch.hobby_room_adaptive_lighting
+              icon: mdi:theme-light-dark
+              show_name: false
+              color_domain: light
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.hobby_room_all_lights
+          - name: All lights
+          - icon: mdi:lightbulb-group
+          - count_entity: sensor.hobby_room_lights_on_count
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.hobby_room_person1_table_lights
+          - name: Person 1's Table
+          - icon: mdi:lightbulb-group
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.hobby_room_person2_table_lights
+          - name: Person 2's Table
+          - icon: mdi:lightbulb-group
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Bedroom
+          - sub_button:
+            - entity: switch.bedroom_adaptive_lighting
+              icon: mdi:theme-light-dark
+              show_name: false
+              color_domain: light
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.bedroom_all_lights
+          - name: All lights
+          - icon: mdi:lightbulb-group
+          - count_entity: sensor.bedroom_lights_on_count
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.bedroom_main_lights
+          - name: Main Lights
+          - icon: mdi:lightbulb-group
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.bedroom_cabinet_lights
+          - name: Cabinet Lights
+          - icon: mdi:lightbulb-group
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Hallway
+          - sub_button:
+            - entity: switch.hallway_adaptive_lighting
+              icon: mdi:theme-light-dark
+              show_name: false
+              color_domain: light
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.hallway_all_lights
+          - name: All lights
+          - icon: mdi:lightbulb-group
+          - count_entity: sensor.hallway_lights_on_count
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.hallway_stairs_light
+          - name: Stairs
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.hallway_bedroom_light
+          - name: Bedroom
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.hallway_hobby_room_light
+          - name: Hobby Room
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Walk-in Closet
+          - sub_button:
+            - entity: switch.walk_in_closet_adaptive_lighting
+              icon: mdi:theme-light-dark
+              show_name: false
+              color_domain: light
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.walk_in_closet_all_lights
+          - name: All lights
+          - icon: mdi:lightbulb-group
+          - count_entity: sensor.walk_in_closet_lights_on_count
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.walk_in_closet_left_light
+          - name: Left Light
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.walk_in_closet_right_light
+          - name: Right Light
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Master Bathroom
+          - sub_button:
+            - entity: switch.master_bathroom_adaptive_lighting
+              icon: mdi:theme-light-dark
+              show_name: false
+              color_domain: light
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.master_bathroom_all_lights
+          - name: All lights
+          - icon: mdi:lightbulb-group
+          - count_entity: sensor.master_bathroom_lights_on_count
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.master_bathroom_shower_light
+          - name: Shower Light
+      - type: custom:decluttering-card
+        template: light_row
+        variables:
+          - entity: light.master_bathroom_door_light
+          - name: Door Light
+  #
+  # Fans popup: the two standing fans
+  #
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#fans'
+    name: Fans
+    icon: mdi:fan
+    show_header: true
+    close_by_clicking_outside: true
+    styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+    margin_top_mobile: max(0px, calc(100vh - 760px))
+    margin_top_desktop: max(0px, calc(100vh - 760px))
+    cards:
+      - type: custom:mushroom-fan-card
+        entity: fan.dmaker_p33_c4d3_fan
+        name:
+          type: area
+        icon_animation: true
+        show_percentage_control: true
+        collapsible_controls: true
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+        features:
+          - type: fan-preset-modes
+            style: dropdown
+      - type: custom:mushroom-fan-card
+        entity: fan.dmaker_p15_03db_fan
+        name:
+          type: area
+        icon_animation: true
+        show_percentage_control: true
+        collapsible_controls: true
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+        features:
+          - type: fan-preset-modes
+            style: dropdown

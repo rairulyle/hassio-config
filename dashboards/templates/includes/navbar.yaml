@@ -1,36 +1,47 @@
+# Bar icons are all MDI so they share its padding and read the same size; the app: set fills the whole
+# 24px box and looks bigger.
 type: custom:navbar-card
 routes:
   - url: /lovelace/home
-    icon: app:app-dashboard
-    label: Home
+    icon: mdi:home-variant
+    label: Overview
 
   - url: /lovelace/rooms
-    icon: app:app-rooms
+    icon: mdi:view-grid
     label: Rooms
     selected: '[[[ return window.location.pathname.startsWith("/lovelace/rooms") ]]]'
     hold_action:
       action: open-popup
     popup:
-      - url: /lovelace/rooms-living-room
-        icon: app:app-chair
-        label: Living Room
+      - url: /lovelace/rooms-hallway
+        icon: mdi:coat-rack
+        label: Hallway
       - url: /lovelace/rooms-master-bedroom
         icon: app:app-bed-king
         label: Master Bedroom
-      - url: /lovelace/rooms-bedroom
-        icon: app:app-bed-single
-        label: Bedroom
       - url: /lovelace/rooms-master-bathroom
         icon: mdi:shower-head
         label: Master Bathroom
-
-  - url: /lovelace/climate
-    icon: app:app-climate
-    label: Climate
+      - url: /lovelace/rooms-bedroom
+        icon: app:app-bed-single
+        label: Bedroom
+      - url: /lovelace/rooms-hobby-room
+        icon: mdi:desk
+        label: Hobby Room
+      - url: /lovelace/rooms-living-room
+        icon: app:app-chair
+        label: Living Room
+      - url: /lovelace/rooms-carport
+        icon: mdi:garage-variant
+        label: Carport
 
   - url: /lovelace/pets
     icon: mdi:cat
     label: Pets
+
+  - url: /lovelace/cameras
+    icon: mdi:cctv
+    label: Cameras
 
   - icon: mdi:dots-horizontal
     label: More
@@ -53,12 +64,14 @@ mobile:
   show_labels: false
   show_popup_label_backgrounds: true
 styles: |
-  /* Floating bar styled like a Mushroom card: card colour, card radius, inset from the edges. */
+  /* Floating bar: card radius, inset from the edges, raised above the cards by its own surface,
+     shadow and hairline (app-navbar-* theme tokens, set per light/dark mode). */
   .navbar-card {
-    border: none;
-    background: rgba(var(--rgb-card-background-color), 0.94);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--app-navbar-border, transparent);
+    background: var(--app-navbar-background, rgba(var(--rgb-card-background-color), 0.94));
+    box-shadow: var(--app-navbar-shadow, none);
+    backdrop-filter: blur(20px) saturate(1.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
     border-radius: var(--ha-card-border-radius, 14px);
     width: calc(100% - 24px);
     margin: 0 auto;

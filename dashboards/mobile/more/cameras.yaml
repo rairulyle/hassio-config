@@ -1,0 +1,87 @@
+type: custom:vertical-layout
+title: Cameras
+path: cameras
+theme: Catppuccin Auto Latte Mocha Dashboard
+subview: true
+layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
+cards:
+  # Same order as Frigate (ui.order 1-9). Tap or hold a camera for its live stream.
+
+  #
+  # Outdoor
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Outdoor
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.doorbell_camera
+      - name: Doorbell
+      - show_name: true
+      - aspect_ratio: '4:3' # 896x672 in Frigate; the other cameras are 1280x720 (16:9)
+      - tap_action: # tap opens the Gate call screen (live + talk); hold still shows the stream
+          action: navigate
+          navigation_path: /lovelace/gate
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.porch_gate_camera
+      - name: Gate
+      - show_name: true
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.porch_main_door_camera
+      - name: Main Door
+      - show_name: true
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.carport_carport_camera
+      - name: Carport
+      - show_name: true
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.lanai_lanai_camera
+      - name: Lanai
+      - show_name: true
+
+  #
+  # Indoor
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Indoor
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.living_room_living_room_camera
+      - name: Living Room
+      - show_name: true
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.kitchen_kitchen_camera
+      - name: Kitchen
+      - show_name: true
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.indoor_garden_stairs_camera
+      - name: Stairs
+      - show_name: true
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.hallway_hallway_camera
+      - name: Hallway
+      - show_name: true
+
+  #
+  # Navbar
+  #
+  - !include /config/dashboards/templates/includes/navbar.yaml

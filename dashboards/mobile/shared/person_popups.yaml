@@ -7,7 +7,14 @@
   entity: person.person1
   name: Person 1
   button_type: state
-  show_state: true
+  # The header shows the room (sensor.person1_location) instead of the person's plain home/away.
+  show_state: false
+  sub_button:
+    - entity: sensor.person1_location
+      show_state: true
+      state_background: false
+      tap_action:
+        action: more-info
   show_header: true
   close_by_clicking_outside: true
   styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
@@ -16,7 +23,7 @@
   cards:
     - type: map
       entities:
-        - device_tracker.person1_phone
+        - device_tracker.person1_galaxy_z_fold8_ultra_person1_z_fold8_ultra
       hours_to_show: 24
       default_zoom: 14
       auto_fit: true
@@ -30,13 +37,13 @@
       square: false
       cards:
         - type: custom:mushroom-entity-card
-          entity: sensor.person1_phone_battery_level
+          entity: sensor.person1_galaxy_z_fold8_ultra_person1_z_fold8_ultra_battery_level
           name: Battery
           fill_container: true
           tap_action:
             action: more-info
         - type: custom:mushroom-entity-card
-          entity: switch.desktop1_pc
+          entity: switch.desktop1_pc_wake_on_lan
           name: Gaming PC
           secondary_info: last-changed
           fill_container: true
@@ -54,7 +61,14 @@
   entity: person.person2
   name: Person 2
   button_type: state
-  show_state: true
+  # The header shows the room (sensor.person2_location) instead of the person's plain home/away.
+  show_state: false
+  sub_button:
+    - entity: sensor.person2_location
+      show_state: true
+      state_background: false
+      tap_action:
+        action: more-info
   show_header: true
   close_by_clicking_outside: true
   styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
@@ -63,7 +77,7 @@
   cards:
     - type: map
       entities:
-        - device_tracker.person2_phone
+        - device_tracker.person2_galaxy_z_fold8_person2_z_fold8
       hours_to_show: 24
       default_zoom: 14
       auto_fit: true
@@ -77,7 +91,7 @@
       square: false
       cards:
         - type: custom:mushroom-entity-card
-          entity: sensor.person2_phone_battery_level
+          entity: sensor.person2_galaxy_z_fold8_person2_z_fold8_battery_level
           name: Battery
           fill_container: true
           tap_action:
@@ -122,177 +136,3 @@
             background: linear-gradient(to right, hsl(0deg 0% 0% / 50%) 48%, transparent 70%, #000 100%)!important;
             box-shadow: none!important;
           }
-
-#
-# Lights popup: the all-lights group, grouped by floor then room (auto-entities per room)
-#
-- type: custom:bubble-card
-  card_type: pop-up
-  hash: '#lights'
-  entity: light.all_lights
-  name: Lights
-  icon: mdi:lightbulb-group
-  button_type: state
-  show_state: true
-  show_header: true
-  close_by_clicking_outside: true
-  styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
-  margin_top_mobile: max(0px, calc(100vh - 760px))
-  margin_top_desktop: max(0px, calc(100vh - 760px))
-  cards:
-    - type: custom:decluttering-card
-      template: section_title
-      variables:
-        - title: Second Floor
-    - type: custom:mushroom-title-card
-      subtitle: Master Bedroom
-    - type: custom:auto-entities
-      show_empty: false
-      card:
-        type: grid
-        columns: 1
-        square: false
-      card_param: cards
-      filter:
-        include:
-          - group: light.all_lights
-            area: master_bedroom
-            options:
-              type: custom:mushroom-light-card
-              show_brightness_control: true
-              collapsible_controls: true
-              tap_action:
-                action: toggle
-              hold_action:
-                action: more-info
-        exclude:
-          - state: unavailable
-    - type: custom:mushroom-title-card
-      subtitle: Bedroom
-    - type: custom:auto-entities
-      show_empty: false
-      card:
-        type: grid
-        columns: 1
-        square: false
-      card_param: cards
-      filter:
-        include:
-          - group: light.all_lights
-            area: bedroom
-            options:
-              type: custom:mushroom-light-card
-              show_brightness_control: true
-              collapsible_controls: true
-              tap_action:
-                action: toggle
-              hold_action:
-                action: more-info
-        exclude:
-          - state: unavailable
-    - type: custom:mushroom-title-card
-      subtitle: Master Bathroom
-    - type: custom:auto-entities
-      show_empty: false
-      card:
-        type: grid
-        columns: 1
-        square: false
-      card_param: cards
-      filter:
-        include:
-          - group: light.all_lights
-            area: bathroom
-            options:
-              type: custom:mushroom-light-card
-              show_brightness_control: true
-              collapsible_controls: true
-              tap_action:
-                action: toggle
-              hold_action:
-                action: more-info
-        exclude:
-          - state: unavailable
-
-#
-# Fans popup: the standing fans by floor then room (the purifier has its own place)
-#
-- type: custom:bubble-card
-  card_type: pop-up
-  hash: '#fans'
-  name: Fans
-  icon: mdi:fan
-  show_header: true
-  close_by_clicking_outside: true
-  styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
-  margin_top_mobile: max(0px, calc(100vh - 760px))
-  margin_top_desktop: max(0px, calc(100vh - 760px))
-  cards:
-    - type: custom:decluttering-card
-      template: section_title
-      variables:
-        - title: First Floor
-    - type: custom:mushroom-title-card
-      subtitle: Living Room
-    - type: custom:auto-entities
-      show_empty: false
-      card:
-        type: grid
-        columns: 1
-        square: false
-      card_param: cards
-      filter:
-        include:
-          - domain: fan
-            area: main_room
-            options:
-              type: custom:mushroom-fan-card
-              icon_animation: true
-              show_percentage_control: true
-              collapsible_controls: true
-              tap_action:
-                action: toggle
-              hold_action:
-                action: more-info
-              features:
-                - type: fan-preset-modes
-                  style: dropdown
-        exclude:
-          - entity_id: fan.zhimi_vb4_00ae_air_purifier
-          - state: unavailable
-      sort:
-        method: name
-    - type: custom:decluttering-card
-      template: section_title
-      variables:
-        - title: Second Floor
-    - type: custom:mushroom-title-card
-      subtitle: Bedroom
-    - type: custom:auto-entities
-      show_empty: false
-      card:
-        type: grid
-        columns: 1
-        square: false
-      card_param: cards
-      filter:
-        include:
-          - domain: fan
-            area: bedroom
-            options:
-              type: custom:mushroom-fan-card
-              icon_animation: true
-              show_percentage_control: true
-              collapsible_controls: true
-              tap_action:
-                action: toggle
-              hold_action:
-                action: more-info
-              features:
-                - type: fan-preset-modes
-                  style: dropdown
-        exclude:
-          - entity_id: fan.zhimi_vb4_00ae_air_purifier
-          - state: unavailable
-      sort:
-        method: name

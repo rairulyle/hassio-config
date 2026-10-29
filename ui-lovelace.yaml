@@ -9,10 +9,14 @@ views:
   - !include /config/dashboards/mobile/rooms/rooms.yaml
   - !include /config/dashboards/mobile/rooms/living_room.yaml
   - !include /config/dashboards/mobile/rooms/master_bedroom.yaml
-  - !include /config/dashboards/mobile/rooms/bedroom.yaml
   - !include /config/dashboards/mobile/rooms/master_bathroom.yaml
-  - !include /config/dashboards/mobile/climate/climate.yaml
+  - !include /config/dashboards/mobile/rooms/bedroom.yaml
+  - !include /config/dashboards/mobile/rooms/hobby_room.yaml
+  - !include /config/dashboards/mobile/rooms/hallway.yaml
+  - !include /config/dashboards/mobile/rooms/carport.yaml
   - !include /config/dashboards/mobile/pets/pets.yaml
+  - !include /config/dashboards/mobile/more/cameras.yaml
+  - !include /config/dashboards/mobile/more/gate.yaml
   - !include /config/dashboards/mobile/more/people.yaml
   - !include /config/dashboards/mobile/more/system.yaml
 
