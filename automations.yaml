@@ -791,3 +791,137 @@
           - light.hallway_all_lights
           - light.walk_in_closet_all_lights
   mode: restart
+- id: zigbee_coordinator_mode_alert
+  alias: Zigbee coordinator mode alert
+  description: High-priority alert on Person 1's phone when the SLZB-MR4U leaves Ethernet
+    mode (USB or Wi-Fi). Zigbee2MQTT can't reach tcp://192.168.10.20:6638 then, so
+    every Zigbee device is down. The SMLIGHT integration polls slowly, so a Zigbee2MQTT
+    drop forces a refresh of the mode sensor. Clears and confirms once it's back on
+    Ethernet.
+  triggers:
+  - trigger: state
+    entity_id: sensor.slzb_mr4u_connection_mode
+    to:
+    - usb
+    - wifi
+    id: mode_changed
+  - trigger: state
+    entity_id: binary_sensor.zigbee2mqtt_bridge_connection_state
+    to: 'off'
+    for:
+      seconds: 20
+    id: z2m_down
+  - trigger: state
+    entity_id: sensor.slzb_mr4u_connection_mode
+    from:
+    - usb
+    - wifi
+    to: eth
+    id: mode_restored
+  conditions: []
+  actions:
+  - variables:
+      phone: notify.mobile_app_person1_phone
+      slzb_url: http://192.168.10.20
+      mode_name: '{{ {''usb'': ''USB'', ''wifi'': ''Wi-Fi''}.get(states(''sensor.slzb_mr4u_connection_mode''),
+        states(''sensor.slzb_mr4u_connection_mode'')) }}'
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: z2m_down
+      sequence:
+      - action: homeassistant.update_entity
+        target:
+          entity_id: sensor.slzb_mr4u_connection_mode
+    - conditions:
+      - condition: trigger
+        id: mode_changed
+      sequence:
+      - action: '{{ phone }}'
+        data:
+          title: 🚨 Zigbee down, SLZB-MR4U in {{ mode_name }} mode
+          message: The coordinator left Ethernet mode, so every Zigbee device is offline.
+            Open its web UI, set Mode > Connection mode to Ethernet and save.
+          data:
+            priority: high
+            ttl: 0
+            importance: high
+            channel: Zigbee coordinator
+            tag: slzb-mode
+            sticky: 'true'
+            clickAction: '{{ slzb_url }}'
+            actions:
+            - action: URI
+              title: Open SLZB-MR4U
+              uri: '{{ slzb_url }}'
+    - conditions:
+      - condition: trigger
+        id: mode_restored
+      sequence:
+      - action: '{{ phone }}'
+        data:
+          message: clear_notification
+          data:
+            tag: slzb-mode
+      - action: '{{ phone }}'
+        data:
+          title: ✅ SLZB-MR4U back on Ethernet
+          message: Zigbee2MQTT can reach the coordinator again.
+          data:
+            importance: low
+            channel: Zigbee coordinator status
+            tag: slzb-mode-restored
+            clickAction: '{{ slzb_url }}'
+  mode: queued
+- id: litter_box_visit
+  alias: Litter Box - Visit Notification
+  description: Push to Person 1 and Person 2 when a cat uses a Neakasa M1 litter box, naming the cat, the
+    box and its weight. Triggered by the per-box cat sensors (sensor.<cat>_last_visit_<box>), so a
+    visit the box didn't match to a cat sends nothing. The Neakasa cloud records arrive on the
+    integration's poll (10 min by default), so the push can lag the visit by that much. Low importance,
+    "Litter box" channel, grouped.
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.cat1_last_visit_master_bedroom
+    - sensor.cat1_last_visit_hallway
+    - sensor.cat2_last_visit_master_bedroom
+    - sensor.cat2_last_visit_hallway
+    - sensor.cat3_last_visit_master_bedroom
+    - sensor.cat3_last_visit_hallway
+  conditions:
+  # A new, later visit from the last hour: skips restarts, reconnects and the integration's lookback.
+  - condition: template
+    value_template: >
+      {% set new = as_datetime(trigger.to_state.state if trigger.to_state else none, none) %}
+      {% set old = as_datetime(trigger.from_state.state if trigger.from_state else none, none) %}
+      {{ trigger.from_state is not none and trigger.from_state.state != 'unavailable'
+         and new is not none and (old is none or new > old)
+         and now() - new < timedelta(hours=1) }}
+  actions:
+  - variables:
+      phones:
+      - notify.mobile_app_person1_phone
+      - notify.mobile_app_person2_s_fold8
+      boxes:
+        master_bedroom: Master Bedroom
+        hallway: Hallway
+      cat: "{{ trigger.entity_id | regex_replace('^sensor\\.(\\w+?)_last_visit_\\w+$', '\\\\1') }}"
+      box: "{{ trigger.entity_id | regex_replace('^sensor\\.\\w+?_last_visit_', '') }}"
+      weight: "{{ states('sensor.' ~ cat ~ '_weight_' ~ box) }}"
+      visit_time: "{{ as_local(as_datetime(trigger.to_state.state)).strftime('%-I:%M %p') }}"
+  - repeat:
+      for_each: '{{ phones }}'
+      sequence:
+      - action: '{{ repeat.item }}'
+        continue_on_error: true
+        data:
+          title: "\U0001F431 {{ cat | title }} used the {{ boxes[box] }} litter box"
+          message: "At {{ visit_time }}{{ ' · ' ~ weight ~ ' kg' if is_number(weight) }}"
+          data:
+            importance: low
+            channel: Litter box
+            group: litter-box
+            clickAction: /lovelace/pets
+  mode: queued
+  max: 10
