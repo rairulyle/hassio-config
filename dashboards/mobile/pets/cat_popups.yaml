@@ -1,0 +1,197 @@
+#
+# Cat1 popup
+#
+- type: custom:bubble-card
+  card_type: pop-up
+  hash: '#cat1'
+  entity: person.cat1
+  name: Cat1
+  button_type: state
+  # The header shows the room from the Bermuda tracker instead of the person's plain home/away.
+  show_state: false
+  sub_button:
+    - entity: sensor.cat1_tracker_area
+      show_state: true
+      state_background: false
+      tap_action:
+        action: more-info
+  show_header: true
+  close_by_clicking_outside: true
+  styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+  margin_top_mobile: max(0px, calc(100vh - 760px))
+  margin_top_desktop: max(0px, calc(100vh - 760px))
+  cards:
+    - type: custom:decluttering-card
+      template: section_title
+      variables:
+        - title: Weight
+    - type: statistics-graph
+      entities:
+        - entity: sensor.cat1_weight
+          name: Weight
+      days_to_show: 30
+      period: day
+      stat_types:
+        - mean
+      chart_type: line
+      hide_legend: true
+    - type: custom:decluttering-card
+      template: section_title
+      variables:
+        - title: Tracker
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+        - type: custom:mushroom-entity-card
+          entity: sensor.cat1_tracker_floor
+          name: Floor
+          fill_container: true
+          tap_action:
+            action: more-info
+        - type: custom:mushroom-entity-card
+          entity: sensor.cat1_tracker_distance
+          name: Distance
+          fill_container: true
+          tap_action:
+            action: more-info
+        - type: custom:mushroom-number-card
+          entity: number.cat1_tracker_calibration_ref_power_at_1m_0_for_default
+          name: Calibration
+          display_mode: buttons
+          secondary_info: none
+          fill_container: true
+          tap_action:
+            action: more-info
+
+#
+# Cat2 popup
+#
+- type: custom:bubble-card
+  card_type: pop-up
+  hash: '#cat2'
+  entity: person.cat2
+  name: Cat2
+  button_type: state
+  # The header shows the room from the Bermuda tracker instead of the person's plain home/away.
+  show_state: false
+  sub_button:
+    - entity: sensor.cat2_tracker_area
+      show_state: true
+      state_background: false
+      tap_action:
+        action: more-info
+  show_header: true
+  close_by_clicking_outside: true
+  styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+  margin_top_mobile: max(0px, calc(100vh - 760px))
+  margin_top_desktop: max(0px, calc(100vh - 760px))
+  cards:
+    - type: custom:decluttering-card
+      template: section_title
+      variables:
+        - title: Weight
+    - type: statistics-graph
+      entities:
+        - entity: sensor.cat2_weight
+          name: Weight
+      days_to_show: 30
+      period: day
+      stat_types:
+        - mean
+      chart_type: line
+      hide_legend: true
+    - type: custom:decluttering-card
+      template: section_title
+      variables:
+        - title: Tracker
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+        - type: custom:mushroom-entity-card
+          entity: sensor.cat2_tracker_floor
+          name: Floor
+          fill_container: true
+          tap_action:
+            action: more-info
+        - type: custom:mushroom-entity-card
+          entity: sensor.cat2_tracker_distance
+          name: Distance
+          fill_container: true
+          tap_action:
+            action: more-info
+        - type: custom:mushroom-number-card
+          entity: number.cat2_tracker_calibration_ref_power_at_1m_0_for_default
+          name: Calibration
+          display_mode: buttons
+          secondary_info: none
+          fill_container: true
+          tap_action:
+            action: more-info
+
+#
+# Cat3 popup
+#
+- type: custom:bubble-card
+  card_type: pop-up
+  hash: '#cat3'
+  entity: person.cat3
+  name: Cat3
+  button_type: state
+  # The header shows the room from the Bermuda tracker instead of the person's plain home/away.
+  show_state: false
+  sub_button:
+    - entity: sensor.cat3_tracker_area
+      show_state: true
+      state_background: false
+      tap_action:
+        action: more-info
+  show_header: true
+  close_by_clicking_outside: true
+  styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+  margin_top_mobile: max(0px, calc(100vh - 760px))
+  margin_top_desktop: max(0px, calc(100vh - 760px))
+  cards:
+    - type: custom:decluttering-card
+      template: section_title
+      variables:
+        - title: Weight
+    - type: statistics-graph
+      entities:
+        - entity: sensor.cat3_weight
+          name: Weight
+      days_to_show: 30
+      period: day
+      stat_types:
+        - mean
+      chart_type: line
+      hide_legend: true
+    - type: custom:decluttering-card
+      template: section_title
+      variables:
+        - title: Tracker
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+        - type: custom:mushroom-entity-card
+          entity: sensor.cat3_tracker_floor
+          name: Floor
+          fill_container: true
+          tap_action:
+            action: more-info
+        - type: custom:mushroom-entity-card
+          entity: sensor.cat3_tracker_distance
+          name: Distance
+          fill_container: true
+          tap_action:
+            action: more-info
+        - type: custom:mushroom-number-card
+          entity: number.cat3_tracker_calibration_ref_power_at_1m_0_for_default
+          name: Calibration
+          display_mode: buttons
+          secondary_info: none
+          fill_container: true
+          tap_action:
+            action: more-info

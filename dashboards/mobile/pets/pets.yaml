@@ -14,17 +14,19 @@ cards:
       - type: template
         entity: automation.feed_cats
         icon: mdi:clock
-        icon_color: "{{ 'green' if is_state('automation.feed_cats','on') else 'grey' }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('automation.feed_cats') }}"
         content: "{{ 'Schedule On' if is_state('automation.feed_cats','on') else 'Schedule Off' }}"
         tap_action:
           action: more-info
-      - type: entity
-        entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
-        content_info: state
+      # Litter: the worst of both boxes, naming the box (litter_state / litter_label in custom_templates/litterbox.jinja).
+      # It warns on a full waste bucket only; needs_cleaning is on after every visit until auto-clean runs.
+      - type: template
+        icon: mdi:toilet
+        icon_color: "{% from 'litterbox.jinja' import litter_state %}{{ {'full': 'red', 'cleaning': 'blue'}.get(litter_state() | trim, 'green') }}"
+        content: "{% from 'litterbox.jinja' import litter_label %}{{ litter_label() }}"
         tap_action:
-          action: toggle
-        hold_action:
-          action: more-info
+          action: navigate
+          navigation_path: '#litter_boxes'
       - type: action
         icon: mdi:dots-horizontal
         icon_color: grey
@@ -33,55 +35,160 @@ cards:
           navigation_path: '#pets_settings'
 
   #
-  # Feeding
+  # Cats: one section each, with the cat as a person (picture, room) and its litter box readings
+  #
+  - type: custom:decluttering-card
+    template: cat_section
+    variables:
+      - cat: cat1
+      - name: Cat1
+      - hash: '#cat1'
+  - type: custom:decluttering-card
+    template: cat_section
+    variables:
+      - cat: cat2
+      - name: Cat2
+      - hash: '#cat2'
+  - type: custom:decluttering-card
+    template: cat_section
+    variables:
+      - cat: cat3
+      - name: Cat3
+      - hash: '#cat3'
+
+  #
+  # Litter boxes: the two Neakasa M1s. Sub-buttons: litter level, then Clean and Level, which open
+  # the button's dialog (its Press button is the confirmation).
   #
   - type: custom:decluttering-card
     template: section_title
     variables:
-      - title: Cat1, Cat2, & Cat3
+      - title: Litter Boxes
+  - type: custom:bubble-card
+    card_type: button
+    button_type: state
+    entity: sensor.neakasa_m1_status
+    name: Master Bedroom
+    icon: mdi:toilet
+    show_state: true
+    # The status reads unknown while the waste bucket is full, so it says Full then.
+    styles: |
+      ${(() => {
+        const s = hass.states['sensor.neakasa_m1_status'];
+        const full = s?.state === 'unknown' && hass.states['binary_sensor.neakasa_m1_waste_bucket_full']?.state === 'on';
+        card.querySelector('.bubble-state').innerText = full ? 'Full' : hass.formatEntityState(s);
+        return '';
+      })()}
+    tap_action:
+      action: more-info
+    sub_button:
+      - entity: sensor.neakasa_m1_sand_level
+        icon: mdi:grain
+        show_state: true
+        state_background: false
+        tap_action:
+          action: more-info
+      - name: Clean
+        entity: button.neakasa_m1_clean_now
+        icon: mdi:broom
+        tap_action:
+          action: more-info
+      - name: Level
+        entity: button.neakasa_m1_level_now
+        icon: mdi:wave
+        tap_action:
+          action: more-info
+  - type: custom:bubble-card
+    card_type: button
+    button_type: state
+    entity: sensor.neakasa_m1_status_2
+    name: Hallway
+    icon: mdi:toilet
+    show_state: true
+    styles: |
+      ${(() => {
+        const s = hass.states['sensor.neakasa_m1_status_2'];
+        const full = s?.state === 'unknown' && hass.states['binary_sensor.neakasa_m1_waste_bucket_full_2']?.state === 'on';
+        card.querySelector('.bubble-state').innerText = full ? 'Full' : hass.formatEntityState(s);
+        return '';
+      })()}
+    tap_action:
+      action: more-info
+    sub_button:
+      - entity: sensor.neakasa_m1_sand_level_2
+        icon: mdi:grain
+        show_state: true
+        state_background: false
+        tap_action:
+          action: more-info
+      - name: Clean
+        entity: button.neakasa_m1_clean_now_2
+        icon: mdi:broom
+        tap_action:
+          action: more-info
+      - name: Level
+        entity: button.neakasa_m1_level_now_2
+        icon: mdi:wave
+        tap_action:
+          action: more-info
+
+  #
+  # Feeding: the two Xiaomi feeders in the master bedroom. script.feed_cat feeds both, from here,
+  # the Home card and automation.feed_cats, so its last run is the last meal.
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Feeding
   - type: grid
     columns: 2
     square: false
     cards:
-      - type: custom:mushroom-entity-card
+      - type: custom:mushroom-template-card
         entity: script.feed_cat
-        name: Feed Now
-        secondary_info: last-changed
+        primary: Feed Now
+        secondary: >
+          {% set at = state_attr('script.feed_cat', 'last_triggered') %}
+          {{ ('Fed ' ~ relative_time(at) ~ ' ago') if at else 'Both feeders' }}
+        icon: mdi:food-drumstick
+        icon_color: amber
         fill_container: true
         tap_action:
           action: perform-action
           perform_action: script.feed_cat
           confirmation:
-            text: Dispense 3 portions from both feeders?
+            text: Dispense a meal from both feeders?
         hold_action:
           action: more-info
       - type: custom:mushroom-entity-card
         entity: automation.feed_cats
-        name: Scheduled Feeding
+        name: Schedule
         fill_container: true
         tap_action:
           action: toggle
         hold_action:
           action: more-info
-      - type: custom:mushroom-number-card
-        entity: number.pet_feeder_1_feed
-        name: Feeder 1 Portions
-        display_mode: buttons
-        secondary_info: none
+      - type: custom:mushroom-template-card
+        entity: sensor.xiaomi_iv2001_dc59_pet_food_left_level
+        primary: Feeder 1
+        secondary: "Food {{ states('sensor.xiaomi_iv2001_dc59_pet_food_left_level') }} · {{ states('number.xiaomi_iv2001_dc59_target_feeding_measure') }} portions"
+        icon: mdi:bowl-mix
+        icon_color: "{{ 'green' if is_state('sensor.xiaomi_iv2001_dc59_pet_food_left_level', 'normal') else 'red' }}"
         fill_container: true
         tap_action:
           action: more-info
-      - type: custom:mushroom-number-card
-        entity: number.pet_feeder_2_feed
-        name: Feeder 2 Portions
-        display_mode: buttons
-        secondary_info: none
+      - type: custom:mushroom-template-card
+        entity: sensor.xiaomi_iv2001_f93f_pet_food_left_level
+        primary: Feeder 2
+        secondary: "Food {{ states('sensor.xiaomi_iv2001_f93f_pet_food_left_level') }} · {{ states('number.xiaomi_iv2001_f93f_target_feeding_measure') }} portions"
+        icon: mdi:bowl-mix
+        icon_color: "{{ 'green' if is_state('sensor.xiaomi_iv2001_f93f_pet_food_left_level', 'normal') else 'red' }}"
         fill_container: true
         tap_action:
           action: more-info
 
   #
-  # Water
+  # Water: 2F fountain in the hallway (f7b6), GF fountain in the main room (0138)
   #
   - type: custom:decluttering-card
     template: section_title
@@ -91,30 +198,23 @@ cards:
     columns: 2
     square: false
     cards:
-      - type: custom:mushroom-entity-card
+      - type: custom:mushroom-template-card
         entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
-        name: Pet Fountain
+        primary: 2F Fountain
+        secondary: "{{ 'Low water' if is_state('binary_sensor.xiaomi_iv02_f7b6_water_shortage_status', 'on') else 'Filter ' ~ states('sensor.xiaomi_iv02_f7b6_filter_left_time') ~ ' days' }} · {{ states('sensor.xiaomi_iv02_f7b6_battery_level') | float(0) | round(0) | int }}%"
+        icon: mdi:water
+        color: "{% from 'state_color.jinja' import state_css_color %}{{ state_css_color('switch.xiaomi_iv02_f7b6_pet_drinking_fountain') }}"
         fill_container: true
         tap_action:
           action: toggle
         hold_action:
           action: more-info
-      - type: custom:mushroom-entity-card
-        entity: sensor.xiaomi_iv02_f7b6_battery_level
-        name: Battery
-        fill_container: true
-        tap_action:
-          action: more-info
-      - type: custom:mushroom-entity-card
-        entity: sensor.xiaomi_iv02_f7b6_filter_left_time
-        name: Filter Days Left
-        fill_container: true
-        tap_action:
-          action: more-info
-      - type: custom:mushroom-entity-card
-        entity: switch.xiaomi_iv02_f7b6_no_disturb
-        name: Quiet Mode
-        secondary_info: last-changed
+      - type: custom:mushroom-template-card
+        entity: switch.xiaomi_iv02_0138_pet_drinking_fountain
+        primary: GF Fountain
+        secondary: "{{ 'Low water' if is_state('binary_sensor.xiaomi_iv02_0138_water_shortage_status', 'on') else 'Filter ' ~ states('sensor.xiaomi_iv02_0138_filter_left_time') ~ ' days' }} · {{ states('sensor.xiaomi_iv02_0138_battery_level') | float(0) | round(0) | int }}%"
+        icon: mdi:water
+        color: "{% from 'state_color.jinja' import state_css_color %}{{ state_css_color('switch.xiaomi_iv02_0138_pet_drinking_fountain') }}"
         fill_container: true
         tap_action:
           action: toggle
@@ -125,6 +225,124 @@ cards:
   # Navbar
   #
   - !include /config/dashboards/templates/includes/navbar.yaml
+
+  #
+  # Cat popups
+  #
+  - type: vertical-stack
+    cards: !include /config/dashboards/mobile/pets/cat_popups.yaml
+
+  #
+  # Litter boxes popup (the litter chip): each box's waste bucket, status and actions
+  #
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#litter_boxes'
+    name: Litter Boxes
+    icon: mdi:toilet
+    show_header: true
+    close_by_clicking_outside: true
+    styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+    margin_top_mobile: max(0px, calc(100vh - 760px))
+    margin_top_desktop: max(0px, calc(100vh - 760px))
+    cards:
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Master Bedroom
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: sensor.neakasa_m1_status
+            name: Status
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: sensor.neakasa_m1_visits_today
+            name: Visits Today
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: binary_sensor.neakasa_m1_waste_bucket_full
+            name: Waste Bucket
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: sensor.neakasa_m1_sand_level
+            name: Litter Level
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.neakasa_m1_auto_clean
+            name: Auto Clean
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          # Opens the button's dialog; its Press button is the confirmation.
+          - type: custom:mushroom-entity-card
+            entity: button.neakasa_m1_clean_now
+            name: Clean Now
+            icon: mdi:broom
+            fill_container: true
+            tap_action:
+              action: more-info
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Hallway
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: sensor.neakasa_m1_status_2
+            name: Status
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: sensor.neakasa_m1_visits_today_2
+            name: Visits Today
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: binary_sensor.neakasa_m1_waste_bucket_full_2
+            name: Waste Bucket
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: sensor.neakasa_m1_sand_level_2
+            name: Litter Level
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.neakasa_m1_auto_clean_2
+            name: Auto Clean
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: button.neakasa_m1_clean_now_2
+            name: Clean Now
+            icon: mdi:broom
+            fill_container: true
+            tap_action:
+              action: more-info
 
   #
   # Settings popup
@@ -169,20 +387,120 @@ cards:
       - type: custom:decluttering-card
         template: section_title
         variables:
-          - title: Feeder Status
+          - title: Litter Boxes
       - type: grid
         columns: 2
         square: false
         cards:
           - type: custom:mushroom-entity-card
-            entity: binary_sensor.pet_feeder_1_fault
-            name: Feeder 1 Fault
+            entity: switch.neakasa_m1_auto_clean
+            name: MB Auto Clean
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.neakasa_m1_auto_clean_2
+            name: Hallway Auto Clean
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.neakasa_m1_auto_level
+            name: MB Auto Level
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.neakasa_m1_auto_level_2
+            name: Hallway Auto Level
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.neakasa_m1_silent_mode
+            name: MB Silent Mode
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.neakasa_m1_silent_mode_2
+            name: Hallway Silent Mode
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: number.neakasa_m1_sand_calibration
+            name: MB Litter Calibration
             fill_container: true
             tap_action:
               action: more-info
           - type: custom:mushroom-entity-card
-            entity: binary_sensor.pet_feeder_2_fault
-            name: Feeder 2 Fault
+            entity: number.neakasa_m1_sand_calibration_2
+            name: Hallway Litter Calibration
             fill_container: true
             tap_action:
               action: more-info
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Feeders
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: sensor.xiaomi_iv2001_dc59_desiccant_left_level
+            name: Feeder 1 Desiccant
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: sensor.xiaomi_iv2001_f93f_desiccant_left_level
+            name: Feeder 2 Desiccant
+            fill_container: true
+            tap_action:
+              action: more-info
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Fountains
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: switch.xiaomi_iv02_f7b6_no_disturb
+            name: 2F Quiet Mode
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.xiaomi_iv02_0138_no_disturb
+            name: GF Quiet Mode
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-select-card
+            entity: select.xiaomi_iv02_f7b6_mode
+            name: 2F Mode
+            fill_container: true
+          - type: custom:mushroom-select-card
+            entity: select.xiaomi_iv02_0138_mode
+            name: GF Mode
+            fill_container: true
