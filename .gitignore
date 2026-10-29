@@ -41,13 +41,19 @@ themes/minimalist-*/
 # Binary assets not tracked here
 www/dashboard/images/
 
-# Local AI tooling (project skills)
+# Local AI tooling and its state
 .claude/
+.impeccable/
+.superpowers/
+.agents/
+.cursor/
+AGENTS.md
+CLAUDE.md
 
-# Impeccable: local-only state
-.impeccable/config.local.json
-.impeccable/critique/
-.impeccable/hook.cache.json
+# Private docs and notes (kept on this machine only)
+*.md
+!/README.md
+notes/
 
 # Claude API access token
 .ha_token

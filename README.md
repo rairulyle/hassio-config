@@ -14,8 +14,7 @@ Hopefully it gives you some ideas for your own configuration.
 ## Dashboard
 
 The default dashboard runs in YAML mode straight from the files under
-[`dashboards/`](dashboards/). See [dashboards/README.md](dashboards/README.md) for the
-structure, how changes show up, and the conventions used.
+[`dashboards/`](dashboards/).
 
 ```
 ui-lovelace.yaml              entry file (title, template includes, views)
