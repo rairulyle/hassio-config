@@ -21,12 +21,18 @@ deps/
 tts/
 image/
 zigbee2mqtt/
+zigbee2mqtt.old-*/
+zha_snapshot_*.json
+zha_backup_*.json
 dashboard_backups/
+esphome/.device-builder*
+esphome/.esphome/
 
 # Managed by HACS / integrations (reinstall instead of versioning)
 custom_components/
 www/community/
-www/bubble/
+www/bubble/*
+!www/bubble/bubble-modules.yaml
 www/bubble-card.js
 blueprints/
 themes/catppuccin/
@@ -42,3 +48,10 @@ www/dashboard/images/
 .impeccable/config.local.json
 .impeccable/critique/
 .impeccable/hook.cache.json
+
+# Claude API access token
+.ha_token
+
+# Python bytecode and editor temp files
+__pycache__/
+*.tmp

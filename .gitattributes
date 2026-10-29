@@ -3,3 +3,4 @@
 *.jpg binary
 *.yaml filter=personal
 *.md filter=personal
+*.jinja filter=personal
