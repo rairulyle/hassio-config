@@ -1,0 +1,28 @@
+{#-
+  Aircon helpers for climate entities.
+  aircon_icon(entity_id):  mode icon (snowflake, heat wave, ...), mdi:air-conditioner when off or offline.
+  aircon_mode(entity_id):  "Cooling" / "Drying" while hvac_action says so (dry mode is always drying), else the mode: "Cool", "Dry",
+                           "Fan", "Off", "Offline". For the Faikin aircons hvac_action comes from the
+                           action_template in mqtt.yaml (room still 0.5 C or more above the target).
+  aircon_label(entity_id): "Cooling · 24°" — aircon_mode plus the target (or room) temperature while running.
+                           Dry and fan only show no temperature: the Daikin has no set point in those modes.
+  Usage: {% from 'aircon.jinja' import aircon_label %}{{ aircon_label('climate.bedroom_aircon') }}
+  The room tile (app_room_card_aircon) builds the same label in JavaScript: keep them in step.
+-#}
+{%- macro aircon_icon(entity_id) -%}
+{{ {'heat_cool':'mdi:sun-snowflake-variant','heat':'mdi:heat-wave','cool':'mdi:snowflake','dry':'mdi:water-percent','fan_only':'mdi:fan'}.get(states(entity_id), 'mdi:air-conditioner') }}
+{%- endmacro -%}
+{%- macro aircon_mode(entity_id) -%}
+{%- set s = states(entity_id) -%}
+{%- set a = state_attr(entity_id, 'hvac_action') -%}
+{%- if s in ['cool', 'dry'] and a in ['cooling', 'drying'] -%}
+{{ {'cooling':'Cooling','drying':'Drying'}[a] }}
+{%- else -%}
+{{ {'heat_cool':'Auto','heat':'Heat','cool':'Cool','dry':'Dry','fan_only':'Fan','off':'Off','unavailable':'Offline'}.get(s, s) }}
+{%- endif -%}
+{%- endmacro -%}
+{%- macro aircon_label(entity_id) -%}
+{%- set s = states(entity_id) -%}
+{%- set t = state_attr(entity_id, 'temperature') or state_attr(entity_id, 'current_temperature') -%}
+{{ aircon_mode(entity_id) }}{{ (' · ' ~ (t | round(0) | int) ~ '°') if (t and s not in ['off','unavailable','dry','fan_only']) else '' }}
+{%- endmacro -%}

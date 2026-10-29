@@ -1,0 +1,26 @@
+{#-
+  state_color(entity_id, state=none): the colour HA's frontend (and the theme) gives this state,
+  i.e. --state-<domain>-<state>-color, falling back to the domain's and then the global
+  active colour. Returned as "from var(...) r g b" because Mushroom wraps icon_color
+  in rgb(); relative colour syntax turns the CSS colour back into r g b channels.
+  Off-like states all get the one idle grey (--app-icon-shape-off-rgb) the room tiles and Mushroom
+  cards use. Keep the off list in step with off_states in app_room_card_device.
+  Usage: {% from 'state_color.jinja' import state_color %}{{ state_color('lock.front_door') }}
+  A bare domain borrows that domain's colours: state_color('light', states('switch.x')).
+
+  state_css_color(entity_id, state=none): the same colour as a complete CSS colour, rgb(...).
+  For Mushroom 5's template card (color, badge_color, and icon_color, which it renames to color):
+  it passes the value to CSS as is, so the bare "from var(...) r g b" from state_color is invalid there.
+-#}
+{%- macro state_color(entity_id, state=none) -%}
+{%- set domain = entity_id.split('.')[0] -%}
+{%- set s = state if state is not none else states(entity_id) -%}
+{%- if s in ['off', 'unavailable', 'unknown', 'idle', 'standby', 'closed', 'not_home', 'docked', 'paused'] -%}
+var(--app-icon-shape-off-rgb)
+{%- else -%}
+from var(--state-{{ domain }}-{{ s }}-color, var(--state-{{ domain }}-active-color, var(--state-active-color))) r g b
+{%- endif -%}
+{%- endmacro -%}
+{%- macro state_css_color(entity_id, state=none) -%}
+rgb({{ state_color(entity_id, state) }})
+{%- endmacro -%}

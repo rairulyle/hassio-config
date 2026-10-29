@@ -1,0 +1,43 @@
+# The cat litter box sensors are UI template helpers (Settings > Helpers), built on custom_templates/litterbox.jinja.
+
+# Per-person location: person.* decides home/away (Companion app GPS only; Bermuda is kept out of
+# person on purpose), and while home this adds the room from the phone's Bermuda area. Away shows the zone or Away.
+- sensor:
+    - name: Person 1 Location
+      unique_id: person1_location
+      default_entity_id: sensor.person1_location
+      state: >
+        {% set person = states('person.person1') %}
+        {% set room = states('sensor.person1_ble_phone_area') %}
+        {% if person == 'home' %}{{ room if room not in ['unknown', 'unavailable', 'none', ''] else 'Home' }}
+        {% elif person in ['not_home', 'unknown', 'unavailable'] %}Away
+        {% else %}{{ person }}{% endif %}
+      icon: >
+        {% set person = states('person.person1') %}
+        {% set room = states('sensor.person1_ble_phone_area') %}
+        {% if person == 'home' %}{{ (state_attr('sensor.person1_ble_phone_area', 'icon') or 'mdi:home-account') if room not in ['unknown', 'unavailable', 'none', ''] else 'mdi:home' }}
+        {% elif person in ['not_home', 'unknown', 'unavailable'] %}mdi:account-arrow-right
+        {% else %}mdi:map-marker{% endif %}
+      attributes:
+        source: "{{ state_attr('person.person1', 'source') }}"
+        floor: "{{ state_attr('sensor.person1_ble_phone_area', 'floor_name') }}"
+        distance: "{{ states('sensor.person1_ble_phone_distance') }}"
+    - name: Person 2 Location
+      unique_id: person2_location
+      default_entity_id: sensor.person2_location
+      state: >
+        {% set person = states('person.person2') %}
+        {% set room = states('sensor.person2_ble_phone_area') %}
+        {% if person == 'home' %}{{ room if room not in ['unknown', 'unavailable', 'none', ''] else 'Home' }}
+        {% elif person in ['not_home', 'unknown', 'unavailable'] %}Away
+        {% else %}{{ person }}{% endif %}
+      icon: >
+        {% set person = states('person.person2') %}
+        {% set room = states('sensor.person2_ble_phone_area') %}
+        {% if person == 'home' %}{{ (state_attr('sensor.person2_ble_phone_area', 'icon') or 'mdi:home-account') if room not in ['unknown', 'unavailable', 'none', ''] else 'mdi:home' }}
+        {% elif person in ['not_home', 'unknown', 'unavailable'] %}mdi:account-arrow-right
+        {% else %}mdi:map-marker{% endif %}
+      attributes:
+        source: "{{ state_attr('person.person2', 'source') }}"
+        floor: "{{ state_attr('sensor.person2_ble_phone_area', 'floor_name') }}"
+        distance: "{{ states('sensor.person2_ble_phone_distance') }}"

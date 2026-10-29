@@ -1,0 +1,70 @@
+{#-
+  Litter box helpers: one value per cat across both Neakasa M1 boxes.
+  The Neakasa cloud keeps a separate cat profile on each box, so the integration makes one set of
+  sensors per box: sensor.<cat>_<metric>_<box>, box being master_bedroom or hallway (both hidden).
+  cat_visits_today(cat): visits on both boxes added up (unknown when neither box has a count).
+  cat_latest_box(cat):   the box the cat used last ('master_bedroom' / 'hallway'), '' when unknown.
+  cat_last_visit(cat):   the later of the two last visits, as the source sensor's ISO timestamp.
+  cat_weight(cat):       the weight from the box the cat used last, else from the other box.
+  cat_reported(cat, metric): True while at least one box's sensor for that metric is available (for availability).
+  Usage: {% from 'litterbox.jinja' import cat_visits_today %}{{ cat_visits_today('cat1') }}
+  A third box: add its suffix to every list below.
+-#}
+{%- macro cat_visits_today(cat) -%}
+{%- set counts = ['master_bedroom', 'hallway'] | map('regex_replace', '^', 'sensor.' ~ cat ~ '_visits_today_') | map('states') | select('is_number') | map('int') | list -%}
+{{ counts | sum if counts else none }}
+{%- endmacro -%}
+{%- macro cat_latest_box(cat) -%}
+{%- set ns = namespace(box='', at=none) -%}
+{%- for box in ['master_bedroom', 'hallway'] -%}
+{%- set at = as_datetime(states('sensor.' ~ cat ~ '_last_visit_' ~ box), none) -%}
+{%- if at is not none and (ns.at is none or at > ns.at) -%}
+{%- set ns.box = box -%}
+{%- set ns.at = at -%}
+{%- endif -%}
+{%- endfor -%}
+{{ ns.box }}
+{%- endmacro -%}
+{%- macro cat_last_visit(cat) -%}
+{%- set box = cat_latest_box(cat) | trim -%}
+{{ states('sensor.' ~ cat ~ '_last_visit_' ~ box) if box else none }}
+{%- endmacro -%}
+{%- macro cat_weight(cat) -%}
+{%- set latest = cat_latest_box(cat) | trim -%}
+{%- set boxes = ([latest] if latest else []) + ['master_bedroom', 'hallway'] -%}
+{%- set weights = boxes | map('regex_replace', '^', 'sensor.' ~ cat ~ '_weight_') | map('states') | select('is_number') | map('float') | list -%}
+{{ weights | first | round(2) if weights else none }}
+{%- endmacro -%}
+{%- macro cat_reported(cat, metric) -%}
+{{ ['master_bedroom', 'hallway'] | map('regex_replace', '^', 'sensor.' ~ cat ~ '_' ~ metric ~ '_') | map('states') | reject('eq', 'unavailable') | list | count > 0 }}
+{%- endmacro -%}
+{#-
+  Litter box state, for the Pets chip. Boxes: suffix '' is the Master Bedroom box, '_2' the Hallway box.
+  needs_cleaning is left out on purpose: the firmware raises it every time a cat leaves, so it is on most
+  of the day while auto-clean waits. The waste bucket is the one that needs a person.
+  box_state(box): 'full' (waste bucket full), 'cleaning' (a clean or restore cycle is running) or 'ok'.
+  litter_state():  the worst box_state across both boxes.
+  litter_label():  chip text naming the box(es) in that state: "Hallway Waste Bucket Full",
+                   "Both Waste Buckets Full", "Master Bedroom Cleaning", or "Litter OK".
+-#}
+{%- macro box_state(box) -%}
+{%- if is_state('binary_sensor.neakasa_m1_waste_bucket_full' ~ box, 'on') -%}full
+{%- elif states('sensor.neakasa_m1_status' ~ box) in ['cleaning', 'restoring'] -%}cleaning
+{%- else -%}ok
+{%- endif -%}
+{%- endmacro -%}
+{%- macro litter_state() -%}
+{%- set states_now = [box_state('') | trim, box_state('_2') | trim] -%}
+{{ ['full', 'cleaning'] | select('in', states_now) | first | default('ok') }}
+{%- endmacro -%}
+{%- macro litter_label() -%}
+{%- set worst = litter_state() | trim -%}
+{%- set names = {'': 'Master Bedroom', '_2': 'Hallway'} -%}
+{%- set ns = namespace(boxes=[]) -%}
+{%- for box in ['', '_2'] if box_state(box) | trim == worst -%}{%- set ns.boxes = ns.boxes + [names[box]] -%}{%- endfor -%}
+{%- set both = ns.boxes | count > 1 -%}
+{%- if worst == 'full' -%}{{ 'Both Waste Buckets Full' if both else ns.boxes | first ~ ' Waste Bucket Full' }}
+{%- elif worst == 'cleaning' -%}{{ 'Both Cleaning' if both else ns.boxes | first ~ ' Cleaning' }}
+{%- else -%}Litter OK
+{%- endif -%}
+{%- endmacro -%}
