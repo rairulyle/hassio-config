@@ -12,11 +12,18 @@ cards:
     card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
     chips:
       - type: template
-        entity: light.master_bathroom_lights
-        icon: mdi:lightbulb-group
-        icon_color: "{{ 'amber' if (expand(['light.master_bathroom_shower_light', 'light.master_bathroom_door_light']) | selectattr('state','eq','on') | list | count) > 0 else 'grey' }}"
-        content: "{% set n = expand(['light.master_bathroom_shower_light', 'light.master_bathroom_door_light']) | selectattr('state','eq','on') | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }}"
+        entity: switch.master_bathroom_adaptive_lighting
+        icon: "{{ 'mdi:weather-night' if is_state('switch.master_bathroom_adaptive_lighting_sleep_mode','on') else 'mdi:theme-light-dark' }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('light', states('switch.master_bathroom_adaptive_lighting')) }}"
+        content: "{{ 'Manual' if not is_state('switch.master_bathroom_adaptive_lighting','on') else ('Sleep' if is_state('switch.master_bathroom_adaptive_lighting_sleep_mode','on') else 'Adaptive') }}"
         tap_action:
+          action: toggle
+        double_tap_action:
+          action: perform-action
+          perform_action: switch.toggle
+          target:
+            entity_id: switch.master_bathroom_adaptive_lighting_sleep_mode
+        hold_action:
           action: more-info
 
   #
@@ -26,36 +33,42 @@ cards:
     template: section_title
     variables:
       - title: Lights
-  - type: tile
-    entity: light.master_bathroom_shower_light
-    name: Shower Light
-    icon: mdi:light-recessed
-    show_entity_picture: false
-    hide_state: false
-    features:
-      - type: light-brightness
-    features_position: inline
-    vertical: false
-  - type: tile
-    entity: light.master_bathroom_door_light
-    name: Door Light
-    icon: mdi:light-recessed
-    show_entity_picture: false
-    hide_state: false
-    features:
-      - type: light-brightness
-    features_position: inline
-    vertical: false
-  - type: tile
-    entity: light.master_bathroom_lights
-    name: All Lights
-    icon: mdi:lightbulb-group
-    show_entity_picture: false
-    hide_state: false
-    features:
-      - type: light-color-temp
-    features_position: inline
-    vertical: false
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.master_bathroom_all_lights
+      - name: All lights
+      - icon: mdi:lightbulb-group
+      - count_entity: sensor.master_bathroom_lights_on_count
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.master_bathroom_shower_light
+      - name: Shower Light
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.master_bathroom_door_light
+      - name: Door Light
+
+  #
+  # Exhaust: wall switch L3 (direct load); the automation runs it with the lights
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Exhaust
+  - type: custom:mushroom-template-card
+    entity: switch.master_bathroom_exhaust_fan
+    primary: Exhaust Fan
+    secondary: "{{ 'On' if is_state('switch.master_bathroom_exhaust_fan', 'on') else 'Off' }}{{ ' · Auto with lights' if is_state('automation.master_bathroom_exhaust_fan_with_lights', 'on') }}"
+    icon: mdi:fan
+    color: "{% from 'state_color.jinja' import state_css_color %}{{ state_css_color('switch.master_bathroom_exhaust_fan') }}"
+    fill_container: true
+    tap_action:
+      action: toggle
+    hold_action:
+      action: more-info
 
   #
   # Navbar

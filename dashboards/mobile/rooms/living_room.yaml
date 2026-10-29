@@ -12,13 +12,6 @@ cards:
     card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
     chips:
       - type: entity
-        entity: fan.dmaker_p33_c4d3_fan
-        content_info: state
-        tap_action:
-          action: toggle
-        hold_action:
-          action: more-info
-      - type: entity
         entity: fan.zhimi_vb4_00ae_air_purifier
         content_info: state
         tap_action:
@@ -39,6 +32,18 @@ cards:
           navigation_path: '#living_room_settings'
 
   #
+  # Camera
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Camera
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.living_room_living_room_camera
+
+  #
   # Climate
   #
   - type: custom:bubble-card
@@ -57,22 +62,14 @@ cards:
         show_state: true
         tap_action:
           action: more-info
-      - entity: sensor.zhimi_vb4_00ae_pm25_density
+      - entity: sensor.zhimi_vb4_00ae_air_quality
         state_background: false
         icon: mdi:blur
         show_state: true
         tap_action:
           action: more-info
-      - entity: sensor.zhimi_vb4_00ae_air_quality
-        state_background: false
-        icon: mdi:leaf
-        show_state: true
-        tap_action:
-          action: more-info
     styles: |
-      .bubble-icon { color: var(--primary-color) !important; }
-      .bubble-icon-container { background-color: color-mix(in srgb, var(--primary-color) 20%, transparent) !important; }
-      .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
+      ${(() => { const t = parseFloat(hass.states['sensor.zhimi_vb4_00ae_temperature']?.state); const p = parseFloat(hass.states['sensor.zhimi_vb4_00ae_pm25_density']?.state); card.querySelector('.bubble-state').innerText = (isNaN(t) ? '—' : Math.round(t * 10) / 10 + '°') + (isNaN(p) ? '' : ' · PM2.5 ' + Math.round(p)); return ''; })()}
 
   #
   # Devices
@@ -81,59 +78,13 @@ cards:
     template: section_title
     variables:
       - title: Devices
-  - type: grid
-    columns: 2
-    square: false
-    cards:
-      - type: custom:mushroom-fan-card
-        entity: fan.dmaker_p33_c4d3_fan
-        name: Standing Fan
-        icon_animation: true
-        show_percentage_control: true
-        collapsible_controls: true
-        fill_container: true
-        tap_action:
-          action: toggle
-        hold_action:
-          action: more-info
-        features:
-          - type: fan-preset-modes
-            style: dropdown
-      - type: custom:mushroom-entity-card
-        entity: fan.zhimi_vb4_00ae_air_purifier
-        name: Air Purifier
-        secondary_info: state
-        fill_container: true
-        tap_action:
-          action: more-info
-        hold_action:
-          action: more-info
-      - type: custom:mushroom-entity-card
-        entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
-        name: Pet Fountain
-        fill_container: true
-        tap_action:
-          action: toggle
-        hold_action:
-          action: more-info
-      - type: conditional
-        conditions:
-          - condition: state
-            entity: vacuum.ijai_v3_aaa0_robot_cleaner
-            state_not: unavailable
-          - condition: state
-            entity: vacuum.ijai_v3_aaa0_robot_cleaner
-            state_not: unknown
-        card:
-          type: custom:mushroom-vacuum-card
-          entity: vacuum.ijai_v3_aaa0_robot_cleaner
-          name: Robot Vacuum
-          fill_container: true
-          commands:
-            - start_pause
-            - return_home
-          tap_action:
-            action: more-info
+  - type: custom:mushroom-entity-card
+    entity: fan.zhimi_vb4_00ae_air_purifier
+    secondary_info: state
+    tap_action:
+      action: more-info
+    hold_action:
+      action: more-info
 
   #
   # Media: only while a player is reachable
@@ -237,39 +188,4 @@ cards:
             name: Filter Life
             fill_container: true
             tap_action:
-              action: more-info
-      - type: custom:decluttering-card
-        template: section_title
-        variables:
-          - title: Standing Fan
-      - type: grid
-        columns: 3
-        square: false
-        cards:
-          - type: custom:mushroom-entity-card
-            entity: switch.dmaker_p33_c4d3_physical_control_locked
-            name: Child Lock
-            secondary_info: last-changed
-            fill_container: true
-            tap_action:
-              action: toggle
-            hold_action:
-              action: more-info
-          - type: custom:mushroom-entity-card
-            entity: switch.dmaker_p33_c4d3_alarm
-            name: Beep
-            secondary_info: last-changed
-            fill_container: true
-            tap_action:
-              action: toggle
-            hold_action:
-              action: more-info
-          - type: custom:mushroom-entity-card
-            entity: light.dmaker_p33_c4d3_indicator_light
-            name: Indicator Light
-            secondary_info: last-changed
-            fill_container: true
-            tap_action:
-              action: toggle
-            hold_action:
               action: more-info

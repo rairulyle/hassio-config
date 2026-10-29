@@ -1,0 +1,51 @@
+type: custom:vertical-layout
+title: Carport
+path: rooms-carport
+theme: Catppuccin Auto Latte Mocha Dashboard
+subview: true
+layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
+cards:
+  #
+  # Camera
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Camera
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.carport_carport_camera
+
+  #
+  # Gate
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Gate
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: custom:decluttering-card
+        template: gate_button
+        variables:
+          - status: sensor.carport_gate_status
+          - script: script.carport_gate
+          - operation: unlock
+          - name: Unlock
+          - icon: mdi:lock-open-variant
+      - type: custom:decluttering-card
+        template: gate_button
+        variables:
+          - status: sensor.carport_gate_status
+          - script: script.carport_gate
+          - operation: lock
+          - name: Lock
+          - icon: mdi:lock
+
+  #
+  # Navbar
+  #
+  - !include /config/dashboards/templates/includes/navbar.yaml

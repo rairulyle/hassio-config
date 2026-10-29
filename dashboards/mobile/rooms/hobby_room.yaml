@@ -1,0 +1,346 @@
+type: custom:vertical-layout
+title: Hobby Room
+path: rooms-hobby-room
+theme: Catppuccin Auto Latte Mocha Dashboard
+subview: true
+layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
+cards:
+  #
+  # Chips
+  #
+  - type: custom:mushroom-chips-card
+    card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
+    chips:
+      - type: template
+        entity: climate.hobby_room_aircon
+        icon: "{% from 'aircon.jinja' import aircon_icon %}{{ aircon_icon('climate.hobby_room_aircon') }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('climate.hobby_room_aircon') }}"
+        content: "{% from 'aircon.jinja' import aircon_label %}{{ aircon_label('climate.hobby_room_aircon') }}"
+        tap_action:
+          action: more-info
+      - type: template
+        entity: sensor.hobby_room_climate_sensor_temperature
+        icon: mdi:thermometer-water
+        content: "{{ states('sensor.hobby_room_climate_sensor_temperature') | float(0) | round(1) }}° · {{ states('sensor.hobby_room_climate_sensor_humidity') | float(0) | round(0) | int }}%"
+        tap_action:
+          action: more-info
+      - type: template
+        entity: switch.hobby_room_adaptive_lighting
+        icon: "{{ 'mdi:weather-night' if is_state('switch.hobby_room_adaptive_lighting_sleep_mode','on') else 'mdi:theme-light-dark' }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('light', states('switch.hobby_room_adaptive_lighting')) }}"
+        content: "{{ 'Manual' if not is_state('switch.hobby_room_adaptive_lighting','on') else ('Sleep' if is_state('switch.hobby_room_adaptive_lighting_sleep_mode','on') else 'Adaptive') }}"
+        tap_action:
+          action: toggle
+        double_tap_action:
+          action: perform-action
+          perform_action: switch.toggle
+          target:
+            entity_id: switch.hobby_room_adaptive_lighting_sleep_mode
+        hold_action:
+          action: more-info
+      - type: template
+        entity: lock.hobby_room_door
+        icon: "{{ 'mdi:lock' if is_state('lock.hobby_room_door','locked') else ('mdi:lock-question' if is_state('lock.hobby_room_door','unavailable') else 'mdi:lock-open-variant') }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('lock.hobby_room_door') }}"
+        content: "{{ {'locked':'Locked','unlocked':'Unlocked','locking':'Locking…','unlocking':'Unlocking…','jammed':'Jammed','open':'Open'}.get(states('lock.hobby_room_door'), 'Offline') }}"
+        tap_action:
+          action: more-info
+      - type: action
+        icon: mdi:dots-horizontal
+        icon_color: grey
+        tap_action:
+          action: navigate
+          navigation_path: '#hobby_room_settings'
+
+  #
+  # Aircon
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Aircon
+  - type: custom:decluttering-card
+    template: aircon_card
+    variables:
+      - entity: climate.hobby_room_aircon
+
+  #
+  # Fan
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Fan
+  - type: custom:mushroom-fan-card
+    entity: fan.dmaker_p33_c4d3_fan
+    icon_animation: true
+    show_percentage_control: true
+    collapsible_controls: true
+    tap_action:
+      action: toggle
+    hold_action:
+      action: more-info
+    features:
+      - type: fan-preset-modes
+        style: dropdown
+
+  #
+  # Lights
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Lights
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.hobby_room_all_lights
+      - name: All lights
+      - icon: mdi:lightbulb-group
+      - count_entity: sensor.hobby_room_lights_on_count
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.hobby_room_person1_table_lights
+      - name: Person 1's Table
+      - icon: mdi:lightbulb-group
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.hobby_room_person2_table_lights
+      - name: Person 2's Table
+      - icon: mdi:lightbulb-group
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: tile
+        entity: light.hobby_room_person1_table_left_light
+        name: Person 1 Left
+        icon: mdi:light-recessed
+        vertical: true
+        hide_state: true
+      - type: tile
+        entity: light.hobby_room_person1_table_right_light
+        name: Person 1 Right
+        icon: mdi:light-recessed
+        vertical: true
+        hide_state: true
+      - type: tile
+        entity: light.hobby_room_person2_table_left_light
+        name: Person 2 Left
+        icon: mdi:light-recessed
+        vertical: true
+        hide_state: true
+      - type: tile
+        entity: light.hobby_room_person2_table_right_light
+        name: Person 2 Right
+        icon: mdi:light-recessed
+        vertical: true
+        hide_state: true
+
+  #
+  # Server: tap opens details so the plug can't be switched off by accident
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Server
+  - type: custom:decluttering-card
+    template: socket_tile
+    variables:
+      - entity: switch.hobby_room_server_socket
+      - power: sensor.hobby_room_server_socket_power
+      - name: Server Socket
+      - icon: mdi:server
+      - tap: more-info
+
+  #
+  # Security
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Security
+  - type: tile
+    entity: lock.hobby_room_door
+    name: Door
+    vertical: false
+    state_content:
+      - state
+    features:
+      - type: lock-commands
+    features_position: inline
+
+  #
+  # Navbar
+  #
+  - !include /config/dashboards/templates/includes/navbar.yaml
+
+  #
+  # Settings popup
+  #
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#hobby_room_settings'
+    name: Hobby Room Settings
+    icon: mdi:desk
+    show_header: true
+    close_by_clicking_outside: true
+    styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+    margin_top_mobile: max(0px, calc(100vh - 760px))
+    margin_top_desktop: max(0px, calc(100vh - 760px))
+    cards:
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Aircon
+      - type: grid
+        columns: 3
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: select.hobby_room_aircon_demand_control
+            name: Demand Control
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: sensor.hobby_room_aircon_lifetime_outside_energy
+            name: Lifetime Energy
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: button.hobby_room_aircon_restart
+            name: Restart Controller
+            fill_container: true
+            tap_action:
+              action: more-info
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Door Lock
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: switch.hobby_room_door_automatic_lock
+            name: Auto Lock
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-number-card
+            entity: number.hobby_room_door_auto_lock_delay
+            name: Auto Lock Delay
+            display_mode: buttons
+            secondary_info: none
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: select.hobby_room_door_double_verification
+            name: Double Verification
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: select.hobby_room_door_lock_volume
+            name: Lock Volume
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: sensor.hobby_room_door_battery
+            name: Battery
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: sensor.hobby_room_door_alarm
+            name: Lock Alarm
+            fill_container: true
+            tap_action:
+              action: more-info
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Standing Fan
+      - type: grid
+        columns: 3
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: switch.dmaker_p33_c4d3_physical_control_locked
+            name: Child Lock
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.dmaker_p33_c4d3_alarm
+            name: Beep
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: light.dmaker_p33_c4d3_indicator_light
+            name: Indicator Light
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Wall Switch
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: switch.hobby_room_wall_switch_l1
+            name: Relay 1
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.hobby_room_wall_switch_l2
+            name: Relay 2
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: more-info
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Server Socket
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: sensor.hobby_room_server_socket_energy
+            name: Energy
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.hobby_room_server_socket_child_lock
+            name: Child Lock
+            fill_container: true
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info

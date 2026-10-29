@@ -12,31 +12,38 @@ cards:
     card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
     chips:
       - type: template
-        entity: light.master_bedroom_lights
-        icon: mdi:lightbulb-group
-        icon_color: "{{ 'amber' if (expand(['light.master_bedroom_main_left_light', 'light.master_bedroom_main_center_light', 'light.master_bedroom_main_right_light', 'light.master_bedroom_window_light']) | selectattr('state','eq','on') | list | count) > 0 else 'grey' }}"
-        content: "{% set n = expand(['light.master_bedroom_main_left_light', 'light.master_bedroom_main_center_light', 'light.master_bedroom_main_right_light', 'light.master_bedroom_window_light']) | selectattr('state','eq','on') | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }}"
+        entity: climate.master_bedroom_aircon
+        icon: "{% from 'aircon.jinja' import aircon_icon %}{{ aircon_icon('climate.master_bedroom_aircon') }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('climate.master_bedroom_aircon') }}"
+        content: "{% from 'aircon.jinja' import aircon_label %}{{ aircon_label('climate.master_bedroom_aircon') }}"
         tap_action:
           action: more-info
       - type: template
-        entity: climate.master_bedroom_aircon
-        icon: "{{ {'heat_cool':'mdi:sun-snowflake-variant','heat':'mdi:heat-wave','cool':'mdi:snowflake','dry':'mdi:water-percent','fan_only':'mdi:fan'}.get(states('climate.master_bedroom_aircon'), 'mdi:air-conditioner') }}"
-        icon_color: "{{ {'heat_cool':'teal','heat':'red','cool':'blue','dry':'cyan','fan_only':'green'}.get(states('climate.master_bedroom_aircon'), 'grey') }}"
-        content: "{% set s = states('climate.master_bedroom_aircon') %}{% set t = state_attr('climate.master_bedroom_aircon','temperature') or state_attr('climate.master_bedroom_aircon','current_temperature') %}{{ {'heat_cool':'Auto','heat':'Heat','cool':'Cool','dry':'Dry','fan_only':'Fan','off':'Off','unavailable':'Offline'}.get(s, s) }}{{ (' · ' ~ (t | round(0) | int) ~ '°') if (t and s not in ['off','unavailable']) else '' }}"
+        entity: sensor.master_bedroom_climate_sensor_temperature
+        icon: mdi:thermometer-water
+        content: "{{ states('sensor.master_bedroom_climate_sensor_temperature') | float(0) | round(1) }}° · {{ states('sensor.master_bedroom_climate_sensor_humidity') | float(0) | round(0) | int }}%"
         tap_action:
           action: more-info
       - type: template
         entity: lock.master_bedroom_door
         icon: "{{ 'mdi:lock' if is_state('lock.master_bedroom_door','locked') else ('mdi:lock-question' if is_state('lock.master_bedroom_door','unavailable') else 'mdi:lock-open-variant') }}"
-        icon_color: "{{ {'locked':'green','jammed':'red','unavailable':'grey'}.get(states('lock.master_bedroom_door'), 'amber') }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('lock.master_bedroom_door') }}"
         content: "{{ {'locked':'Locked','unlocked':'Unlocked','locking':'Locking…','unlocking':'Unlocking…','jammed':'Jammed','open':'Open'}.get(states('lock.master_bedroom_door'), 'Offline') }}"
         tap_action:
           action: more-info
       - type: template
-        entity: sensor.master_bedroom_aircon_ac_home
-        icon: mdi:thermometer
-        content: "{% set v = states('sensor.master_bedroom_aircon_ac_home') | float(none) %}{{ (v | round(1) ~ '°') if v is not none else '—' }}"
+        entity: switch.master_bedroom_adaptive_lighting
+        icon: "{{ 'mdi:weather-night' if is_state('switch.master_bedroom_adaptive_lighting_sleep_mode','on') else 'mdi:theme-light-dark' }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('light', states('switch.master_bedroom_adaptive_lighting')) }}"
+        content: "{{ 'Manual' if not is_state('switch.master_bedroom_adaptive_lighting','on') else ('Sleep' if is_state('switch.master_bedroom_adaptive_lighting_sleep_mode','on') else 'Adaptive') }}"
         tap_action:
+          action: toggle
+        double_tap_action:
+          action: perform-action
+          perform_action: switch.toggle
+          target:
+            entity_id: switch.master_bedroom_adaptive_lighting_sleep_mode
+        hold_action:
           action: more-info
       - type: action
         icon: mdi:dots-horizontal
@@ -52,25 +59,10 @@ cards:
     template: section_title
     variables:
       - title: Aircon
-  - type: custom:mushroom-climate-card
-    entity: climate.master_bedroom_aircon
-    primary_info: state
-    secondary_info: last-changed
-    hvac_modes:
-      - cool
-      - dry
-      - fan_only
-      - heat_cool
-      - "off"
-    show_temperature_control: true
-    collapsible_controls: true
-    tap_action:
-      action: more-info
-    features:
-      - type: climate-fan-modes
-        style: dropdown
-      - type: climate-swing-modes
-        style: dropdown
+  - type: custom:decluttering-card
+    template: aircon_card
+    variables:
+      - entity: climate.master_bedroom_aircon
 
   #
   # Lights
@@ -79,27 +71,24 @@ cards:
     template: section_title
     variables:
       - title: Lights
-  - type: tile
-    entity: light.master_bedroom_main_lights
-    name: Main Lights
-    icon: mdi:lightbulb-group
-    show_entity_picture: false
-    hide_state: false
-    features:
-      - type: light-brightness
-    features_position: inline
-    vertical: false
-  - type: tile
-    entity: light.master_bedroom_window_light
-    name: Window Light
-    icon: mdi:light-recessed
-    show_entity_picture: false
-    hide_state: false
-    features:
-      - type: light-brightness
-    features_position: inline
-    vertical: false
-
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.master_bedroom_all_lights
+      - name: All lights
+      - icon: mdi:lightbulb-group
+      - count_entity: sensor.master_bedroom_lights_on_count
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.master_bedroom_main_lights
+      - name: Main Lights
+      - icon: mdi:lightbulb-group
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.master_bedroom_window_light
+      - name: Window Light
   - type: grid
     columns: 3
     square: false
@@ -136,7 +125,6 @@ cards:
     vertical: false
     state_content:
       - state
-      - last_changed
     features:
       - type: lock-commands
     features_position: inline

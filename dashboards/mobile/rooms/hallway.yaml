@@ -1,0 +1,133 @@
+type: custom:vertical-layout
+title: Hallway
+path: rooms-hallway
+theme: Catppuccin Auto Latte Mocha Dashboard
+subview: true
+layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
+cards:
+  #
+  # Chips
+  #
+  - type: custom:mushroom-chips-card
+    card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
+    chips:
+      - type: template
+        entity: switch.hallway_adaptive_lighting
+        icon: "{{ 'mdi:weather-night' if is_state('switch.hallway_adaptive_lighting_sleep_mode','on') else 'mdi:theme-light-dark' }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('light', states('switch.hallway_adaptive_lighting')) }}"
+        content: "{{ 'Manual' if not is_state('switch.hallway_adaptive_lighting','on') else ('Sleep' if is_state('switch.hallway_adaptive_lighting_sleep_mode','on') else 'Adaptive') }}"
+        tap_action:
+          action: toggle
+        double_tap_action:
+          action: perform-action
+          perform_action: switch.toggle
+          target:
+            entity_id: switch.hallway_adaptive_lighting_sleep_mode
+        hold_action:
+          action: more-info
+
+  #
+  # Camera
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Camera
+  - type: custom:decluttering-card
+    template: camera_view
+    variables:
+      - entity: camera.hallway_hallway_camera
+
+  #
+  # Lights
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Lights
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.hallway_all_lights
+      - name: All lights
+      - icon: mdi:lightbulb-group
+      - count_entity: sensor.hallway_lights_on_count
+  - type: grid
+    columns: 3
+    square: false
+    cards:
+      - type: tile
+        entity: light.hallway_stairs_light
+        name: Stairs
+        icon: mdi:light-recessed
+        vertical: true
+        hide_state: true
+      - type: tile
+        entity: light.hallway_bedroom_light
+        name: Bedroom
+        icon: mdi:light-recessed
+        vertical: true
+        hide_state: true
+      - type: tile
+        entity: light.hallway_hobby_room_light
+        name: Hobby Room
+        icon: mdi:light-recessed
+        vertical: true
+        hide_state: true
+
+  #
+  # Sockets
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Sockets
+  - type: custom:decluttering-card
+    template: socket_tile
+    variables:
+      - entity: switch.hallway_socket
+      - power: sensor.hallway_socket_power
+      - name: Socket
+
+  #
+  # Devices
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Devices
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: switch.xiaomi_iv02_f7b6_pet_drinking_fountain
+        name: Pet Fountain
+        fill_container: true
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: vacuum.hallway_robot_vacuum_vacuum
+            state_not: unavailable
+          - condition: state
+            entity: vacuum.hallway_robot_vacuum_vacuum
+            state_not: unknown
+        card:
+          type: custom:mushroom-vacuum-card
+          entity: vacuum.hallway_robot_vacuum_vacuum
+          name: Robot Vacuum
+          fill_container: true
+          commands:
+            - start_pause
+            - return_home
+          tap_action:
+            action: more-info
+
+  #
+  # Navbar
+  #
+  - !include /config/dashboards/templates/includes/navbar.yaml

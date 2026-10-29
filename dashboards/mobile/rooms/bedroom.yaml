@@ -12,17 +12,30 @@ cards:
     card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
     chips:
       - type: template
-        entity: light.bedroom_all_lights
-        icon: mdi:lightbulb-group
-        icon_color: "{{ 'amber' if (expand(['light.bedroom_door_light', 'light.bedroom_window_light', 'light.bedroom_cabinet_left_light', 'light.bedroom_cabinet_right_light']) | selectattr('state','eq','on') | list | count) > 0 else 'grey' }}"
-        content: "{% set n = expand(['light.bedroom_door_light', 'light.bedroom_window_light', 'light.bedroom_cabinet_left_light', 'light.bedroom_cabinet_right_light']) | selectattr('state','eq','on') | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }}"
+        entity: climate.bedroom_aircon
+        icon: "{% from 'aircon.jinja' import aircon_icon %}{{ aircon_icon('climate.bedroom_aircon') }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('climate.bedroom_aircon') }}"
+        content: "{% from 'aircon.jinja' import aircon_label %}{{ aircon_label('climate.bedroom_aircon') }}"
         tap_action:
           action: more-info
-      - type: entity
-        entity: fan.dmaker_p15_03db_fan
-        content_info: state
+      - type: template
+        entity: sensor.bedroom_climate_sensor_temperature
+        icon: mdi:thermometer-water
+        content: "{{ states('sensor.bedroom_climate_sensor_temperature') | float(0) | round(1) }}° · {{ states('sensor.bedroom_climate_sensor_humidity') | float(0) | round(0) | int }}%"
+        tap_action:
+          action: more-info
+      - type: template
+        entity: switch.bedroom_adaptive_lighting
+        icon: "{{ 'mdi:weather-night' if is_state('switch.bedroom_adaptive_lighting_sleep_mode','on') else 'mdi:theme-light-dark' }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('light', states('switch.bedroom_adaptive_lighting')) }}"
+        content: "{{ 'Manual' if not is_state('switch.bedroom_adaptive_lighting','on') else ('Sleep' if is_state('switch.bedroom_adaptive_lighting_sleep_mode','on') else 'Adaptive') }}"
         tap_action:
           action: toggle
+        double_tap_action:
+          action: perform-action
+          perform_action: switch.toggle
+          target:
+            entity_id: switch.bedroom_adaptive_lighting_sleep_mode
         hold_action:
           action: more-info
       - type: action
@@ -33,34 +46,45 @@ cards:
           navigation_path: '#bedroom_settings'
 
   #
+  # Aircon
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Aircon
+  - type: custom:decluttering-card
+    template: aircon_card
+    variables:
+      - entity: climate.bedroom_aircon
+
+  #
   # Lights
   #
   - type: custom:decluttering-card
     template: section_title
     variables:
       - title: Lights
-  - type: tile
-    entity: light.bedroom_main_lights
-    name: Main Lights
-    icon: mdi:lightbulb-group
-    show_entity_picture: false
-    hide_state: false
-    features:
-      - type: light-brightness
-    features_position: inline
-    vertical: false
-  - type: tile
-    entity: light.bedroom_cabinet_lights
-    name: Cabinet Lights
-    icon: mdi:lightbulb-group
-    show_entity_picture: false
-    hide_state: false
-    features:
-      - type: light-brightness
-    features_position: inline
-    vertical: false
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.bedroom_all_lights
+      - name: All lights
+      - icon: mdi:lightbulb-group
+      - count_entity: sensor.bedroom_lights_on_count
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.bedroom_main_lights
+      - name: Main Lights
+      - icon: mdi:lightbulb-group
+  - type: custom:decluttering-card
+    template: light_row
+    variables:
+      - entity: light.bedroom_cabinet_lights
+      - name: Cabinet Lights
+      - icon: mdi:lightbulb-group
   - type: grid
-    columns: 4
+    columns: 2
     square: false
     cards:
       - type: tile
@@ -77,65 +101,30 @@ cards:
         hide_state: true
       - type: tile
         entity: light.bedroom_cabinet_left_light
-        name: Cab. L
+        name: Cabinet Left
         icon: mdi:light-recessed
         vertical: true
         hide_state: true
       - type: tile
         entity: light.bedroom_cabinet_right_light
-        name: Cab. R
+        name: Cabinet Right
         icon: mdi:light-recessed
         vertical: true
         hide_state: true
 
   #
-  # Fan
+  # Sockets
   #
   - type: custom:decluttering-card
     template: section_title
     variables:
-      - title: Fan
-  - type: custom:mushroom-fan-card
-    entity: fan.dmaker_p15_03db_fan
-    name: Standing Fan
-    icon_animation: true
-    show_percentage_control: true
-    collapsible_controls: true
-    tap_action:
-      action: toggle
-    hold_action:
-      action: more-info
-    features:
-      - type: fan-preset-modes
-        style: dropdown
-
-  #
-  # Media: only while the TV is reachable
-  #
-  - type: conditional
-    conditions:
-      - condition: state
-        entity: media_player.bedroom_tv
-        state_not: unavailable
-    card:
-      type: vertical-stack
-      cards:
-        - type: custom:decluttering-card
-          template: section_title
-          variables:
-            - title: Media
-        - type: custom:mushroom-media-player-card
-          entity: media_player.bedroom_tv
-          name: Bedroom TV
-          use_media_info: true
-          collapsible_controls: true
-          media_controls:
-            - play_pause_stop
-            - previous
-            - next
-          volume_controls:
-            - volume_mute
-            - volume_set
+      - title: Sockets
+  - type: custom:decluttering-card
+    template: socket_tile
+    variables:
+      - entity: switch.bedroom_bed_side_socket
+      - power: sensor.bedroom_bed_side_socket_power
+      - name: Bed-side
 
   #
   # Navbar
@@ -149,7 +138,7 @@ cards:
     card_type: pop-up
     hash: '#bedroom_settings'
     name: Bedroom Settings
-    icon: mdi:bed-single
+    icon: app:app-bed-single
     show_header: true
     close_by_clicking_outside: true
     styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
@@ -159,35 +148,62 @@ cards:
       - type: custom:decluttering-card
         template: section_title
         variables:
-          - title: Standing Fan
+          - title: Aircon
       - type: grid
         columns: 3
         square: false
         cards:
           - type: custom:mushroom-entity-card
-            entity: switch.dmaker_p15_03db_physical_control_locked
-            name: Child Lock
-            secondary_info: last-changed
+            entity: select.bedroom_aircon_demand_control
+            name: Demand Control
             fill_container: true
             tap_action:
-              action: toggle
-            hold_action:
               action: more-info
           - type: custom:mushroom-entity-card
-            entity: switch.dmaker_p15_03db_alarm
-            name: Beep
-            secondary_info: last-changed
+            entity: sensor.bedroom_aircon_lifetime_outside_energy
+            name: Lifetime Energy
             fill_container: true
             tap_action:
-              action: toggle
-            hold_action:
               action: more-info
           - type: custom:mushroom-entity-card
-            entity: light.dmaker_p15_03db_indicator_light
-            name: Indicator Light
+            entity: button.bedroom_aircon_restart
+            name: Restart Controller
+            fill_container: true
+            tap_action:
+              action: more-info
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Wall Switch
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: switch.bedroom_wall_switch_l1
+            name: Relay 1
             secondary_info: last-changed
             fill_container: true
             tap_action:
-              action: toggle
-            hold_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.bedroom_wall_switch_l2
+            name: Relay 2
+            secondary_info: last-changed
+            fill_container: true
+            tap_action:
+              action: more-info
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Sockets
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: sensor.bedroom_bed_side_socket_energy
+            name: Bed-side Energy
+            fill_container: true
+            tap_action:
               action: more-info
