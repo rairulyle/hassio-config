@@ -338,12 +338,24 @@ Catppuccin Auto Latte Mocha Dashboard:
       mush-rgb-cyan: 11, 120, 168
       mush-rgb-teal: 23, 146, 153
       mush-rgb-red: 210, 15, 57
+      # Aircon mode colours: what the Mushroom climate card shows (its defaults), defined once here.
+      # HA state-climate-*-color below reads these, so chips, room tiles and the native popup match the card.
+      mush-rgb-state-climate-cool: 30, 102, 245
+      mush-rgb-state-climate-dry: 255, 152, 0
+      mush-rgb-state-climate-fan-only: 23, 146, 153
+      mush-rgb-state-climate-heat: 255, 111, 34
+      mush-rgb-state-climate-heat-cool: 43, 122, 29
+      mush-rgb-state-climate-auto: 43, 122, 29
       # Bubble Card: rows use the card corner radius; sub-buttons and chips stay pills
       bubble-border-radius: var(--ha-card-border-radius)
       bubble-sub-button-border-radius: 12px
       # Bubble main icon: tinted circle like the Mushroom icon shape
       bubble-icon-border-radius: 50%
       app-icon-shape-off-rgb: 124, 127, 147  # Mushroom disabled grey (light), tints idle icon shapes
+      # Floating navbar: same surface as the cards (a whiter bar makes the cards look grey); a text-tinted shadow and a hairline raise it
+      app-navbar-background: rgba(var(--catppuccin-base-rgb), 0.94)
+      app-navbar-border: rgba(var(--catppuccin-text-rgb), 0.10)
+      app-navbar-shadow: 0 12px 32px -8px rgba(var(--catppuccin-text-rgb), 0.32), 0 2px 8px rgba(var(--catppuccin-text-rgb), 0.12)
       bubble-icon-background-color: color-mix(in srgb, currentColor 20%, transparent)
       bubble-main-background-color: var(--card-background-color)
       bubble-accent-color: rgba(var(--rgb-primary-color), 0.2)  # Bubble applies this inline as the on-state fill; icon/text turn solid mauve via each row's styles
@@ -528,11 +540,11 @@ Catppuccin Auto Latte Mocha Dashboard:
       state-switch-off-color: "var(--catppuccin-overlay1)"
       state-fan-on-color: "var(--primary-color)"
       state-fan-off-color: "var(--catppuccin-overlay1)"
-      state-climate-cool-color: "var(--catppuccin-blue)"
-      state-climate-heat-color: "var(--catppuccin-red)"
-      state-climate-dry-color: "#0b78a8"
-      state-climate-fan_only-color: "#2b7a1d"
-      state-climate-heat_cool-color: "var(--catppuccin-teal)"
+      state-climate-cool-color: "rgb(var(--mush-rgb-state-climate-cool))"
+      state-climate-heat-color: "rgb(var(--mush-rgb-state-climate-heat))"
+      state-climate-dry-color: "rgb(var(--mush-rgb-state-climate-dry))"
+      state-climate-fan_only-color: "rgb(var(--mush-rgb-state-climate-fan-only))"
+      state-climate-heat_cool-color: "rgb(var(--mush-rgb-state-climate-heat-cool))"
       state-climate-off-color: "var(--catppuccin-overlay1)"
       state-media_player-off-color: "var(--catppuccin-overlay1)"
       state-media_player-idle-color: "var(--catppuccin-overlay1)"
@@ -869,12 +881,23 @@ Catppuccin Auto Latte Mocha Dashboard:
       # Mushroom cards: active icon colour for plain entities follows the accent instead of Mushroom's blue
       mush-rgb-state-entity: var(--catppuccin-mauve-rgb)
       mush-rgb-amber: 249, 226, 175  # = Mocha yellow, the light state colour (matches HA light tiles)
+      # Aircon mode colours: what the Mushroom climate card shows (its defaults), defined once here.
+      mush-rgb-state-climate-cool: 33, 150, 243
+      mush-rgb-state-climate-dry: 255, 152, 0
+      mush-rgb-state-climate-fan-only: 0, 150, 136
+      mush-rgb-state-climate-heat: 255, 111, 34
+      mush-rgb-state-climate-heat-cool: 76, 175, 80
+      mush-rgb-state-climate-auto: 76, 175, 80
       # Bubble Card: rows use the card corner radius; sub-buttons and chips stay pills
       bubble-border-radius: var(--ha-card-border-radius)
       bubble-sub-button-border-radius: 12px
       # Bubble main icon: tinted circle like the Mushroom icon shape
       bubble-icon-border-radius: 50%
       app-icon-shape-off-rgb: 111, 111, 111  # Mushroom disabled grey (dark), tints idle icon shapes
+      # Floating navbar: one step up (surface0) from the cards, a deep shadow and a light hairline, since shadows barely show on dark
+      app-navbar-background: rgba(49, 50, 68, 0.9)
+      app-navbar-border: rgba(var(--catppuccin-text-rgb), 0.10)
+      app-navbar-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(0, 0, 0, 0.4)
       bubble-icon-background-color: color-mix(in srgb, currentColor 20%, transparent)
       bubble-main-background-color: var(--card-background-color)
       bubble-accent-color: rgba(var(--rgb-primary-color), 0.2)  # Bubble applies this inline as the on-state fill; icon/text turn solid mauve via each row's styles
@@ -1059,11 +1082,11 @@ Catppuccin Auto Latte Mocha Dashboard:
       state-switch-off-color: "var(--catppuccin-overlay1)"
       state-fan-on-color: "var(--primary-color)"
       state-fan-off-color: "var(--catppuccin-overlay1)"
-      state-climate-cool-color: "var(--catppuccin-blue)"
-      state-climate-heat-color: "var(--catppuccin-red)"
-      state-climate-dry-color: "var(--catppuccin-sky)"
-      state-climate-fan_only-color: "var(--catppuccin-green)"
-      state-climate-heat_cool-color: "var(--catppuccin-teal)"
+      state-climate-cool-color: "rgb(var(--mush-rgb-state-climate-cool))"
+      state-climate-heat-color: "rgb(var(--mush-rgb-state-climate-heat))"
+      state-climate-dry-color: "rgb(var(--mush-rgb-state-climate-dry))"
+      state-climate-fan_only-color: "rgb(var(--mush-rgb-state-climate-fan-only))"
+      state-climate-heat_cool-color: "rgb(var(--mush-rgb-state-climate-heat-cool))"
       state-climate-off-color: "var(--catppuccin-overlay1)"
       state-media_player-off-color: "var(--catppuccin-overlay1)"
       state-media_player-idle-color: "var(--catppuccin-overlay1)"
