@@ -8,6 +8,11 @@
 #   - temperature / humidity: JS templates or null
 #   - chips: list of button-cards for the top-left chip row
 #   - room_devices: list of button-cards (app_room_card_device)
+#   - camera: camera entity whose snapshot sits behind the chips and overview row (optional).
+#     The photo is a ::before layer over the top 16:9 only; the device row keeps its solid background. The snapshot reloads every minute (the now()
+#     cache-buster) and whenever the camera's access token rotates. While a snapshot shows, the
+#     card sets the --room-photo-* variables that app_room_overview reads for light text and a
+#     16:9 photo area that shows the whole frame. Holding the overview row opens the camera's live view.
 #
 room_card:
   default:
@@ -15,8 +20,48 @@ room_card:
     - humidity: null
     - status: null
     - chips: []
+    - camera: ''
   card:
     type: custom:stack-in-card
+    card_mod:
+      style: |
+        {% set pic = state_attr('[[camera]]', 'entity_picture') if '[[camera]]' else none %}
+        ha-card {
+          --vertical-stack-card-gap: 8px;
+          {% if pic %}
+          /* The photo lives on ::before, sized to the top 16:9 only. The card itself paints nothing,
+             so nothing dark sits under the device row's rounded corners. */
+          background: transparent !important;
+          position: relative;
+          isolation: isolate;
+          /* 16:9 photo area: chips (12px pad + 36px chip + 8px gap) + overview (this pad + 42px row + 10px pad)
+             + 8px gap above the device row = 56.25% of the card width.
+             A % padding resolves against the overview card's width. */
+          --room-photo-overview-pad-top: max(10px, calc(56.25% - 116px));
+          --room-photo-text: #fff;
+          --room-photo-secondary-text: rgba(255, 255, 255, 0.85);
+          --room-photo-icon: rgba(255, 255, 255, 0.9);
+          --room-photo-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+          {% endif %}
+        }
+        {% if pic %}
+        /* Photo layer: the card width at 16:9 (a % padding is a share of the width), plus 16px that tucks
+           under the device row so no strip shows if the rows are a pixel off. Behind the content (z-index -1
+           inside the isolated card), rounded on top only. */
+        ha-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 0;
+          padding-bottom: calc(56.25% + 16px);
+          z-index: -1;
+          border-radius: var(--ha-card-border-radius, 12px) var(--ha-card-border-radius, 12px) 0 0;
+          background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.7) 100%), url('{{ pic }}&_={{ (now().timestamp() // 60) | int }}') center top / 100% auto no-repeat, #000;
+          pointer-events: none;
+        }
+        {% endif %}
     cards:
       - type: custom:mod-card
         card_mod: !include /config/dashboards/templates/includes/card_mod/app_layout_card_mod.yaml
@@ -26,7 +71,7 @@ room_card:
           layout:
             grid-template-columns: 100%
             margin: 0px 0px 0px 0px
-            padding: 16px 20px 0px 20px
+            padding: 12px 16px 0px 16px
             card_margin: 0px
           cards:
             - type: custom:mushroom-chips-card
@@ -46,6 +91,11 @@ room_card:
           action: navigate
           navigation_path: '[[navigation_path]]'
           haptic: light
+        # Camera rooms open the live view; without a camera the empty entity falls back to the room entity.
+        hold_action:
+          action: more-info
+          entity: '[[camera]]'
+          haptic: medium
 
       - type: custom:stack-in-card
         mode: horizontal

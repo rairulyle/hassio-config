@@ -1,21 +1,27 @@
 # Room card device tile, themed like a vertical Mushroom entity card:
 # tinted icon circle on top, name (14/600) and state (12/400) below.
 # The icon colour lives on img_cell; the icon inherits it and the disc is that colour at 20%.
-# A card can override the colour with styles.img_cell.color (see the lock and aircon tiles).
+# The colour is HA's state colour, worked out like the chips' (custom_templates/state_color.jinja), so don't
+# override it per card: a tile and its chip must match.
+# Light icons follow one rule: a *_lights id is a group (bulb group), a *_light id is a single fitting (recessed).
+# Other devices keep their entity icon; a card can still set its own icon.
 app_room_card_device:
   show_state: true
+  icon: >
+    [[[ if (!entity || !entity.entity_id.startsWith('light.')) return undefined; return entity.entity_id.endsWith('_lights') ? 'mdi:lightbulb-group' : 'mdi:light-recessed'; ]]]
   size: 22px
   variables:
-    active_states: ['on', 'playing', 'paused', 'heat', 'cool', 'dry', 'fan_only', 'heat_cool', 'auto', 'locked', 'cleaning', 'open']
+    # same off list and colour chain as custom_templates/state_color.jinja, so a tile matches its chip
+    off_states: ['off', 'unavailable', 'unknown', 'idle', 'standby', 'closed', 'not_home', 'docked', 'paused']
   styles:
     grid:
       - grid-template-areas: '"i" "n" "s"'
       - grid-template-rows: min-content min-content min-content
-      - row-gap: 6px
+      - row-gap: 4px
     card:
       - background: transparent
       - box-shadow: none
-      - padding: 14px 8px
+      - padding: 10px 6px 12px
       - border: none
       - backdrop-filter: none
       - -webkit-backdrop-filter: none
@@ -31,7 +37,7 @@ app_room_card_device:
       - height: 42px
       - border-radius: 50%
       - color: >
-          [[[ if (!variables.active_states.includes(entity.state)) return 'rgb(var(--app-icon-shape-off-rgb))'; return entity.entity_id.startsWith('light.') ? 'var(--state-light-active-color)' : 'var(--primary-color)'; ]]]
+          [[[ if (variables.off_states.includes(entity.state)) return 'rgb(var(--app-icon-shape-off-rgb))'; const d = entity.entity_id.split('.')[0]; return `var(--state-${d}-${entity.state}-color, var(--state-${d}-active-color, var(--state-active-color)))`; ]]]
       - background-color: color-mix(in srgb, currentColor 20%, transparent)
     icon:
       - color: currentColor

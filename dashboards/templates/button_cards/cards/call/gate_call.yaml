@@ -1,0 +1,218 @@
+# Phone-call style controls for the pedestrian gate call screen (dashboards/mobile/more/gate.yaml).
+# They sit inside the Advanced Camera Card as elements and run one of its actions (call_start,
+# call_answer, call_end, microphone_mute, microphone_unmute) via variables.card_action.
+# A plain fire-dom-event tap_action does not work here: button-card hands it to HA, which fires
+# ll-custom from <home-assistant>, outside the camera card, so the card never sees it. Dispatching
+# the event from the button itself keeps it inside the card.
+
+# Round button with a label under it.
+# variables: card_action (Advanced Camera Card action), background (circle colour),
+#            color (icon colour), pulse (true while ringing)
+gate_call_button:
+  show_state: false
+  show_name: true
+  show_icon: true
+  variables:
+    card_action: ''
+    background: 'rgba(255, 255, 255, 0.18)'
+    color: '#ffffff'
+    pulse: false
+  tap_action:
+    action: javascript
+    javascript: |
+      [[[
+        this.dispatchEvent(new CustomEvent('ll-custom', {
+          bubbles: true,
+          composed: true,
+          detail: { action: 'fire-dom-event', advanced_camera_card_action: variables.card_action },
+        }));
+      ]]]
+  styles:
+    card:
+      - background: none
+      - border: none
+      - box-shadow: none
+      - padding: 0
+      - overflow: visible
+      - width: 84px
+      - '--ha-card-background': none
+    grid:
+      - grid-template-areas: '"i" "n"'
+      - grid-template-rows: 72px auto
+      - row-gap: 10px
+      - justify-items: center
+    img_cell:
+      - width: 72px
+      - height: 72px
+      - border-radius: 50%
+      - background: '[[[ return variables.background ]]]'
+      - animation: '[[[ return variables.pulse ? "gate-call-pulse 1.6s ease-out infinite" : "none" ]]]'
+    icon:
+      - width: 32px
+      - color: '[[[ return variables.color ]]]'
+    name:
+      - color: '#ffffff'
+      - font-size: 13px
+      - font-weight: 500
+  extra_styles: |
+    @keyframes gate-call-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.6); }
+      100% { box-shadow: 0 0 0 22px rgba(52, 199, 89, 0); }
+    }
+
+# Plain white text on the black screen (caller name, call status).
+# variables: size (font size), weight, opacity
+gate_call_text:
+  show_state: false
+  show_name: true
+  show_icon: false
+  tap_action:
+    action: none
+  hold_action:
+    action: none
+  variables:
+    size: 15px
+    weight: 400
+    opacity: 0.7
+  styles:
+    card:
+      - background: none
+      - border: none
+      - box-shadow: none
+      - padding: 0
+      - '--ha-card-background': none
+    name:
+      - color: '#ffffff'
+      - justify-self: start
+      - font-size: '[[[ return variables.size ]]]'
+      - font-weight: '[[[ return variables.weight ]]]'
+      - opacity: '[[[ return variables.opacity ]]]'
+      - white-space: nowrap
+
+# Quick replies: a "Quick reply" pill that opens the doorbell's canned messages above it. Tapping a
+# message plays it at the gate right away (select.select_option) and closes the list.
+# The messages are the options of variables.entity (set in the Reolink app), up to 5.
+# Open/closed is a class on this card, toggled by its pill; the nested cards reach it with
+# this.getRootNode().host.
+# variables: entity (Reolink "Play quick reply message" select)
+gate_quick_reply:
+  show_name: false
+  show_icon: false
+  show_state: false
+  tap_action:
+    action: none
+  hold_action:
+    action: none
+  variables:
+    entity: select.doorbell_play_quick_reply_message
+  custom_fields:
+    m0:
+      card:
+        type: custom:button-card
+        template: gate_quick_reply_item
+        variables: { index: 0 }
+    m1: { card: { type: custom:button-card, template: gate_quick_reply_item, variables: { index: 1 } } }
+    m2: { card: { type: custom:button-card, template: gate_quick_reply_item, variables: { index: 2 } } }
+    m3: { card: { type: custom:button-card, template: gate_quick_reply_item, variables: { index: 3 } } }
+    m4: { card: { type: custom:button-card, template: gate_quick_reply_item, variables: { index: 4 } } }
+    toggle:
+      card:
+        type: custom:button-card
+        template: gate_quick_reply_toggle
+  styles:
+    card:
+      - background: none
+      - border: none
+      - box-shadow: none
+      - padding: 0
+      - overflow: visible
+      - '--ha-card-background': none
+    grid:
+      - grid-template-areas: '"m0" "m1" "m2" "m3" "m4" "toggle"'
+      - grid-template-columns: 1fr
+      - row-gap: 8px
+      - justify-items: center
+    custom_fields:
+      # Slots without a message stay hidden even when the list is open.
+      m0:
+        - width: 100%
+        - display: '[[[ return (states[variables.entity]?.attributes.options || [])[0] ? "" : "none" ]]]'
+      m1:
+        - width: 100%
+        - display: '[[[ return (states[variables.entity]?.attributes.options || [])[1] ? "" : "none" ]]]'
+      m2:
+        - width: 100%
+        - display: '[[[ return (states[variables.entity]?.attributes.options || [])[2] ? "" : "none" ]]]'
+      m3:
+        - width: 100%
+        - display: '[[[ return (states[variables.entity]?.attributes.options || [])[3] ? "" : "none" ]]]'
+      m4:
+        - width: 100%
+        - display: '[[[ return (states[variables.entity]?.attributes.options || [])[4] ? "" : "none" ]]]'
+  extra_styles: |
+    :host(:not(.open)) #m0, :host(:not(.open)) #m1, :host(:not(.open)) #m2,
+    :host(:not(.open)) #m3, :host(:not(.open)) #m4 { display: none !important; }
+
+# One quick-reply message (inside gate_quick_reply). variables: index (which option of the select)
+gate_quick_reply_item:
+  show_icon: false
+  show_state: false
+  variables:
+    index: 0
+    entity: select.doorbell_play_quick_reply_message
+  name: '[[[ return (states[variables.entity]?.attributes.options || [])[variables.index] || "" ]]]'
+  tap_action:
+    action: javascript
+    javascript: |
+      [[[
+        const option = (states[variables.entity]?.attributes.options || [])[variables.index];
+        if (option) hass.callService('select', 'select_option', { entity_id: variables.entity, option });
+        this.getRootNode().host?.classList.remove('open');
+      ]]]
+  styles:
+    card:
+      - background: 'rgba(28, 28, 30, 0.92)'
+      - border: none
+      - box-shadow: none
+      - border-radius: 16px
+      - padding: 12px 16px
+      - '--ha-card-background': 'rgba(28, 28, 30, 0.92)'
+    name:
+      - color: '#ffffff'
+      - font-size: 14px
+      - line-height: 1.35
+      - white-space: normal
+      - text-align: left
+      - justify-self: start
+
+# The "Quick reply" pill that opens and closes the list (inside gate_quick_reply).
+gate_quick_reply_toggle:
+  show_icon: true
+  show_state: false
+  icon: mdi:message-reply-text
+  name: Quick reply
+  tap_action:
+    action: javascript
+    javascript: |
+      [[[ this.getRootNode().host?.classList.toggle('open'); ]]]
+  styles:
+    card:
+      - background: 'rgba(255, 255, 255, 0.18)'
+      - border: none
+      - box-shadow: none
+      - border-radius: 999px
+      - padding: 10px 18px
+      - width: auto
+      - '--ha-card-background': 'rgba(255, 255, 255, 0.18)'
+    grid:
+      - grid-template-areas: '"i n"'
+      - grid-template-columns: auto auto
+      - column-gap: 8px
+      - align-items: center
+    icon:
+      - width: 18px
+      - color: '#ffffff'
+    name:
+      - color: '#ffffff'
+      - font-size: 14px
+      - font-weight: 500

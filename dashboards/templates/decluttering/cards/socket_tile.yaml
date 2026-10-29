@@ -1,0 +1,20 @@
+# Socket tile: a smart plug with its live power draw as the secondary line ("64 W", or "Off").
+# variables: entity (switch), power (power sensor), name, icon (optional),
+#            tap (optional: toggle by default; use more-info for plugs that must not be switched by accident)
+# Icon colour is HA's state colour for the switch (state_css_color in custom_templates/state_color.jinja).
+socket_tile:
+  default:
+    - icon: mdi:power-socket-us
+    - tap: toggle
+  card:
+    type: custom:mushroom-template-card
+    entity: '[[entity]]'
+    primary: '[[name]]'
+    secondary: "{% set p = states('[[power]]') | float(none) %}{{ 'Off' if is_state('[[entity]]', 'off') else ((p | round(0) | int ~ ' W') if p is not none else '—') }}"
+    icon: '[[icon]]'
+    color: "{% from 'state_color.jinja' import state_css_color %}{{ state_css_color('[[entity]]') }}"
+    fill_container: true
+    tap_action:
+      action: '[[tap]]'
+    hold_action:
+      action: more-info

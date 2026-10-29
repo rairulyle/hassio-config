@@ -1,0 +1,15 @@
+# Room card aircon tile: app_room_card_device with the mode icon and a short mode label
+# ("Cooling", "Cool", "Auto", "Offline"). The icon colour comes from app_room_card_device (HA's climate state colours).
+# "Cooling"/"Drying" follow hvac_action (set by the action_template in mqtt.yaml), like aircon_mode in
+# custom_templates/aircon.jinja: keep them in step.
+app_room_card_aircon:
+  template: app_room_card_device
+  icon: "[[[ return { heat_cool: 'mdi:sun-snowflake-variant', heat: 'mdi:heat-wave', cool: 'mdi:snowflake', dry: 'mdi:water-percent', fan_only: 'mdi:fan' }[entity.state] || 'mdi:air-conditioner'; ]]]"
+  state_display: >
+    [[[
+      const s = entity.state;
+      const a = entity.attributes.hvac_action;
+      if ((s === 'cool' || s === 'dry') && (a === 'cooling' || a === 'drying')) return a === 'cooling' ? 'Cooling' : 'Drying';
+      const m = { off: 'Off', cool: 'Cool', heat: 'Heat', dry: 'Dry', fan_only: 'Fan', heat_cool: 'Auto', unavailable: 'Offline' };
+      return m[s] || s;
+    ]]]

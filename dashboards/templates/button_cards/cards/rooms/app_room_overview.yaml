@@ -14,19 +14,30 @@ app_room_overview:
       return entity.state == 'on' ? 'Lights on' : 'Lights off';
     ]]]
   styles:
+    # Extra top padding only while a camera snapshot is the background, sized by room_card so the photo area is 16:9.
+    card:
+      - padding: var(--room-photo-overview-pad-top, 10px) 16px 10px
     img_cell:
       - width: 42px
       - height: 42px
       - border-radius: 50%
-      - color: "[[[ return (entity && entity.state == 'on') ? 'var(--primary-color)' : 'rgb(var(--app-icon-shape-off-rgb))'; ]]]"
+      - color: "[[[ return (entity && entity.state == 'on') ? 'var(--primary-color)' : 'var(--room-photo-icon, rgb(var(--app-icon-shape-off-rgb)))'; ]]]"
       - background-color: color-mix(in srgb, currentColor 20%, transparent)
     icon:
       - color: currentColor
     # No status line under the name: centre the name (and the temperature when there is no humidity line).
+    # The --room-photo-* variables are set by room_card only while a camera snapshot is the background.
     name:
       - grid-row: 1 / span 2
       - align-self: center
+      - color: var(--room-photo-text, var(--primary-text-color))
+      - text-shadow: var(--room-photo-text-shadow, none)
     custom_fields:
       temperature:
         - grid-row: "[[[ return (variables.humidity || variables.aqi) ? 'auto' : '1 / span 2'; ]]]"
         - align-self: "[[[ return (variables.humidity || variables.aqi) ? 'end' : 'center'; ]]]"
+        - color: var(--room-photo-text, var(--primary-text-color))
+        - text-shadow: var(--room-photo-text-shadow, none)
+      secondary_climate:
+        - color: var(--room-photo-secondary-text, var(--secondary-text-color))
+        - text-shadow: var(--room-photo-text-shadow, none)

@@ -1,0 +1,24 @@
+# Gate button: runs the gate script for one operation and shows the gate's progress.
+# variables: status (gate status sensor: Ready / Locking / Unlocking / Offline),
+#            script (the gate script), operation (lock or unlock, passed to the script), name, icon
+# The button keeps HA's lock-<operation>ed colour and reads "Ready". While the gate moves it shows the gate's
+# "Locking"/"Unlocking" on the button that started it (still coloured); the other greys to "Wait". Offline greys both.
+# The script ignores presses during the cooldown or while the relay is offline.
+gate_button:
+  card:
+    type: custom:mushroom-template-card
+    entity: '[[status]]'
+    primary: '[[name]]'
+    secondary: "{% set s = states('[[status]]') %}{{ 'Wait' if s.endswith('ing') and s != ('[[operation]]' | capitalize) ~ 'ing' else s }}"
+    icon: '[[icon]]'
+    color: >
+      {% from 'state_color.jinja' import state_css_color %}{% set s = states('[[status]]') %}
+      {{ state_css_color('lock', '[[operation]]ed') if s in ['Ready', ('[[operation]]' | capitalize) ~ 'ing'] else 'disabled' }}
+    fill_container: true
+    tap_action:
+      action: perform-action
+      perform_action: '[[script]]'
+      data:
+        operation: '[[operation]]'
+    hold_action:
+      action: more-info

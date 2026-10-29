@@ -1,0 +1,91 @@
+# Custom Bubble Card modules for this dashboard.
+# Loaded by Bubble Card from /local/bubble/bubble-modules.yaml.
+# Apply to a card with:  modules: [icon_glow, soft_gradient]
+# Modules with is_global: true apply to every supported card automatically.
+
+# House style for every Bubble button, so cards carry no styles of their own.
+# Icon: amber for a light that is on, mauve for any other device that is on, grey when off,
+# mauve for things without an on/off state (sensors, weather, scripts, plain buttons).
+# Light rows read their brightness ("60%") instead of "On".
+# Optional per-card settings, under app_style: in the card config:
+#   color: CSS colour that replaces the icon colour (e.g. var(--accent-color))
+#   count_entity: a "<Room> - Lights On Count" sensor; a lit light row reads "2 On · 60%" (colour follows the light itself)
+app_style:
+  name: "App style"
+  version: "v1.1"
+  creator: "custom"
+  description: "House colours for icons, sliders and sub-buttons; brightness and light count as the state."
+  is_global: true
+  unsupported:
+    - separator
+    - horizontal-buttons-stack
+    - pop-up
+  code: |
+    ${(() => {
+      const opts = this.config.app_style || {};
+      const st = hass.states[entity];
+      const domain = (entity || '').split('.')[0];
+      const toggles = ['light', 'switch', 'fan', 'input_boolean', 'vacuum', 'media_player', 'climate', 'cover', 'lock', 'humidifier', 'siren'];
+      const active = ['on', 'open', 'opening', 'unlocked', 'cleaning', 'returning', 'playing', 'heat', 'cool', 'dry', 'fan_only', 'heat_cool', 'auto'];
+      const n = parseInt(hass.states[opts.count_entity]?.state);
+      const counted = !isNaN(n);
+      // A light (or group) is lit by its own state, which is always current. The count sensor lags it by
+      // about a second and the card only redraws when its own entity changes, so the count only adds the number.
+      const on = domain === 'light' && st?.state === 'on';
+      const lit = domain === 'light' ? on : counted && n > 0;
+      const pct = on && st.attributes.brightness != null ? Math.round(st.attributes.brightness / 2.55) + '%' : '';
+      const el = card.querySelector('.bubble-state');
+      if (el && counted && n > 0 && (on || domain !== 'light')) el.innerText = [n + ' On', pct].filter(Boolean).join(' · ');
+      else if (el && counted && !toggles.includes(domain)) el.innerText = 'Off';
+      else if (el && pct) el.innerText = pct;
+      const c = opts.color
+        || (lit ? 'var(--state-light-active-color)'
+        : (counted && domain !== 'light') || (toggles.includes(domain) && !active.includes(st?.state)) ? 'rgb(var(--app-icon-shape-off-rgb))'
+        : 'var(--primary-color)');
+      return `.bubble-icon { color: ${c} !important; }
+        .bubble-icon-container { background-color: color-mix(in srgb, ${c} 20%, transparent) !important; }
+        .bubble-range-fill { background-color: color-mix(in srgb, ${c} 35%, transparent) !important; }`;
+    })()}
+    .bubble-sub-button.background-on, .bubble-sub-button.background-on ha-icon, .bubble-sub-button.background-on .bubble-sub-button-icon { color: var(--primary-color); }
+
+icon_glow:
+  name: "Icon glow when active"
+  version: "v1.0"
+  creator: "custom"
+  description: "Adds a soft glow around the icon while the entity is on, cooling, heating, drying, playing or cleaning."
+  unsupported:
+    - separator
+    - horizontal-buttons-stack
+    - pop-up
+  code: |
+    .bubble-icon-container {
+      transition: box-shadow 0.35s ease;
+      box-shadow: ${['on','cool','heat','dry','fan_only','heat_cool','playing','cleaning','watering'].includes(state) ? '0 0 16px 2px var(--bubble-accent-color, var(--accent-color))' : 'none'};
+    }
+
+soft_gradient:
+  name: "Soft accent gradient"
+  version: "v1.0"
+  creator: "custom"
+  description: "Blends a hint of the accent colour into the top-left of the card background."
+  unsupported:
+    - separator
+    - horizontal-buttons-stack
+    - pop-up
+  code: |
+    .bubble-button-card-container {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--bubble-accent-color, var(--accent-color)) 14%, var(--card-background-color)) 0%, var(--card-background-color) 65%) !important;
+    }
+
+# Icon-only sub-buttons (no name, state or attribute shown) are circles, not pills, on every card.
+app_round_icon_buttons:
+  name: "Round icon-only sub-buttons"
+  version: "v1.0"
+  creator: "custom"
+  description: "Makes a sub-button that shows only an icon a circle as wide as it is tall."
+  is_global: true
+  code: |
+    ${[].concat(this.config.sub_button?.main ?? this.config.sub_button ?? []).map((b, i) =>
+      b && !b.group && !b.sub_button_type && !b.show_name && !b.show_state && !b.show_attribute
+        ? `.bubble-sub-button-${i + 1} { width: var(--bubble-sub-button-height, 36px) !important; min-width: 0 !important; padding: 0 !important; border-radius: 50% !important; }`
+        : '').join('')}

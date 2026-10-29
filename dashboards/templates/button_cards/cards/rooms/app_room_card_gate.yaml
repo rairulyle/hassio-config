@@ -1,0 +1,23 @@
+# Room card gate tile: app_room_card_device that runs the gate script instead of toggling the relay.
+# entity: the gate status sensor (Ready / Locking / Unlocking / Offline).
+# variables: script (the gate script), operation (lock or unlock, passed to the script).
+# The tile keeps HA's lock-<operation>ed colour and reads "Ready". While the gate moves it shows the gate's
+# "Locking"/"Unlocking" on the tile that started it (still coloured); the other greys to "Wait". Offline greys both.
+# The script ignores presses during the cooldown or while the relay is offline.
+app_room_card_gate:
+  template: app_room_card_device
+  variables:
+    busy: "[[[ return variables.operation[0].toUpperCase() + variables.operation.slice(1) + 'ing'; ]]]"
+  state_display: "[[[ const s = entity.state; return s.endsWith('ing') && s !== variables.busy ? 'Wait' : s; ]]]"
+  styles:
+    img_cell:
+      - color: >
+          [[[ const s = entity.state; return s === 'Ready' || s === variables.busy ? `var(--state-lock-${variables.operation}ed-color)` : 'rgb(var(--app-icon-shape-off-rgb))'; ]]]
+  tap_action:
+    action: perform-action
+    perform_action: "[[[ return variables.script; ]]]"
+    data:
+      operation: "[[[ return variables.operation; ]]]"
+    haptic: light
+  hold_action:
+    action: more-info

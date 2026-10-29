@@ -1,0 +1,28 @@
+# Person tile: the person's picture with their room as the secondary line ("Hobby Room", "Home", a zone, or "Away").
+# variables: person (person entity), location (sensor.<name>_location from template.yaml, or a pet's Bermuda
+#            sensor.<cat>_tracker_area), name, hash (popup to open)
+# With no room (e.g. a pet's tag out of range) the line reads "Unknown" / "Unavailable", in title case like the
+# rest of the dashboard; room and zone names are shown as they are (no | title, which would turn Walk-in into Walk-In).
+# The Mushroom person card can only show the person's own state, so this is a template card.
+# The badge is the room's area icon when home (the location sensor's icon, from Bermuda's area sensor),
+# mdi:home when home without a room, a marker in a zone, or away. Coloured with HA's state colour for the person.
+person_tile:
+  card:
+    type: custom:mushroom-template-card
+    entity: '[[person]]'
+    primary: '[[name]]'
+    secondary: >
+      {% set room = states('[[location]]') %}
+      {{ {'unknown': 'Unknown', 'unavailable': 'Unavailable', 'none': 'Unknown', '': 'Unknown'}.get(room, room) }}
+    picture: "{{ state_attr('[[person]]', 'entity_picture') }}"
+    badge_icon: >
+      {% set s = states('[[person]]') %}
+      {% set room_icon = state_attr('[[location]]', 'icon') if states('[[location]]') not in ['Home', 'unknown', 'unavailable'] %}
+      {{ (room_icon or 'mdi:home') if s == 'home' else ('mdi:home-export-outline' if s in ['not_home', 'unknown', 'unavailable'] else 'mdi:map-marker') }}
+    badge_color: "{% from 'state_color.jinja' import state_css_color %}{{ state_css_color('[[person]]') }}"
+    fill_container: true
+    tap_action:
+      action: navigate
+      navigation_path: '[[hash]]'
+    hold_action:
+      action: more-info

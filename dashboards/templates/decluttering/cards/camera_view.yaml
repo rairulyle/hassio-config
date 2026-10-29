@@ -1,0 +1,25 @@
+# Camera view for a room page: the camera's still image, refreshed about every 10 seconds
+# (camera_view: auto), in the full frame. Tap or hold opens the live stream.
+# variables: entity (camera),
+#            name (optional: label in the footer bar when show_name is on; defaults to the camera's name),
+#            show_name (optional: false by default; the Cameras view turns it on),
+#            tap_action (optional: more-info by default; the doorbell opens the Gate call screen),
+#            aspect_ratio (optional: 16:9 by default; match the camera's Frigate detect size, e.g. the doorbell is 4:3)
+camera_view:
+  default:
+    - name: ''
+    - show_name: false
+    - tap_action:
+        action: more-info
+    - aspect_ratio: '16:9'
+  card:
+    type: picture-entity
+    entity: '[[entity]]'
+    name: '[[name]]'
+    camera_view: auto
+    aspect_ratio: '[[aspect_ratio]]'
+    show_name: '[[show_name]]'
+    show_state: false
+    tap_action: '[[tap_action]]'
+    hold_action:
+      action: more-info

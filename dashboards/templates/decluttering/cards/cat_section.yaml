@@ -1,0 +1,49 @@
+# Cat section: one cat's tile and litter box readings, under a section title with the cat's name.
+# variables: cat (slug used in the entity IDs: cat1, cat2, cat3), name, hash (the cat's popup)
+# The tile is person_tile: the cat is a person with its Bermuda tracker, and the room is the tracker's area.
+# Weight, visits, last visit and last litter box are UI template helpers (Settings > Helpers) that merge both boxes
+# with custom_templates/litterbox.jinja, not the per-box sensor.<cat>_<metric>_master_bedroom / _hallway duplicates.
+cat_section:
+  card:
+    type: vertical-stack
+    cards:
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: '[[name]]'
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:decluttering-card
+            template: person_tile
+            variables:
+              - person: person.[[cat]]
+              - location: sensor.[[cat]]_tracker_area
+              - name: '[[name]]'
+              - hash: '[[hash]]'
+          - type: custom:mushroom-entity-card
+            entity: sensor.[[cat]]_weight
+            name: Weight
+            icon: mdi:scale-bathroom
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-entity-card
+            entity: sensor.[[cat]]_visits_today
+            name: Visits Today
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-template-card
+            entity: sensor.[[cat]]_last_visit
+            primary: Last Visit
+            secondary: >
+              {% set at = as_datetime(states('sensor.[[cat]]_last_visit'), none) %}
+              {% set box = states('sensor.[[cat]]_last_litter_box') if has_value('sensor.[[cat]]_last_litter_box') %}
+              {{ (relative_time(at) ~ ' ago') if at else 'No visits yet' }}{{ ' · ' ~ box if box }}
+            icon: mdi:toilet
+            color: "{% from 'state_color.jinja' import state_css_color %}{{ state_css_color('sensor', 'active' if has_value('sensor.[[cat]]_last_visit') else 'unknown') }}"
+            fill_container: true
+            tap_action:
+              action: more-info

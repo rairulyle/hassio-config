@@ -1,6 +1,23 @@
-# Section title: Bubble Card separator. variables: title
+# Section title: Bubble Card separator.
+# variables: title (optional), icon (optional), sub_button (optional list of Bubble sub-buttons shown on the right)
+# Sub-buttons render as bare icons in HA's state colour (--state-<domain>-<state>-color, same
+# fallbacks as custom_templates/state_color.jinja). A sub-button may set color_domain to borrow
+# another domain's colours, e.g. color_domain: light for adaptive lighting switches.
 section_title:
+  default:
+    - title: ''
+    - icon: ''
+    - sub_button: []
   card:
     type: custom:bubble-card
     card_type: separator
     name: '[[title]]'
+    icon: '[[icon]]'
+    sub_button: '[[sub_button]]'
+    styles: |
+      .bubble-sub-button { background: none !important; }
+      ${[].concat(this.config.sub_button?.main ?? this.config.sub_button ?? []).map((b, i) => {
+        const d = b.color_domain ?? b.entity?.split('.')[0], s = hass.states[b.entity]?.state;
+        const kind = ['off', 'unavailable', 'unknown', 'idle', 'standby', 'closed', 'not_home', 'docked', 'paused'].includes(s) ? 'inactive' : 'active';
+        return d ? `.bubble-sub-button-${i + 1}, .bubble-sub-button-${i + 1} .bubble-sub-button-icon { color: var(--state-${d}-${s}-color, var(--state-${d}-${kind}-color, var(--state-${kind}-color))) !important; }` : '';
+      }).join('')}

@@ -32,16 +32,19 @@ app_room_card_overview:
       - grid-template-columns: 42px 1fr 100px
       - grid-template-rows: 1fr 1fr
     card:
-      - --mdc-ripple-color: transparent
-      - --mdc-ripple-press-opacity: 0
-      - padding: 12px 20px
+      # neutral press/hover feedback like the device tiles; otherwise button-card tints it with the
+      # entity colour (a room whose lights are on would hover yellow)
+      - --ha-ripple-color: var(--primary-text-color)
+      - --ha-ripple-hover-opacity: 0.04
+      - --ha-ripple-pressed-opacity: 0.08
+      - padding: 10px 16px
       - background: transparent
       - backdrop-filter: none
       - -webkit-backdrop-filter: none
       - box-shadow: none
       - border: none
     name:
-      - padding-left: 16px
+      - padding-left: 14px
       - justify-self: start
       - align-self: end
       - font-size: 18px
@@ -49,7 +52,7 @@ app_room_card_overview:
       - font-weight: 700
       - color: var(--primary-text-color)
     state:
-      - padding-left: 16px
+      - padding-left: 14px
       - justify-self: start
       - font-size: 11px
       - line-height: 11px

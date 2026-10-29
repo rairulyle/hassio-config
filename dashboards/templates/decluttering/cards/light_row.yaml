@@ -1,0 +1,23 @@
+# Light row: a one-line Bubble slider for a single light or sub-group.
+# variables: entity, name (optional, defaults to the entity name), icon (optional, defaults to mdi:light-recessed;
+# pass mdi:lightbulb-group for a group row), count_entity (optional: a "<Room> - Lights On Count" sensor; the state
+# then reads "2 On · 60%")
+# Icon tap opens more-info; drag the body for brightness. Colours and state text come from the global
+# app_style module in www/bubble/bubble-modules.yaml.
+light_row:
+  default:
+    - name: ''
+    - icon: mdi:light-recessed
+    - count_entity: ''
+  card:
+    type: custom:bubble-card
+    card_type: button
+    button_type: slider
+    entity: '[[entity]]'
+    name: '[[name]]'
+    icon: '[[icon]]'
+    show_state: true
+    tap_action:
+      action: more-info
+    app_style:
+      count_entity: '[[count_entity]]'

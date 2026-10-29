@@ -1,0 +1,36 @@
+# Aircon card: a Mushroom climate card for a Faikin (Daikin) unit, with fan and swing dropdowns.
+# variables: entity (climate), name (optional, defaults to the entity name)
+# The state line is swapped for aircon_mode (custom_templates/aircon.jinja) so it reads "Cooling" / "Drying"
+# until the room reaches the target, like the chips and room tiles. Format matches Mushroom: "Cool - 25.2 °C".
+# Econo, Powerful and Outdoor quiet are left to the Faikin's switches on the device page.
+aircon_card:
+  default:
+    - name: ''
+  card:
+    type: custom:mushroom-climate-card
+    entity: '[[entity]]'
+    name: '[[name]]'
+    primary_info: state
+    secondary_info: last-changed
+    hvac_modes:
+      - cool
+      - dry
+      - fan_only
+      - "off"
+    show_temperature_control: true
+    collapsible_controls: true
+    tap_action:
+      action: more-info
+    features:
+      - type: climate-fan-modes
+        style: dropdown
+      - type: climate-swing-modes
+        style: dropdown
+    card_mod:
+      style:
+        mushroom-state-info$: |
+          .primary { font-size: 0 !important; }
+          .primary::after {
+            content: "{% from 'aircon.jinja' import aircon_mode %}{{ aircon_mode('[[entity]]') }}{% set c = state_attr('[[entity]]', 'current_temperature') %}{{ (' - ' ~ c ~ ' °C') if c is number else '' }}";
+            font-size: var(--card-primary-font-size, 14px);
+          }
