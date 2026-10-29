@@ -181,3 +181,498 @@
     data:
       option: Lock
   mode: single
+- id: '1792307408000'
+  alias: Camera offline alert
+  description: High-priority push to Person 1 and Person 2 when a Frigate camera has no video
+    for 2 minutes, one "Frigate offline" alert (camera alerts paused) when Frigate
+    itself is down, and a quiet note when things come back.
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.doorbell_camera_fps
+    - sensor.gate_camera_fps
+    - sensor.main_door_camera_fps
+    - sensor.carport_camera_fps
+    - sensor.lanai_camera_fps
+    - sensor.living_room_camera_fps
+    - sensor.kitchen_camera_fps
+    - sensor.stairs_camera_fps
+    - sensor.hallway_camera_fps
+    below: 1
+    for:
+      minutes: 2
+    id: camera_offline
+  - trigger: state
+    entity_id:
+    - camera.doorbell_camera
+    - camera.porch_gate_camera
+    - camera.porch_main_door_camera
+    - camera.carport_carport_camera
+    - camera.lanai_lanai_camera
+    - camera.living_room_living_room_camera
+    - camera.kitchen_kitchen_camera
+    - camera.indoor_garden_stairs_camera
+    - camera.hallway_hallway_camera
+    to: unavailable
+    for:
+      minutes: 2
+    id: camera_offline
+  - trigger: numeric_state
+    entity_id:
+    - sensor.doorbell_camera_fps
+    - sensor.gate_camera_fps
+    - sensor.main_door_camera_fps
+    - sensor.carport_camera_fps
+    - sensor.lanai_camera_fps
+    - sensor.living_room_camera_fps
+    - sensor.kitchen_camera_fps
+    - sensor.stairs_camera_fps
+    - sensor.hallway_camera_fps
+    above: 0.9
+    for:
+      minutes: 1
+    id: camera_online
+  - trigger: state
+    entity_id:
+    - camera.doorbell_camera
+    - camera.porch_gate_camera
+    - camera.porch_main_door_camera
+    - camera.carport_carport_camera
+    - camera.lanai_lanai_camera
+    - camera.living_room_living_room_camera
+    - camera.kitchen_kitchen_camera
+    - camera.indoor_garden_stairs_camera
+    - camera.hallway_hallway_camera
+    from: unavailable
+    not_to:
+    - unavailable
+    - unknown
+    for:
+      minutes: 1
+    id: camera_online
+  - trigger: state
+    entity_id: update.frigate_server_2
+    to: unavailable
+    for:
+      minutes: 2
+    id: frigate_offline
+  - trigger: mqtt
+    topic: frigate/available
+    payload: offline
+    id: frigate_mqtt_offline
+  - trigger: state
+    entity_id: update.frigate_server_2
+    from: unavailable
+    not_to:
+    - unavailable
+    - unknown
+    for:
+      minutes: 1
+    id: frigate_online
+  - trigger: mqtt
+    topic: frigate/available
+    payload: online
+    id: frigate_mqtt_online
+  conditions: []
+  actions:
+  - variables:
+      phones:
+      - notify.mobile_app_person1_phone
+      - notify.mobile_app_person2_s_fold8
+      frigate_url: /ccab4aaf_frigate-proxy
+      cameras:
+        doorbell: camera.doorbell_camera
+        gate: camera.porch_gate_camera
+        main_door: camera.porch_main_door_camera
+        carport: camera.carport_carport_camera
+        lanai: camera.lanai_lanai_camera
+        living_room: camera.living_room_living_room_camera
+        kitchen: camera.kitchen_kitchen_camera
+        stairs: camera.indoor_garden_stairs_camera
+        hallway: camera.hallway_hallway_camera
+      camera: '{%- set e = trigger.entity_id | default('''') -%} {%- if e.startswith(''sensor.'')
+        and e.endswith(''_camera_fps'') -%}{{ e[7:-11] }} {%- else -%}{%- for k, v
+        in cameras.items() if v == e -%}{{ k }}{%- endfor -%}{%- endif -%}'
+      camera_entity: '{{ cameras.get(camera, '''') }}'
+      name: '{{ state_attr(camera_entity, ''friendly_name'') or camera | replace(''_'',
+        '' '') | title }}'
+      since: '{{ as_local(trigger.to_state.last_changed).strftime(''%H:%M'') if trigger.to_state
+        is defined and trigger.to_state else now().strftime(''%H:%M'') }}'
+      outage_minutes: '{{ ((trigger.to_state.last_changed - trigger.from_state.last_changed).total_seconds()
+        / 60) | round(1) if trigger.from_state is defined and trigger.from_state and
+        trigger.to_state else 0 }}'
+      frigate_down: '{{ states(''update.frigate_server_2'') in [''unavailable'', ''unknown'']
+        or expand(cameras.values() | list) | selectattr(''state'', ''eq'', ''unavailable'')
+        | list | count == cameras | count }}'
+      mass_recovery: '{{ expand(cameras.values() | list) | selectattr(''last_changed'',
+        ''gt'', now() - timedelta(minutes=3)) | list | count >= 5 }}'
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: camera_offline
+      - condition: template
+        value_template: '{{ camera != '''' and not frigate_down }}'
+      sequence:
+      - repeat:
+          for_each: '{{ phones }}'
+          sequence:
+          - action: '{{ repeat.item }}'
+            continue_on_error: true
+            data:
+              title: "\U0001F4F7 Camera offline: {{ name }}"
+              message: '{{ name }} has had no video for 2 minutes (since {{ since
+                }}).'
+              data:
+                priority: high
+                ttl: 0
+                importance: high
+                channel: Camera offline
+                tag: camera-offline-{{ camera }}
+                sticky: 'true'
+                alert_once: true
+                image: /api/camera_proxy/{{ camera_entity }}
+                clickAction: '{{ frigate_url }}'
+                actions:
+                - action: URI
+                  title: Open Frigate
+                  uri: '{{ frigate_url }}'
+    - conditions:
+      - condition: trigger
+        id: camera_online
+      - condition: template
+        value_template: '{{ camera != '''' and outage_minutes | float(0) >= 2 }}'
+      sequence:
+      - repeat:
+          for_each: '{{ phones }}'
+          sequence:
+          - action: '{{ repeat.item }}'
+            continue_on_error: true
+            data:
+              message: clear_notification
+              data:
+                tag: camera-offline-{{ camera }}
+          - if:
+            - condition: template
+              value_template: '{{ not mass_recovery and not frigate_down }}'
+            then:
+            - action: '{{ repeat.item }}'
+              continue_on_error: true
+              data:
+                title: '✅ Camera back online: {{ name }}'
+                message: '{{ name }} is streaming again (since {{ since }}).'
+                data:
+                  importance: low
+                  channel: Camera status
+                  tag: camera-online-{{ camera }}
+                  alert_once: true
+                  clickAction: '{{ frigate_url }}'
+    - conditions:
+      - condition: trigger
+        id: frigate_mqtt_offline
+      sequence:
+      - wait_for_trigger:
+        - trigger: mqtt
+          topic: frigate/available
+          payload: online
+        timeout:
+          minutes: 2
+        continue_on_timeout: true
+      - condition: template
+        value_template: '{{ wait.trigger is none }}'
+      - repeat:
+          for_each: '{{ phones }}'
+          sequence:
+          - action: '{{ repeat.item }}'
+            continue_on_error: true
+            data:
+              title: "\U0001F4F7 Frigate offline"
+              message: Frigate has been offline for 2 minutes (since {{ since }}).
+                Per-camera alerts are paused until it's back.
+              data:
+                priority: high
+                ttl: 0
+                importance: high
+                channel: Camera offline
+                tag: frigate-offline
+                sticky: 'true'
+                alert_once: true
+                clickAction: '{{ frigate_url }}'
+                actions:
+                - action: URI
+                  title: Open Frigate
+                  uri: '{{ frigate_url }}'
+    - conditions:
+      - condition: trigger
+        id: frigate_offline
+      sequence:
+      - repeat:
+          for_each: '{{ phones }}'
+          sequence:
+          - action: '{{ repeat.item }}'
+            continue_on_error: true
+            data:
+              title: "\U0001F4F7 Frigate offline"
+              message: Frigate has been offline for 2 minutes (since {{ since }}).
+                Per-camera alerts are paused until it's back.
+              data:
+                priority: high
+                ttl: 0
+                importance: high
+                channel: Camera offline
+                tag: frigate-offline
+                sticky: 'true'
+                alert_once: true
+                clickAction: '{{ frigate_url }}'
+                actions:
+                - action: URI
+                  title: Open Frigate
+                  uri: '{{ frigate_url }}'
+    - conditions:
+      - condition: trigger
+        id:
+        - frigate_online
+        - frigate_mqtt_online
+      sequence:
+      - repeat:
+          for_each: '{{ phones }}'
+          sequence:
+          - action: '{{ repeat.item }}'
+            continue_on_error: true
+            data:
+              message: clear_notification
+              data:
+                tag: frigate-offline
+          - if:
+            - condition: template
+              value_template: '{{ trigger.id == ''frigate_online'' and outage_minutes
+                | float(0) >= 2 }}'
+            then:
+            - action: '{{ repeat.item }}'
+              continue_on_error: true
+              data:
+                title: ✅ Frigate back online
+                message: Frigate is running again (since {{ since }}).
+                data:
+                  importance: low
+                  channel: Camera status
+                  tag: frigate-online
+                  alert_once: true
+                  clickAction: '{{ frigate_url }}'
+  mode: parallel
+  max: 25
+- id: doorbell_ring
+  alias: Doorbell ring
+  description: The Reolink doorbell's Visitor button at the pedestrian gate rings
+    Person 1's and Person 2's phones (high priority, "Doorbell" channel) with a snapshot.
+    Answer opens the Gate view (/lovelace/gate) for live video and two-way talk through
+    Frigate. Also announces on the Home Mini and both TVs. 30 s cooldown between rings.
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.doorbell_visitor
+    from: 'off'
+    to: 'on'
+  conditions: []
+  actions:
+  - variables:
+      phones:
+      - notify.mobile_app_person1_phone
+      - notify.mobile_app_person2_s_fold8
+      door_url: /lovelace/gate
+      speakers: '{{ [''media_player.google_home_mini'', ''media_player.living_room_tv_2'',
+        ''media_player.bedroom_tv''] | reject(''is_state'', [''unavailable'', ''unknown''])
+        | list }}'
+  - repeat:
+      for_each: '{{ phones }}'
+      sequence:
+      - action: '{{ repeat.item }}'
+        continue_on_error: true
+        data:
+          title: "\U0001F514 Someone's at the gate"
+          message: The gate doorbell was pressed.
+          data:
+            priority: high
+            ttl: 0
+            importance: high
+            channel: Doorbell
+            tag: doorbell
+            image: /api/camera_proxy/camera.doorbell_camera
+            clickAction: '{{ door_url }}'
+            actions:
+            - action: URI
+              title: Answer
+              uri: '{{ door_url }}'
+            - action: DOORBELL_IGNORE
+              title: Ignore
+  - if:
+    - condition: template
+      value_template: '{{ speakers | count > 0 }}'
+    then:
+    - action: tts.google_translate_say
+      continue_on_error: true
+      data:
+        entity_id: '{{ speakers }}'
+        message: Someone's at the pedestrian gate.
+        language: en
+        cache: true
+  - delay:
+      seconds: 30
+  mode: single
+  max_exceeded: silent
+- id: frigate_threat_alert
+  alias: Frigate threat alert
+  description: Push to Person 1 and Person 2 when Frigate's GenAI (Gemini) review summary
+    rates an alert as potential_threat_level 1 (high-priority "Frigate review" notification)
+    or 2 (URGENT alarm_stream notification, TTS on speakers, re-sent once if nobody
+    taps Acknowledge within 2 minutes). Triggered by the type=genai message on frigate/reviews;
+    deduped by only firing when the threat level differs from the review's previous
+    level.
+  triggers:
+  - trigger: mqtt
+    topic: frigate/reviews
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.payload_json is defined and trigger.payload_json.type
+      | default('''') == ''genai'' and trigger.payload_json.after.severity | default('''')
+      == ''alert'' }}'
+  - condition: template
+    value_template: '{%- set lvl = trigger.payload_json.after.data.metadata.potential_threat_level
+      | default(none) -%} {%- set prev = trigger.payload_json.before.data.metadata.potential_threat_level
+      | default(none) -%} {{ lvl in [1, 2] and lvl != prev }}'
+  actions:
+  - variables:
+      phones:
+      - notify.mobile_app_person1_phone
+      - notify.mobile_app_person2_s_fold8
+      speakers: '{{ [''media_player.google_home_mini'', ''media_player.living_room_tv_2'',
+        ''media_player.bedroom_tv''] | reject(''is_state'', [''unavailable'', ''unknown''])
+        | list }}'
+      frigate_url: /ccab4aaf_frigate-proxy
+      cameras:
+        doorbell: camera.doorbell_camera
+        gate: camera.porch_gate_camera
+        main_door: camera.porch_main_door_camera
+        carport: camera.carport_carport_camera
+        lanai: camera.lanai_lanai_camera
+      review: '{{ trigger.payload_json.after }}'
+      review_id: '{{ review.id }}'
+      camera: '{{ review.camera }}'
+      name: '{%- if camera == ''doorbell'' -%}Gate doorbell {%- else -%}{{ (state_attr(cameras.get(camera,
+        ''''), ''friendly_name'') or camera | replace(''_'', '' '') | title) | replace(''
+        Camera'', '''') }}{%- endif -%}'
+      meta: '{{ review.data.metadata }}'
+      level: '{{ meta.potential_threat_level | int(0) }}'
+      title: '{{ meta.title | default(''Person detected'', true) }}'
+      summary: '{{ meta.shortSummary | default(meta.scene, true) | default('''', true)
+        }}'
+      first_observation: '{{ (meta.observations | default([], true) | first) if meta.observations
+        | default([], true) | count > 0 else '''' }}'
+      first_detection: '{{ review.data.detections | default([], true) | first | default('''')
+        }}'
+      image: '{{ ''/api/frigate/notifications/'' ~ first_detection ~ ''/snapshot.jpg''
+        if first_detection else ''/api/frigate/notifications/'' ~ review_id ~ ''/review_preview.gif''
+        }}'
+      ack_action: FRIGATE_ACK_{{ review_id }}
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ level == 1 }}'
+      sequence:
+      - repeat:
+          for_each: '{{ phones }}'
+          sequence:
+          - action: '{{ repeat.item }}'
+            continue_on_error: true
+            data:
+              title: '⚠️ {{ name }}: {{ title }}'
+              message: '{{ summary }}'
+              data:
+                priority: high
+                ttl: 0
+                importance: high
+                channel: Frigate review
+                tag: frigate-{{ review_id }}
+                image: '{{ image }}'
+                clickAction: '{{ frigate_url }}'
+                actions:
+                - action: URI
+                  title: Open Frigate
+                  uri: '{{ frigate_url }}'
+    - conditions:
+      - condition: template
+        value_template: '{{ level == 2 }}'
+      sequence:
+      - repeat:
+          for_each: '{{ phones }}'
+          sequence:
+          - action: '{{ repeat.item }}'
+            continue_on_error: true
+            data:
+              title: "\U0001F6A8 SECURITY: {{ name }}: {{ title }}"
+              message: '{{ summary }}{{ ''
+
+                '' ~ first_observation if first_observation else '''' }}'
+              data:
+                priority: high
+                ttl: 0
+                channel: alarm_stream
+                importance: max
+                sticky: 'true'
+                tag: frigate-urgent-{{ review_id }}
+                image: '{{ image }}'
+                clickAction: '{{ frigate_url }}'
+                actions:
+                - action: URI
+                  title: Open Frigate
+                  uri: '{{ frigate_url }}'
+                - action: '{{ ack_action }}'
+                  title: Acknowledge
+      - if:
+        - condition: template
+          value_template: '{{ speakers | count > 0 }}'
+        then:
+        - action: tts.google_translate_say
+          continue_on_error: true
+          data:
+            entity_id: '{{ speakers }}'
+            message: Security alert at the {{ name | lower }}. {{ title }}.
+            language: en
+            cache: false
+      - wait_for_trigger:
+        - trigger: event
+          event_type: mobile_app_notification_action
+          event_data:
+            action: '{{ ack_action }}'
+        timeout:
+          minutes: 2
+        continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ wait.trigger is none }}'
+        then:
+        - repeat:
+            for_each: '{{ phones }}'
+            sequence:
+            - action: '{{ repeat.item }}'
+              continue_on_error: true
+              data:
+                title: "\U0001F6A8 SECURITY: {{ name }}: {{ title }}"
+                message: '{{ summary }}{{ ''
+
+                  '' ~ first_observation if first_observation else '''' }}'
+                data:
+                  priority: high
+                  ttl: 0
+                  channel: alarm_stream
+                  importance: max
+                  sticky: 'true'
+                  tag: frigate-urgent-{{ review_id }}
+                  image: '{{ image }}'
+                  clickAction: '{{ frigate_url }}'
+                  actions:
+                  - action: URI
+                    title: Open Frigate
+                    uri: '{{ frigate_url }}'
+                  - action: '{{ ack_action }}'
+                    title: Acknowledge
+  mode: parallel
+  max: 10
