@@ -22,7 +22,6 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 climate: !include climate.yaml
-light: !include light.yaml
 
 lovelace:
   # Default dashboard (/lovelace) reads the YAML directly: ui-lovelace.yaml and dashboards/.
