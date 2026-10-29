@@ -1,23 +1,15 @@
 - id: '1677318411784'
-  alias: Feed Cats on a Schedule Basis
+  alias: Feed cats on a schedule basis
   description: ''
   triggers:
-  - at: 08:00:00
-    enabled: false
-    trigger: time
-  - at: 00:00:00
-    enabled: false
-    trigger: time
-  - at: '15:00:00'
-    enabled: false
-    trigger: time
   - at: '12:00:00'
     enabled: true
     trigger: time
   conditions: []
   actions:
-  - data: {}
-    action: script.feed_cat
+  - action: script.feed_cat
+    metadata: {}
+    data: {}
   mode: single
 - id: '1703788077286'
   alias: 'Notify: Check and lock Doors and Windows'

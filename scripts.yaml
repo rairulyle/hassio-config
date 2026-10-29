@@ -9,20 +9,15 @@ turn_off_gaming_pc:
   icon: mdi:youtube-gaming
 feed_cat:
   alias: Feed Cats
+  description: One meal from both Xiaomi feeders in the master bedroom (each feeder's Target Feeding Measure).
   sequence:
-  - parallel:
-    - metadata: {}
-      data:
-        value: '3'
-      action: number.set_value
-      target:
-        device_id: d8217263bafa5edf460aa12efac4bc6c
-    - metadata: {}
-      data:
-        value: '3'
-      action: number.set_value
-      target:
-        device_id: bb135344ea128abadf5ae2412e4c7612
+  - action: button.press
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - button.xiaomi_iv2001_dc59_pet_food_out
+      - button.xiaomi_iv2001_f93f_pet_food_out
   mode: single
   icon: mdi:cat
 turn_off_desktop2_pc:
