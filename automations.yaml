@@ -140,6 +140,78 @@
       entity_id: media_player.google_home_mini
       language: en-gb
   mode: single
+- id: '1791788047'
+  alias: Master Bedroom - Aircon to Fan at 3 AM
+  description: Once everyone is asleep, turn off the aircon and switch the standing
+    fan to oscillating natural wind.
+  triggers:
+  - trigger: time
+    at: 03:00:00
+  conditions:
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: climate.master_bedroom_aircon
+      state:
+      - 'off'
+      - unavailable
+      - unknown
+  actions:
+  - action: climate.turn_off
+    target:
+      entity_id: climate.master_bedroom_aircon
+  - action: fan.turn_on
+    target:
+      entity_id: fan.dmaker_p15_03db_fan
+  - action: fan.set_preset_mode
+    target:
+      entity_id: fan.dmaker_p15_03db_fan
+    data:
+      preset_mode: Natural Wind
+  - action: fan.oscillate
+    target:
+      entity_id: fan.dmaker_p15_03db_fan
+    data:
+      oscillating: true
+  mode: single
+- id: '1791894118'
+  alias: Master Bathroom - Exhaust Fan with Lights
+  description: Run the exhaust fan (wall switch L3) while any bathroom light is on,
+    and for 5 minutes after they all go off.
+  triggers:
+  - trigger: state
+    entity_id: light.master_bathroom_all_lights
+    to: 'on'
+    id: lights_on
+  - trigger: state
+    entity_id: light.master_bathroom_all_lights
+    from: 'on'
+    to: 'off'
+    for:
+      minutes: 5
+    id: lights_off
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: lights_on
+      sequence:
+      - action: switch.turn_on
+        metadata: {}
+        target:
+          entity_id: switch.master_bathroom_exhaust_fan
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: lights_off
+      sequence:
+      - action: switch.turn_off
+        metadata: {}
+        target:
+          entity_id: switch.master_bathroom_exhaust_fan
+        data: {}
+  mode: single
 - id: carport_gate_cooldown
   alias: Carport - Gate Cooldown
   description: Records which gate relay fired and starts the cooldown, including presses
@@ -676,3 +748,46 @@
                     title: Acknowledge
   mode: parallel
   max: 10
+- id: hallway_person_lights
+  alias: Hallway - Lights on Person Detected
+  description: When Frigate sees a person in the hallway after sunset, turn on the
+    hallway and walk-in closet lights. Turn them off once no person has been seen
+    for 15 minutes.
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.hallway_hallway_camera_person_occupancy
+    from: 'off'
+    to: 'on'
+    id: person_detected
+  - trigger: state
+    entity_id: binary_sensor.hallway_hallway_camera_person_occupancy
+    from: 'on'
+    to: 'off'
+    for:
+      minutes: 15
+    id: person_cleared
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: person_detected
+      - condition: state
+        entity_id: sun.sun
+        state: below_horizon
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id:
+          - light.hallway_all_lights
+          - light.walk_in_closet_all_lights
+    - conditions:
+      - condition: trigger
+        id: person_cleared
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id:
+          - light.hallway_all_lights
+          - light.walk_in_closet_all_lights
+  mode: restart
