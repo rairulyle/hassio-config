@@ -11,43 +11,6 @@
     metadata: {}
     data: {}
   mode: single
-- id: '1703788077286'
-  alias: 'Notify: Check and lock Doors and Windows'
-  description: ''
-  triggers:
-  - at: 00:00:00
-    trigger: time
-    enabled: true
-  conditions: []
-  actions:
-  - action: conversation.process
-    metadata: {}
-    data:
-      text: You are an advanced smart home assistant named Fairy from Zenless Zone
-        Zero. Your response will be spoken out loud (so no emojis) and should be funny
-        and creative. If possible, include some Japanglish. When an English word closely
-        resembles its Katakana equivalent, use that word (e.g., Master = Masutā).
-        You may include Romaji as long as it is a common Japanese word (e.g., neko,
-        hayaku, etc...). Your task is to create a message reminding us to lock the
-        doors and windows. Say Oyasumi at the end of the sentence. At the moment,
-        I don't have any smart lock devices, so keep the message focused on reminding
-        us manually. You speak English in a Japanese accent so keep that in mind while
-        making a response. Keep it 2 sentences long. Call me master. Don't use word
-        "ne?"
-      agent_id: conversation.chatgpt
-    response_variable: agent
-  - data:
-      message: "\U0001F3E1 {{ agent.response.speech.plain.speech }} <@&DISCORD_ROLE_ID>"
-      target:
-      - 'DISCORD_CHANNEL_ID'
-    action: notify.home_assistant
-  - data:
-      cache: true
-      entity_id: media_player.google_home_mini
-      message: '{{ agent.response.speech.plain.speech }}'
-      language: ja
-    action: tts.google_translate_say
-  mode: single
 - id: '1730897112322'
   alias: Auto Theme Switch
   description: ''
