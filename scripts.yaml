@@ -29,3 +29,39 @@ turn_off_desktop2_pc:
       input: DESKTOP2
   mode: single
   icon: mdi:youtube-gaming
+carport_gate:
+  alias: Carport - Gate
+  description: Locks or unlocks the gate. Ignored while the gate is moving (cooldown)
+    or the relay is offline.
+  icon: mdi:gate
+  mode: single
+  max_exceeded: silent
+  fields:
+    operation:
+      name: Operation
+      required: true
+      selector:
+        select:
+          options:
+          - lock
+          - unlock
+  sequence:
+  - condition: state
+    entity_id: timer.carport_gate_cooldown
+    state: idle
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: sensor.carport_gate_status
+      state: Offline
+  - action: input_select.select_option
+    target:
+      entity_id: input_select.carport_gate_last_operation
+    data:
+      option: '{{ operation | capitalize }}'
+  - action: timer.start
+    target:
+      entity_id: timer.carport_gate_cooldown
+  - action: switch.turn_on
+    target:
+      entity_id: switch.driveway_gate_{{ operation }}

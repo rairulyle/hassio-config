@@ -140,3 +140,44 @@
       entity_id: media_player.google_home_mini
       language: en-gb
   mode: single
+- id: carport_gate_cooldown
+  alias: Carport - Gate Cooldown
+  description: Records which gate relay fired and starts the cooldown, including presses
+    from the Tuya app.
+  triggers:
+  - trigger: state
+    entity_id:
+    - switch.driveway_gate_lock
+    - switch.driveway_gate_unlock
+    from: 'off'
+    to: 'on'
+  conditions: []
+  actions:
+  - action: input_select.select_option
+    target:
+      entity_id: input_select.carport_gate_last_operation
+    data:
+      option: '{{ ''Lock'' if trigger.entity_id == ''switch.driveway_gate_lock'' else
+        ''Unlock'' }}'
+  - action: timer.start
+    target:
+      entity_id: timer.carport_gate_cooldown
+  mode: single
+- id: carport_gate_back_online
+  alias: Carport - Gate Back Online
+  description: When the gate relay comes back online (or HA starts), assume the gate
+    is locked.
+  triggers:
+  - trigger: state
+    entity_id: sensor.carport_gate_status
+    from: Offline
+  - trigger: homeassistant
+    event: start
+  conditions: []
+  actions:
+  - action: input_select.select_option
+    target:
+      entity_id: input_select.carport_gate_last_operation
+    data:
+      option: Lock
+  mode: single
