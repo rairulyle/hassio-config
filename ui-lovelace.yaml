@@ -20,8 +20,8 @@ views:
   - !include /config/dashboards/mobile/more/people.yaml
   - !include /config/dashboards/mobile/more/system.yaml
 
-# Swipe between views with a slide (hass-swipe-navigation); the navbar's taps get the card entry animation from the theme.
+# Swipe between views (hass-swipe-navigation). Its own animation stays off: www/dashboard/view_transitions.js
+# animates every view change, swipes included, so they all move the same way.
 swipe_nav:
-  animate: swipe
-  animate_duration: 250
+  animate: none
   wrap: false
