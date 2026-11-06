@@ -41,3 +41,30 @@
         source: "{{ state_attr('person.person2', 'source') }}"
         floor: "{{ state_attr('sensor.person2_ble_phone_area', 'floor_name') }}"
         distance: "{{ states('sensor.person2_ble_phone_distance') }}"
+
+# Each cat's last Frigate sighting per camera, from the "cats" classification model (the sub_label on
+# frigate/events). sightings: {camera: {cat: {id, at}}}, at being the event start as a Unix timestamp.
+# The litter box push attaches the snapshot of the sighting nearest the visit (pets_litter_box_visit).
+- triggers:
+    - trigger: mqtt
+      topic: frigate/events
+      value_template: "{{ value_json.after.label }}"
+      payload: cat
+  conditions:
+    - condition: template
+      value_template: "{{ trigger.payload_json.after.sub_label is not none and trigger.payload_json.after.has_snapshot }}"
+  sensor:
+    - name: Cat Sightings
+      unique_id: cat_sightings
+      default_entity_id: sensor.cat_sightings
+      icon: mdi:cat
+      state: >
+        {% set sub = trigger.payload_json.after.sub_label %}
+        {{ (sub[0] if sub is list else sub) | lower }}
+      attributes:
+        camera: "{{ trigger.payload_json.after.camera }}"
+        sightings: >
+          {% set e = trigger.payload_json.after %}
+          {% set cat = (e.sub_label[0] if e.sub_label is list else e.sub_label) | lower %}
+          {% set all = (this.attributes.sightings if this.attributes.sightings is mapping else {}) %}
+          {{ dict(all, **{e.camera: dict(all.get(e.camera, {}), **{cat: {'id': e.id, 'at': e.start_time}})}) }}

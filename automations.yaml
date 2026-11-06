@@ -865,7 +865,7 @@
       sequence:
       - action: '{{ phone }}'
         data:
-          title: 🚨 Zigbee down, SLZB-MR4U in {{ mode_name }} mode
+          title: "\U0001F6A8 Zigbee down, SLZB-MR4U in {{ mode_name }} mode"
           message: The coordinator left Ethernet mode, so every Zigbee device is offline.
             Open its web UI, set Mode > Connection mode to Ethernet and save.
           data:
@@ -899,13 +899,15 @@
             tag: slzb-mode-restored
             clickAction: '{{ slzb_url }}'
   mode: queued
-- id: litter_box_visit
-  alias: Litter Box - Visit Notification
-  description: Push to Person 1 and Person 2 when a cat uses a Neakasa M1 litter box, naming the cat, the
-    box and its weight. Triggered by the per-box cat sensors (sensor.<cat>_last_visit_<box>), so a
-    visit the box didn't match to a cat sends nothing. The Neakasa cloud records arrive on the
-    integration's poll (10 min by default), so the push can lag the visit by that much. Low importance,
-    "Litter box" channel, grouped.
+- id: pets_litter_box_visit
+  alias: 'Pets: notify on a litter box visit'
+  description: Push to Person 1 and Person 2 when a cat uses a Neakasa M1 litter box, naming
+    the cat, the box and its weight. Triggered by the per-box cat sensors (sensor.<cat>_last_visit_<box>),
+    so a visit the box didn't match to a cat sends nothing. The Neakasa cloud records
+    arrive on the integration's poll (10 min by default), so the push can lag the
+    visit by that much. Low importance, "Litter box" channel, grouped. A box a Frigate
+    camera sees attaches that cat's snapshot from sensor.cat_sightings when Frigate
+    named the cat within 15 minutes of the visit.
   triggers:
   - trigger: state
     entity_id:
@@ -916,14 +918,12 @@
     - sensor.cat3_last_visit_master_bedroom
     - sensor.cat3_last_visit_hallway
   conditions:
-  # A new, later visit from the last hour: skips restarts, reconnects and the integration's lookback.
   - condition: template
-    value_template: >
-      {% set new = as_datetime(trigger.to_state.state if trigger.to_state else none, none) %}
-      {% set old = as_datetime(trigger.from_state.state if trigger.from_state else none, none) %}
-      {{ trigger.from_state is not none and trigger.from_state.state != 'unavailable'
-         and new is not none and (old is none or new > old)
-         and now() - new < timedelta(hours=1) }}
+    value_template: "{% set new = as_datetime(trigger.to_state.state if trigger.to_state
+      else none, none) %} {% set old = as_datetime(trigger.from_state.state if trigger.from_state
+      else none, none) %} {{ trigger.from_state is not none and trigger.from_state.state
+      != 'unavailable'\n   and new is not none and (old is none or new > old)\n   and
+      now() - new < timedelta(hours=1) }}\n"
   actions:
   - variables:
       phones:
@@ -932,10 +932,26 @@
       boxes:
         master_bedroom: Master Bedroom
         hallway: Hallway
-      cat: "{{ trigger.entity_id | regex_replace('^sensor\\.(\\w+?)_last_visit_\\w+$', '\\\\1') }}"
-      box: "{{ trigger.entity_id | regex_replace('^sensor\\.\\w+?_last_visit_', '') }}"
-      weight: "{{ states('sensor.' ~ cat ~ '_weight_' ~ box) }}"
-      visit_time: "{{ as_local(as_datetime(trigger.to_state.state)).strftime('%-I:%M %p') }}"
+      cat: '{{ trigger.entity_id | regex_replace(''^sensor\.(\w+?)_last_visit_\w+$'',
+        ''\\1'') }}'
+      box: '{{ trigger.entity_id | regex_replace(''^sensor\.\w+?_last_visit_'', '''')
+        }}'
+      weight: '{{ states(''sensor.'' ~ cat ~ ''_weight_'' ~ box) }}'
+      visit_time: '{{ as_local(as_datetime(trigger.to_state.state)).strftime(''%-I:%M
+        %p'') }}'
+      cameras:
+        hallway: hallway
+      sighting: '{% set s = (state_attr(''sensor.cat_sightings'', ''sightings'') or
+        {}).get(cameras.get(box), {}).get(cat) %} {{ s if s and (as_timestamp(trigger.to_state.state)
+        - s.at) | abs < 900 else none }}
+
+        '
+      push: '{% set base = {''importance'': ''low'', ''channel'': ''Litter box'',
+        ''group'': ''litter-box'', ''clickAction'': ''/lovelace/pets''} %} {{ dict(base,
+        image=''/api/frigate/notifications/'' ~ sighting.id ~ ''/snapshot.jpg?crop=1&bbox=0'')
+        if sighting else base }}
+
+        '
   - repeat:
       for_each: '{{ phones }}'
       sequence:
@@ -943,11 +959,8 @@
         continue_on_error: true
         data:
           title: "\U0001F431 {{ cat | title }} used the {{ boxes[box] }} litter box"
-          message: "At {{ visit_time }}{{ ' · ' ~ weight ~ ' kg' if is_number(weight) }}"
-          data:
-            importance: low
-            channel: Litter box
-            group: litter-box
-            clickAction: /lovelace/pets
+          message: At {{ visit_time }}{{ ' · ' ~ weight ~ ' kg' if is_number(weight)
+            }}
+          data: '{{ push }}'
   mode: queued
   max: 10
