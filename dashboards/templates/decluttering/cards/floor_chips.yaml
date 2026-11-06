@@ -1,0 +1,22 @@
+# Floor chips for the Rooms page: the floor's lights on, aircons running and locks, from HA's floor and area
+# registry (floor_areas / area_entities), so a room moved to another floor or a new lock needs no change here.
+# Lights count like the "<Room> - Lights On Count" helpers: Zigbee bulbs with a parent device, minus ZHA groups.
+# Locks are every lock.* on the floor plus the pedestrian gate's status sensor when its device sits on the floor.
+# variables: floor (floor id, e.g. first_floor)
+floor_chips:
+  card:
+    type: custom:mushroom-chips-card
+    card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
+    chips:
+      - type: template
+        icon: mdi:lightbulb-group
+        icon_color: "{% from 'state_color.jinja' import state_color %}{% set n = states.light | selectattr('state', 'eq', 'on') | map(attribute='entity_id') | select('in', floor_areas('[[floor]]') | map('area_entities') | sum(start=[])) | reject('is_device_attr', 'via_device_id', none) | reject('is_device_attr', 'model', 'Group') | list | count %}{{ state_color('light', 'on' if n > 0 else 'off') }}"
+        content: "{% set n = states.light | selectattr('state', 'eq', 'on') | map(attribute='entity_id') | select('in', floor_areas('[[floor]]') | map('area_entities') | sum(start=[])) | reject('is_device_attr', 'via_device_id', none) | reject('is_device_attr', 'model', 'Group') | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }}"
+      - type: template
+        icon: mdi:thermostat
+        icon_color: "{% from 'state_color.jinja' import state_color %}{% set n = states.climate | map(attribute='entity_id') | select('in', floor_areas('[[floor]]') | map('area_entities') | sum(start=[])) | map('states') | reject('in', ['off', 'unavailable', 'unknown']) | list | count %}{{ state_color('climate', 'cool' if n > 0 else 'off') }}"
+        content: "{% set n = states.climate | map(attribute='entity_id') | select('in', floor_areas('[[floor]]') | map('area_entities') | sum(start=[])) | map('states') | reject('in', ['off', 'unavailable', 'unknown']) | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }}"
+      - type: template
+        icon: "{% set e = floor_areas('[[floor]]') | map('area_entities') | sum(start=[]) %}{% set s = (states.lock | map(attribute='entity_id') | select('in', e) | list + (['sensor.pedestrian_gate'] | select('in', e) | list)) | map('states') | list %}{{ 'mdi:lock-open-variant' if s | reject('in', ['locked', 'unavailable', 'unknown']) | list else ('mdi:lock-question' if s | reject('in', ['unavailable', 'unknown']) | list | count == 0 else 'mdi:lock') }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{% set e = floor_areas('[[floor]]') | map('area_entities') | sum(start=[]) %}{% set s = (states.lock | map(attribute='entity_id') | select('in', e) | list + (['sensor.pedestrian_gate'] | select('in', e) | list)) | map('states') | list %}{{ state_color('lock', 'unlocked' if s | reject('in', ['locked', 'unavailable', 'unknown']) | list else ('unavailable' if s | reject('in', ['unavailable', 'unknown']) | list | count == 0 else 'locked')) }}"
+        content: "{% set e = floor_areas('[[floor]]') | map('area_entities') | sum(start=[]) %}{% set s = (states.lock | map(attribute='entity_id') | select('in', e) | list + (['sensor.pedestrian_gate'] | select('in', e) | list)) | map('states') | list %}{% set n = s | reject('in', ['locked', 'unavailable', 'unknown']) | list | count %}{{ (n ~ ' Unlocked') if n > 0 else ('No locks' if s | count == 0 else ('Offline' if s | reject('in', ['unavailable', 'unknown']) | list | count == 0 else 'Locked')) }}"

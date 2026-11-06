@@ -6,32 +6,16 @@ subview: true
 layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
 cards:
   #
-  # Overview chips
-  #
-  - type: custom:mushroom-chips-card
-    card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
-    chips:
-      - type: template
-        entity: climate.master_bedroom_aircon
-        icon: "{% from 'aircon.jinja' import aircon_icon %}{{ aircon_icon('climate.master_bedroom_aircon') }}"
-        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('climate.master_bedroom_aircon') }}"
-        content: "{% from 'aircon.jinja' import aircon_label %}{{ aircon_label('climate.master_bedroom_aircon') }}"
-        tap_action:
-          action: more-info
-      - type: template
-        entity: sensor.zhimi_vb4_00ae_temperature
-        icon: mdi:thermometer
-        content: "{% set v = states('sensor.zhimi_vb4_00ae_temperature') | float(none) %}{{ (v | round(1) ~ '°') if v is not none else '—' }}"
-        tap_action:
-          action: more-info
-
-  #
   # First Floor
   #
   - type: custom:decluttering-card
     template: section_title
     variables:
       - icon: mdi:home-floor-1
+  - type: custom:decluttering-card
+    template: floor_chips
+    variables:
+      - floor: first_floor
 
   #
   # Living Room (hidden for now: uncomment the card below to show it again)
@@ -139,6 +123,10 @@ cards:
     template: section_title
     variables:
       - icon: mdi:home-floor-2
+  - type: custom:decluttering-card
+    template: floor_chips
+    variables:
+      - floor: 2nd_floor
 
   #
   # Master Bedroom
