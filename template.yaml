@@ -2,6 +2,7 @@
 
 # Per-person location: person.* decides home/away (Companion app GPS only; Bermuda is kept out of
 # person on purpose), and while home this adds the room from the phone's Bermuda area. Away shows the zone or Away.
+# dashboard_view is the view the dashboard opens on for that person (custom_templates/room_dashboard.jinja).
 - sensor:
     - name: Person 1 Location
       unique_id: person1_location
@@ -22,6 +23,7 @@
         source: "{{ state_attr('person.person1', 'source') }}"
         floor: "{{ state_attr('sensor.person1_ble_phone_area', 'floor_name') }}"
         distance: "{{ states('sensor.person1_ble_phone_distance') }}"
+        dashboard_view: "{% from 'room_dashboard.jinja' import room_view %}{{ room_view('person1', 'person1_ble_phone') }}"
     - name: Person 2 Location
       unique_id: person2_location
       default_entity_id: sensor.person2_location
@@ -41,6 +43,7 @@
         source: "{{ state_attr('person.person2', 'source') }}"
         floor: "{{ state_attr('sensor.person2_ble_phone_area', 'floor_name') }}"
         distance: "{{ states('sensor.person2_ble_phone_distance') }}"
+        dashboard_view: "{% from 'room_dashboard.jinja' import room_view %}{{ room_view('person2', 'person2_ble_phone') }}"
 
 # Each cat's last Frigate sighting per camera, from the "cats" classification model (the sub_label on
 # frigate/events). sightings: {camera: {cat: {id, at}}}, at being the event start as a Unix timestamp.

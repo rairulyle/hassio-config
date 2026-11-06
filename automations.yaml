@@ -964,6 +964,102 @@
           data: '{{ push }}'
   mode: queued
   max: 10
+- id: dashboard_follow_person_room
+  alias: 'Dashboard: follow the person to their room'
+  description: 'Moves a person''s open dashboards (browsers registered in Browser
+    Mod) to the page of the room Bermuda puts them in, or back to the overview once
+    it loses them. Only screens on the overview or a room page move. "Dashboard: open
+    on the person''s room" picks the room when the app opens.'
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.person1_location
+    - sensor.person2_location
+    attribute: dashboard_view
+    not_to: home
+  - trigger: state
+    entity_id:
+    - sensor.person1_location
+    - sensor.person2_location
+    attribute: dashboard_view
+    to: home
+    for:
+      seconds: 30
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state.attributes.dashboard_view is string }}'
+  actions:
+  - variables:
+      user: '{{ state_attr(trigger.entity_id | replace(''sensor.'', ''person.'') |
+        replace(''_location'', ''''), ''user_id'') }}'
+      path: /lovelace/{{ trigger.to_state.attributes.dashboard_view }}
+      browsers: "{% set ns = namespace(ids=[]) %} {% for e in integration_entities('browser_mod')
+        if e.startswith('sensor.') and state_attr(e, 'pathSegments') is not none %}\n
+        \ {% set current = states(e) %}\n  {% set data = device_entities(device_id(e))
+        | map('state_attr', 'userData') | select('mapping') | first | default(none)
+        %}\n  {% if data and data.id == user and current != path and (current in ['/lovelace',
+        '/lovelace/', '/lovelace/home'] or current.startswith('/lovelace/rooms-'))
+        %}\n    {% set ns.ids = ns.ids + [device_id(e)] %}\n  {% endif %}\n{% endfor
+        %} {{ ns.ids }}\n"
+  - condition: template
+    value_template: '{{ browsers | count > 0 }}'
+  - action: browser_mod.navigate
+    data:
+      path: '{{ path }}'
+      browser_id: '{{ browsers }}'
+  mode: queued
+  max: 10
+- id: dashboard_open_person_room
+  alias: 'Dashboard: open on the person''s room'
+  description: 'When a dashboard comes to the foreground after the page was loaded,
+    the app was opened or reconnected, or it was hidden for 5+ minutes, moves it from
+    the overview or a room page to the page of the room its user is in (dashboard_view
+    of sensor.<person>_location), or to the overview when Bermuda has lost them. Room
+    changes while it stays open are "Dashboard: follow the person to their room".
+    A newly registered phone or browser needs its sensor.browser_mod_<id>_browser_visibility
+    added to the trigger.'
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.browser_mod_c7198e2b_373f04ef_browser_visibility
+    - sensor.browser_mod_aff7cb2f_f27bd61f_browser_visibility
+    - sensor.browser_mod_e51dcebb_5e30d748_browser_visibility
+    - sensor.browser_mod_8d751de5_3ad19ba5_browser_visibility
+    to: visible
+  conditions:
+  - condition: template
+    value_template: "{% set hidden = (trigger.to_state.last_changed - trigger.from_state.last_changed).total_seconds()\n
+      \  if trigger.from_state else 0 %}\n{{ trigger.from_state is none or trigger.from_state.state
+      in ['unavailable', 'unknown']\n   or hidden < 2 or hidden >= 300 }}\n"
+  actions:
+  - variables:
+      browser: '{{ device_id(trigger.entity_id) }}'
+      path_sensor: '{{ device_entities(browser) | select(''search'', ''_browser_path$'')
+        | first | default('''') }}'
+  - wait_template: '{{ states(path_sensor).startswith(''/lovelace'') }}'
+    timeout: 5
+    continue_on_timeout: false
+  - variables:
+      user_data: '{{ device_entities(browser) | map(''state_attr'', ''userData'')
+        | select(''mapping'') | first | default(none) }}'
+      person: '{{ states.person | selectattr(''attributes.user_id'', ''eq'', user_data.id
+        if user_data else none) | map(attribute=''object_id'') | first | default(none)
+        }}'
+      view: '{{ state_attr(''sensor.'' ~ person ~ ''_location'', ''dashboard_view'')
+        if person else none }}'
+      current: '{{ states(path_sensor) }}'
+      landing: '{{ current in [''/lovelace'', ''/lovelace/'', ''/lovelace/home'']
+        }}'
+  - condition: template
+    value_template: "{{ view is string and current != '/lovelace/' ~ view\n   and
+      (landing or current.startswith('/lovelace/rooms-'))\n   and not (view == 'home'
+      and landing) }}\n"
+  - action: browser_mod.navigate
+    data:
+      path: /lovelace/{{ view }}
+      browser_id: '{{ [browser] }}'
+  mode: parallel
+  max: 10
 - id: blinds_close_at_sunset
   alias: 'Blinds: close every blind at sunset'
   description: Fully closes every blind in the house when the sun sets. Offline blinds

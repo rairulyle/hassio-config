@@ -1,0 +1,27 @@
+{#-
+  room_view(person, device, max_distance=6): the dashboard view a person should land on. Their room's
+  view (rooms-<room>) while person.<person> is home and Bermuda places sensor.<device>_area in a room
+  that has a page, with sensor.<device>_distance (metres to the nearest proxy) at most max_distance.
+  Anything else (away, unknown area, a room without a page, no or weak signal) gives home, the overview.
+  The Dashboard automations read it from the dashboard_view attribute of sensor.<person>_location.
+  Usage: {% from 'room_dashboard.jinja' import room_view %}{{ room_view('<person>', '<person>_phone') }}
+-#}
+{%- macro room_view(person, device, max_distance=6) -%}
+{%- set room_views = {
+  'master_bedroom': 'rooms-master-bedroom',
+  'bathroom': 'rooms-master-bathroom',
+  'bedroom': 'rooms-bedroom',
+  'hobby_room': 'rooms-hobby-room',
+  'hallway': 'rooms-hallway',
+  'main_room': 'rooms-living-room',
+  'carport': 'rooms-carport',
+} -%}
+{%- set area = states('sensor.' ~ device ~ '_area') -%}
+{%- set id = area_id(area) if area not in ['unknown', 'unavailable', 'none', ''] else none -%}
+{%- set distance = states('sensor.' ~ device ~ '_distance') | float(none) -%}
+{%- if is_state('person.' ~ person, 'home') and id in room_views and distance is not none and distance <= max_distance -%}
+{{ room_views[id] }}
+{%- else -%}
+home
+{%- endif -%}
+{%- endmacro -%}
