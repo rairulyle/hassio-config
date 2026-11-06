@@ -29,7 +29,8 @@ esphome/.device-builder*
 esphome/.esphome/
 
 # Managed by HACS / integrations (reinstall instead of versioning)
-custom_components/
+custom_components/*
+!custom_components/tuya_v2/
 www/community/
 www/bubble/*
 !www/bubble/bubble-modules.yaml

@@ -1,0 +1,7 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Already configured; the YAML was re-imported."
+    }
+  }
+}

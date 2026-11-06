@@ -36,3 +36,19 @@ lovelace:
       show_in_sidebar: true
 
 mqtt: !include mqtt.yaml
+
+# Pedestrian gate lock (LOOCK G34A, Tuya category jtmspro). A Wi-Fi low-power lock: it sleeps and only
+# talks to the Tuya cloud when woken, so LocalTuya cannot reach it. custom_components/tuya_v2 (a retired
+# Tuya domain, kept so the HA brand server shows the Tuya logo) listens to the Tuya message service for
+# its reports (every unlock, bell key, alarms, battery) and derives sensor.pedestrian_gate from them and
+# the Frigate gate classifier. Status only: the lock cannot be driven from HA.
+tuya_v2:
+  client_id: !secret tuya_client_id
+  client_secret: !secret tuya_client_secret
+  region: !secret tuya_region
+  locks:
+    - device_id: eb9e2652d395294ebbtv9e
+      name: Pedestrian Gate
+      # Frigate state classifier on the Main Door camera: open / closed / unknown. With it
+      # sensor.pedestrian_gate reads "open" while the gate leaf is open; locked = closed and the bolt is back.
+      gate_sensor: sensor.porch_main_door_camera_pedestrian_gate_classification
