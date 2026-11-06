@@ -748,49 +748,42 @@
                     title: Acknowledge
   mode: parallel
   max: 10
-- id: hallway_person_lights
-  alias: Hallway - Lights on Person Detected
-  description: When Frigate sees a person in the hallway after sunset, turn on the
-    hallway and walk-in closet lights. Turn them off once no person has been seen
-    for 15 minutes.
+- id: hallway_lights_on_person
+  alias: 'Hallway: turn on the lights when a person is seen'
+  description: When Frigate sees a person in the hallway once it's dark (sun below
+    -6°, the end of civil dusk), turn on whichever of the hallway and walk-in closet
+    lights are off. Only those are turned off again, once no person has been seen
+    for 15 minutes, so lights switched on by hand are left alone.
   triggers:
   - trigger: state
-    entity_id: binary_sensor.hallway_hallway_camera_person_occupancy
+    entity_id: binary_sensor.hallway_camera_person_occupancy
     from: 'off'
     to: 'on'
-    id: person_detected
-  - trigger: state
-    entity_id: binary_sensor.hallway_hallway_camera_person_occupancy
-    from: 'on'
-    to: 'off'
-    for:
-      minutes: 15
-    id: person_cleared
-  conditions: []
+  conditions:
+  - condition: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    below: -6
   actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id: person_detected
-      - condition: state
-        entity_id: sun.sun
-        state: below_horizon
-      sequence:
-      - action: light.turn_on
-        target:
-          entity_id:
-          - light.hallway_all_lights
-          - light.walk_in_closet_all_lights
-    - conditions:
-      - condition: trigger
-        id: person_cleared
-      sequence:
-      - action: light.turn_off
-        target:
-          entity_id:
-          - light.hallway_all_lights
-          - light.walk_in_closet_all_lights
-  mode: restart
+  - variables:
+      lights: '{{ [''light.hallway_all_lights'', ''light.walk_in_closet_all_lights'']
+        | select(''is_state'', ''off'') | list }}'
+  - condition: template
+    value_template: '{{ lights | count > 0 }}'
+  - action: light.turn_on
+    target:
+      entity_id: '{{ lights }}'
+  - wait_for_trigger:
+    - trigger: state
+      entity_id: binary_sensor.hallway_camera_person_occupancy
+      to: 'off'
+      for:
+        minutes: 15
+  - action: light.turn_off
+    target:
+      entity_id: '{{ lights }}'
+  mode: single
+  max_exceeded: silent
 - id: zigbee_coordinator_left_ethernet
   alias: 'Zigbee: alert when the coordinator leaves Ethernet'
   description: High-priority alert on Person 1's phone when the SLZB-MR4U leaves Ethernet
