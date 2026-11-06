@@ -122,8 +122,8 @@ cards:
   - type: custom:decluttering-card
     template: socket_tile
     variables:
-      - entity: switch.bedroom_bed_side_socket
-      - power: sensor.bedroom_bed_side_socket_power
+      - entity: switch.bedroom_bedside_socket
+      - power: sensor.bedroom_bedside_socket_power
       - name: Bed-side
 
   #
@@ -202,7 +202,7 @@ cards:
         square: false
         cards:
           - type: custom:mushroom-entity-card
-            entity: sensor.bedroom_bed_side_socket_energy
+            entity: sensor.bedroom_bedside_socket_energy
             name: Bed-side Energy
             fill_container: true
             tap_action:

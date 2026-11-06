@@ -43,7 +43,7 @@ cards:
   #       - entity: fan.zhimi_vb4_00ae_air_purifier
   #       - icon: app:app-chair
   #       - navigation_path: /lovelace/rooms-living-room
-  #       - camera: camera.living_room_living_room_camera
+  #       - camera: camera.living_room_camera
   #       - temperature: "[[[ return states['sensor.zhimi_vb4_00ae_temperature'].state ]]]"
   #       - humidity: "[[[ return states['sensor.zhimi_vb4_00ae_relative_humidity'].state ]]]"
   #       - chips:
@@ -99,7 +99,7 @@ cards:
       - entity: switch.driveway_gate_unlock
       - icon: mdi:garage-variant
       - navigation_path: /lovelace/rooms-carport
-      - camera: camera.carport_carport_camera
+      - camera: camera.carport_camera
       - chips:
         # Last gate operation (no gate sensor yet, so this is the last button pressed).
         # Shows the gate status (Locking/Unlocking/Offline) until the cooldown ends, then Locked/Unlocked.
@@ -340,7 +340,7 @@ cards:
       - entity: light.hallway_all_lights
       - icon: mdi:coat-rack
       - navigation_path: /lovelace/rooms-hallway
-      - camera: camera.hallway_hallway_camera
+      - camera: camera.hallway_camera
       - chips:
         - type: template
           entity: light.hallway_all_lights

@@ -279,12 +279,12 @@
     - camera.doorbell_camera
     - camera.porch_gate_camera
     - camera.porch_main_door_camera
-    - camera.carport_carport_camera
-    - camera.lanai_lanai_camera
-    - camera.living_room_living_room_camera
-    - camera.kitchen_kitchen_camera
+    - camera.carport_camera
+    - camera.lanai_camera
+    - camera.living_room_camera
+    - camera.kitchen_camera
     - camera.indoor_garden_stairs_camera
-    - camera.hallway_hallway_camera
+    - camera.hallway_camera
     to: unavailable
     for:
       minutes: 2
@@ -309,12 +309,12 @@
     - camera.doorbell_camera
     - camera.porch_gate_camera
     - camera.porch_main_door_camera
-    - camera.carport_carport_camera
-    - camera.lanai_lanai_camera
-    - camera.living_room_living_room_camera
-    - camera.kitchen_kitchen_camera
+    - camera.carport_camera
+    - camera.lanai_camera
+    - camera.living_room_camera
+    - camera.kitchen_camera
     - camera.indoor_garden_stairs_camera
-    - camera.hallway_hallway_camera
+    - camera.hallway_camera
     from: unavailable
     not_to:
     - unavailable
@@ -349,19 +349,19 @@
   actions:
   - variables:
       phones:
-      - notify.mobile_app_person1_phone
-      - notify.mobile_app_person2_s_fold8
+      - notify.mobile_app_person1_galaxy_z_fold8_ultra
+      - notify.mobile_app_person2_galaxy_z_fold8
       frigate_url: /ccab4aaf_frigate-proxy
       cameras:
         doorbell: camera.doorbell_camera
         gate: camera.porch_gate_camera
         main_door: camera.porch_main_door_camera
-        carport: camera.carport_carport_camera
-        lanai: camera.lanai_lanai_camera
-        living_room: camera.living_room_living_room_camera
-        kitchen: camera.kitchen_kitchen_camera
+        carport: camera.carport_camera
+        lanai: camera.lanai_camera
+        living_room: camera.living_room_camera
+        kitchen: camera.kitchen_camera
         stairs: camera.indoor_garden_stairs_camera
-        hallway: camera.hallway_hallway_camera
+        hallway: camera.hallway_camera
       camera: '{%- set e = trigger.entity_id | default('''') -%} {%- if e.startswith(''sensor.'')
         and e.endswith(''_camera_fps'') -%}{{ e[7:-11] }} {%- else -%}{%- for k, v
         in cameras.items() if v == e -%}{{ k }}{%- endfor -%}{%- endif -%}'
@@ -547,8 +547,8 @@
   actions:
   - variables:
       phones:
-      - notify.mobile_app_person1_phone
-      - notify.mobile_app_person2_s_fold8
+      - notify.mobile_app_person1_galaxy_z_fold8_ultra
+      - notify.mobile_app_person2_galaxy_z_fold8
       door_url: /lovelace/gate
       speakers: '{{ [''media_player.google_home_mini'', ''media_player.living_room_tv_2'',
         ''media_player.bedroom_tv''] | reject(''is_state'', [''unavailable'', ''unknown''])
@@ -613,8 +613,8 @@
   actions:
   - variables:
       phones:
-      - notify.mobile_app_person1_phone
-      - notify.mobile_app_person2_s_fold8
+      - notify.mobile_app_person1_galaxy_z_fold8_ultra
+      - notify.mobile_app_person2_galaxy_z_fold8
       speakers: '{{ [''media_player.google_home_mini'', ''media_player.living_room_tv_2'',
         ''media_player.bedroom_tv''] | reject(''is_state'', [''unavailable'', ''unknown''])
         | list }}'
@@ -623,8 +623,8 @@
         doorbell: camera.doorbell_camera
         gate: camera.porch_gate_camera
         main_door: camera.porch_main_door_camera
-        carport: camera.carport_carport_camera
-        lanai: camera.lanai_lanai_camera
+        carport: camera.carport_camera
+        lanai: camera.lanai_camera
       review: '{{ trigger.payload_json.after }}'
       review_id: '{{ review.id }}'
       camera: '{{ review.camera }}'
@@ -821,7 +821,7 @@
   conditions: []
   actions:
   - variables:
-      phone: notify.mobile_app_person1_phone
+      phone: notify.mobile_app_person1_galaxy_z_fold8_ultra
       slzb_url: http://192.168.10.20
       mode_name: '{{ {''usb'': ''USB'', ''wifi'': ''Wi-Fi''}.get(states(''sensor.slzb_mr4u_connection_mode''),
         states(''sensor.slzb_mr4u_connection_mode'')) }}'
@@ -901,8 +901,8 @@
   actions:
   - variables:
       phones:
-      - notify.mobile_app_person1_phone
-      - notify.mobile_app_person2_s_fold8
+      - notify.mobile_app_person1_galaxy_z_fold8_ultra
+      - notify.mobile_app_person2_galaxy_z_fold8
       boxes:
         master_bedroom: Master Bedroom
         hallway: Hallway

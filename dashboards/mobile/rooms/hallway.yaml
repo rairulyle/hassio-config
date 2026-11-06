@@ -36,7 +36,7 @@ cards:
   - type: custom:decluttering-card
     template: camera_view
     variables:
-      - entity: camera.hallway_hallway_camera
+      - entity: camera.hallway_camera
 
   #
   # Lights
@@ -111,14 +111,14 @@ cards:
       - type: conditional
         conditions:
           - condition: state
-            entity: vacuum.hallway_robot_vacuum_vacuum
+            entity: vacuum.hallway_robot_vacuum
             state_not: unavailable
           - condition: state
-            entity: vacuum.hallway_robot_vacuum_vacuum
+            entity: vacuum.hallway_robot_vacuum
             state_not: unknown
         card:
           type: custom:mushroom-vacuum-card
-          entity: vacuum.hallway_robot_vacuum_vacuum
+          entity: vacuum.hallway_robot_vacuum
           name: Robot Vacuum
           fill_container: true
           commands:

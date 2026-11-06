@@ -41,7 +41,7 @@ cards:
   - type: custom:decluttering-card
     template: camera_view
     variables:
-      - entity: camera.living_room_living_room_camera
+      - entity: camera.living_room_camera
 
   #
   # Climate

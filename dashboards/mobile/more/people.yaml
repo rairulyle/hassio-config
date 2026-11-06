@@ -50,8 +50,8 @@ cards:
       - title: Map
   - type: map
     entities:
-      - device_tracker.person1_galaxy_z_fold8_ultra_person1_z_fold8_ultra
-      - device_tracker.person2_galaxy_z_fold8_person2_z_fold8
+      - device_tracker.person1_galaxy_z_fold8_ultra
+      - device_tracker.person2_galaxy_z_fold8
     hours_to_show: 24
     auto_fit: true
     theme_mode: dark

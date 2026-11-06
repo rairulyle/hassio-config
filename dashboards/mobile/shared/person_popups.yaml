@@ -23,7 +23,7 @@
   cards:
     - type: map
       entities:
-        - device_tracker.person1_galaxy_z_fold8_ultra_person1_z_fold8_ultra
+        - device_tracker.person1_galaxy_z_fold8_ultra
       hours_to_show: 24
       default_zoom: 14
       auto_fit: true
@@ -37,7 +37,7 @@
       square: false
       cards:
         - type: custom:mushroom-entity-card
-          entity: sensor.person1_galaxy_z_fold8_ultra_person1_z_fold8_ultra_battery_level
+          entity: sensor.person1_galaxy_z_fold8_ultra_battery_level
           name: Battery
           fill_container: true
           tap_action:
@@ -77,7 +77,7 @@
   cards:
     - type: map
       entities:
-        - device_tracker.person2_galaxy_z_fold8_person2_z_fold8
+        - device_tracker.person2_galaxy_z_fold8
       hours_to_show: 24
       default_zoom: 14
       auto_fit: true
@@ -91,7 +91,7 @@
       square: false
       cards:
         - type: custom:mushroom-entity-card
-          entity: sensor.person2_galaxy_z_fold8_person2_z_fold8_battery_level
+          entity: sensor.person2_galaxy_z_fold8_battery_level
           name: Battery
           fill_container: true
           tap_action:

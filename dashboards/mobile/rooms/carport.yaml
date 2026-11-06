@@ -15,7 +15,7 @@ cards:
   - type: custom:decluttering-card
     template: camera_view
     variables:
-      - entity: camera.carport_carport_camera
+      - entity: camera.carport_camera
 
   #
   # Gate

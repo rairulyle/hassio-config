@@ -39,13 +39,13 @@ cards:
   - type: custom:decluttering-card
     template: camera_view
     variables:
-      - entity: camera.carport_carport_camera
+      - entity: camera.carport_camera
       - name: Carport
       - show_name: true
   - type: custom:decluttering-card
     template: camera_view
     variables:
-      - entity: camera.lanai_lanai_camera
+      - entity: camera.lanai_camera
       - name: Lanai
       - show_name: true
 
@@ -59,13 +59,13 @@ cards:
   - type: custom:decluttering-card
     template: camera_view
     variables:
-      - entity: camera.living_room_living_room_camera
+      - entity: camera.living_room_camera
       - name: Living Room
       - show_name: true
   - type: custom:decluttering-card
     template: camera_view
     variables:
-      - entity: camera.kitchen_kitchen_camera
+      - entity: camera.kitchen_camera
       - name: Kitchen
       - show_name: true
   - type: custom:decluttering-card
@@ -77,7 +77,7 @@ cards:
   - type: custom:decluttering-card
     template: camera_view
     variables:
-      - entity: camera.hallway_hallway_camera
+      - entity: camera.hallway_camera
       - name: Hallway
       - show_name: true
 
