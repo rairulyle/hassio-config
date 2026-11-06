@@ -964,3 +964,36 @@
           data: '{{ push }}'
   mode: queued
   max: 10
+- id: blinds_close_at_sunset
+  alias: 'Blinds: close every blind at sunset'
+  description: Fully closes every blind in the house when the sun sets. Offline blinds
+    are skipped.
+  triggers:
+  - trigger: sun
+    event: sunset
+  conditions: []
+  actions:
+  - action: cover.close_cover
+    target:
+      entity_id:
+      - cover.bedroom_blinds_curtain
+      - cover.master_bedroom_main_blinds_curtain
+      - cover.master_bedroom_bedside_blinds_curtain
+      - cover.hobby_room_main_blinds_curtain
+      - cover.hobby_room_nook_blinds_curtain
+  mode: single
+- id: blinds_sheer_at_sunrise
+  alias: 'Blinds: set the hobby room and master bedroom blinds to sheer at sunrise'
+  description: Lowers every hobby room and master bedroom blind to sheer (down, but
+    letting light through) when the sun rises.
+  triggers:
+  - trigger: sun
+    event: sunrise
+  conditions: []
+  actions:
+  - action: script.blinds_sheer
+    data:
+      blinds:
+      - cover.hobby_room_blinds
+      - cover.master_bedroom_blinds
+  mode: single
