@@ -1,6 +1,6 @@
 {#-
   Aircon helpers for climate entities.
-  aircon_icon(entity_id):  mode icon (snowflake, heat wave, ...), mdi:air-conditioner when off or offline.
+  aircon_icon(entity_id):  mode icon (snowflake, heat wave, ...), mdi:thermostat when off or offline.
   aircon_mode(entity_id):  "Cooling" / "Drying" while hvac_action says so (dry mode is always drying), else the mode: "Cool", "Dry",
                            "Fan", "Off", "Offline". For the Faikin aircons hvac_action comes from the
                            action_template in mqtt.yaml (room still 0.5 C or more above the target).
@@ -10,7 +10,7 @@
   The room tile (app_room_card_aircon) builds the same label in JavaScript: keep them in step.
 -#}
 {%- macro aircon_icon(entity_id) -%}
-{{ {'heat_cool':'mdi:sun-snowflake-variant','heat':'mdi:heat-wave','cool':'mdi:snowflake','dry':'mdi:water-percent','fan_only':'mdi:fan'}.get(states(entity_id), 'mdi:air-conditioner') }}
+{{ {'heat_cool':'mdi:sun-snowflake-variant','heat':'mdi:heat-wave','cool':'mdi:snowflake','dry':'mdi:water-percent','fan_only':'mdi:fan'}.get(states(entity_id), 'mdi:thermostat') }}
 {%- endmacro -%}
 {%- macro aircon_mode(entity_id) -%}
 {%- set s = states(entity_id) -%}

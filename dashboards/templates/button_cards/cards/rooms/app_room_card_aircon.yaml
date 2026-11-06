@@ -4,7 +4,7 @@
 # custom_templates/aircon.jinja: keep them in step.
 app_room_card_aircon:
   template: app_room_card_device
-  icon: "[[[ return { heat_cool: 'mdi:sun-snowflake-variant', heat: 'mdi:heat-wave', cool: 'mdi:snowflake', dry: 'mdi:water-percent', fan_only: 'mdi:fan' }[entity.state] || 'mdi:air-conditioner'; ]]]"
+  icon: "[[[ return { heat_cool: 'mdi:sun-snowflake-variant', heat: 'mdi:heat-wave', cool: 'mdi:snowflake', dry: 'mdi:water-percent', fan_only: 'mdi:fan' }[entity.state] || 'mdi:thermostat'; ]]]"
   state_display: >
     [[[
       const s = entity.state;

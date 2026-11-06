@@ -217,7 +217,7 @@ cards:
             template: app_attention_row
             entity: climate.master_bedroom_aircon
             name: Aircon
-            icon: mdi:air-conditioner
+            icon: mdi:thermostat
             variables:
               message: Controller offline. Check the Faikin on the unit.
         - type: conditional
