@@ -157,9 +157,9 @@ cards:
             action: more-info
         - type: template
           entity: lock.master_bedroom_door
-          icon: "{{ 'mdi:lock' if is_state('lock.master_bedroom_door','locked') else ('mdi:lock-question' if is_state('lock.master_bedroom_door','unavailable') else 'mdi:lock-open-variant') }}"
+          icon: "{{ 'mdi:lock' if is_state('lock.master_bedroom_door', 'locked') else ('mdi:lock-question' if is_state('lock.master_bedroom_door', 'unavailable') else 'mdi:lock-open-variant') }}"
           icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('lock.master_bedroom_door') }}"
-          content: "{{ {'locked':'Locked','unlocked':'Unlocked','locking':'Locking…','unlocking':'Unlocking…','jammed':'Jammed','open':'Open'}.get(states('lock.master_bedroom_door'), 'Offline') }}"
+          content: "{{ {'locked': 'Locked', 'unlocked': 'Unlocked', 'locking': 'Locking…', 'unlocking': 'Unlocking…', 'jammed': 'Jammed', 'open': 'Open'}.get(states('lock.master_bedroom_door'), 'Offline') }}"
           tap_action:
             action: more-info
       - room_devices:
@@ -185,13 +185,11 @@ cards:
           entity: climate.master_bedroom_aircon
           name: Aircon
           template: app_room_card_aircon
+        # Blinds (both, as the cover.yaml group)
         - type: custom:button-card
-          entity: lock.master_bedroom_door
-          name: Door
-          template: app_room_card_device
-          tap_action:
-            action: more-info
-            haptic: light
+          entity: cover.master_bedroom_blinds
+          name: Blinds
+          template: app_room_card_blinds
 
   #
   # Hobby Room
@@ -222,9 +220,9 @@ cards:
             action: more-info
         - type: template
           entity: lock.hobby_room_door
-          icon: "{{ 'mdi:lock' if is_state('lock.hobby_room_door','locked') else ('mdi:lock-question' if is_state('lock.hobby_room_door','unavailable') else 'mdi:lock-open-variant') }}"
+          icon: "{{ 'mdi:lock' if is_state('lock.hobby_room_door', 'locked') else ('mdi:lock-question' if is_state('lock.hobby_room_door', 'unavailable') else 'mdi:lock-open-variant') }}"
           icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('lock.hobby_room_door') }}"
-          content: "{{ {'locked':'Locked','unlocked':'Unlocked','locking':'Locking…','unlocking':'Unlocking…','jammed':'Jammed','open':'Open'}.get(states('lock.hobby_room_door'), 'Offline') }}"
+          content: "{{ {'locked': 'Locked', 'unlocked': 'Unlocked', 'locking': 'Locking…', 'unlocking': 'Unlocking…', 'jammed': 'Jammed', 'open': 'Open'}.get(states('lock.hobby_room_door'), 'Offline') }}"
           tap_action:
             action: more-info
       - room_devices:
@@ -250,13 +248,11 @@ cards:
           entity: climate.hobby_room_aircon
           name: Aircon
           template: app_room_card_aircon
+        # Blinds (both, as the cover.yaml group)
         - type: custom:button-card
-          entity: lock.hobby_room_door
-          name: Door
-          template: app_room_card_device
-          tap_action:
-            action: more-info
-            haptic: light
+          entity: cover.hobby_room_blinds
+          name: Blinds
+          template: app_room_card_blinds
 
   #
   # Bedroom
@@ -283,6 +279,13 @@ cards:
           icon: "{% from 'aircon.jinja' import aircon_icon %}{{ aircon_icon('climate.bedroom_aircon') }}"
           icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('climate.bedroom_aircon') }}"
           content: "{% from 'aircon.jinja' import aircon_label %}{{ aircon_label('climate.bedroom_aircon') }}"
+          tap_action:
+            action: more-info
+        - type: template
+          entity: cover.bedroom_blinds_curtain
+          icon: "{% from 'blinds.jinja' import blind_icon %}{{ blind_icon('cover.bedroom_blinds_curtain') }}"
+          icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('cover.bedroom_blinds_curtain') }}"
+          content: "{% from 'blinds.jinja' import blind_label %}{{ blind_label('cover.bedroom_blinds_curtain') }}"
           tap_action:
             action: more-info
       - room_devices:

@@ -71,3 +71,39 @@ carport_gate:
       entity_id: switch.driveway_gate_{{ operation }}
 blinds_sheer:
   alias: Blinds - Sheer
+  description: Lowers Korean (combi) blinds to where the sheer stripes line up, so the
+    room stays private but still gets light. Pass one blind or a room's blind group
+    (cover.hobby_room_blinds). Each blind's sheer position is in the sheer variable
+    below; nudge it if the stripes don't line up. Offline blinds are skipped.
+  icon: mdi:weather-sunny
+  mode: parallel
+  fields:
+    blinds:
+      name: Blinds
+      description: A blind, or a room's blind group.
+      required: true
+      selector:
+        entity:
+          domain: cover
+          multiple: true
+  variables:
+    sheer:
+      cover.bedroom_blinds_curtain: 2
+      cover.master_bedroom_main_blinds_curtain: 2
+      cover.master_bedroom_bedside_blinds_curtain: 2
+      cover.hobby_room_main_blinds_curtain: 2
+      cover.hobby_room_nook_blinds_curtain: 2
+    targets: "{{ expand(blinds) | map(attribute='entity_id') | select('in', sheer) | list }}"
+  sequence:
+  - repeat:
+      for_each: '{{ targets }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: "{{ states(repeat.item) not in ['unavailable', 'unknown'] }}"
+        then:
+        - action: cover.set_cover_position
+          target:
+            entity_id: '{{ repeat.item }}'
+          data:
+            position: '{{ sheer[repeat.item] }}'

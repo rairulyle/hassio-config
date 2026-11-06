@@ -119,6 +119,19 @@ cards:
         hide_state: true
 
   #
+  # Blinds
+  #
+  - type: custom:decluttering-card
+    template: section_title
+    variables:
+      - title: Blinds
+  - type: custom:decluttering-card
+    template: blind_row
+    variables:
+      - entity: cover.bedroom_blinds_curtain
+      - name: Blinds
+
+  #
   # Sockets
   #
   - type: custom:decluttering-card

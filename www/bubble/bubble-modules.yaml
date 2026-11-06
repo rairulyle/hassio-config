@@ -6,15 +6,17 @@
 # House style for every Bubble button, so cards carry no styles of their own.
 # Icon: amber for a light that is on, mauve for any other device that is on, grey when off,
 # mauve for things without an on/off state (sensors, weather, scripts, plain buttons).
-# Light rows read their brightness ("60%") instead of "On".
+# Light rows read their brightness ("60%") instead of "On"; blind rows read their position ("Open · 40%", "Closing…"),
+# the same label as blind_label in custom_templates/blinds.jinja. Blind rows without their own icon get blind_icon's:
+# mdi:blinds-horizontal while open or moving, mdi:blinds-horizontal-closed when closed or offline.
 # Optional per-card settings, under app_style: in the card config:
 #   color: CSS colour that replaces the icon colour (e.g. var(--accent-color))
 #   count_entity: a "<Room> - Lights On Count" sensor; a lit light row reads "2 On · 60%" (colour follows the light itself)
 app_style:
   name: "App style"
-  version: "v1.1"
+  version: "v1.3"
   creator: "custom"
-  description: "House colours for icons, sliders and sub-buttons; brightness and light count as the state."
+  description: "House colours for icons, sliders and sub-buttons; brightness, light count and blind position as the state; open/closed blind icons."
   is_global: true
   unsupported:
     - separator
@@ -26,7 +28,7 @@ app_style:
       const st = hass.states[entity];
       const domain = (entity || '').split('.')[0];
       const toggles = ['light', 'switch', 'fan', 'input_boolean', 'vacuum', 'media_player', 'climate', 'cover', 'lock', 'humidifier', 'siren'];
-      const active = ['on', 'open', 'opening', 'unlocked', 'cleaning', 'returning', 'playing', 'heat', 'cool', 'dry', 'fan_only', 'heat_cool', 'auto'];
+      const active = ['on', 'open', 'opening', 'closing', 'unlocked', 'cleaning', 'returning', 'playing', 'heat', 'cool', 'dry', 'fan_only', 'heat_cool', 'auto'];
       const n = parseInt(hass.states[opts.count_entity]?.state);
       const counted = !isNaN(n);
       // A light (or group) is lit by its own state, which is always current. The count sensor lags it by
@@ -34,10 +36,15 @@ app_style:
       const on = domain === 'light' && st?.state === 'on';
       const lit = domain === 'light' ? on : counted && n > 0;
       const pct = on && st.attributes.brightness != null ? Math.round(st.attributes.brightness / 2.55) + '%' : '';
+      const pos = domain === 'cover' ? st?.attributes.current_position : null;
+      const moving = ['opening', 'closing'].includes(st?.state);
+      const blind = pos == null ? '' : moving ? st.state[0].toUpperCase() + st.state.slice(1) + '…' : st.state === 'open' && pos > 0 && pos < 100 ? 'Open · ' + pos + '%' : '';
       const el = card.querySelector('.bubble-state');
       if (el && counted && n > 0 && (on || domain !== 'light')) el.innerText = [n + ' On', pct].filter(Boolean).join(' · ');
       else if (el && counted && !toggles.includes(domain)) el.innerText = 'Off';
       else if (el && pct) el.innerText = pct;
+      else if (el && blind) el.innerText = blind;
+      if (domain === 'cover' && !this.config.icon) card.querySelector('.bubble-icon')?.setAttribute('icon', !st || ['closed', 'unavailable', 'unknown'].includes(st.state) ? 'mdi:blinds-horizontal-closed' : 'mdi:blinds-horizontal');
       const c = opts.color
         || (lit ? 'var(--state-light-active-color)'
         : (counted && domain !== 'light') || (toggles.includes(domain) && !active.includes(st?.state)) ? 'rgb(var(--app-icon-shape-off-rgb))'

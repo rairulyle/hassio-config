@@ -1,0 +1,21 @@
+# Room card blinds tile: app_room_card_device for a blind or a room's blind group (cover.yaml) with the blinds icon
+# and the same label as blind_label in custom_templates/blinds.jinja ("Closed", "Open", "Open · 40%", "Opening…",
+# "Closing…", "Offline"): keep them in step. The icon colour comes from app_room_card_device (HA's cover state
+# colours, closed in the idle grey). Tap or hold opens the cover dialog with the position slider and buttons.
+app_room_card_blinds:
+  template: app_room_card_device
+  icon: "[[[ return ['closed', 'unavailable', 'unknown'].includes(entity.state) ? 'mdi:blinds-horizontal-closed' : 'mdi:blinds-horizontal'; ]]]"
+  state_display: >
+    [[[
+      const s = entity.state;
+      const p = entity.attributes.current_position;
+      if (s === 'opening' || s === 'closing') return s.charAt(0).toUpperCase() + s.slice(1) + '…';
+      if (s === 'open' && typeof p === 'number' && p > 0 && p < 100) return `Open · ${Math.round(p)}%`;
+      return { open: 'Open', closed: 'Closed' }[s] || 'Offline';
+    ]]]
+  tap_action:
+    action: more-info
+    haptic: light
+  hold_action:
+    action: more-info
+    haptic: medium

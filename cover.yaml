@@ -1,0 +1,17 @@
+# Room blind groups, one per room with more than one blind. The room cards' blinds chip and the
+# room pages' Blinds section show while the group is available, so they stay hidden until a blind is paired.
+# The members are the ids localtuya gives the Curtain entity of a device named "<Room> Main Blinds",
+# "<Room> Nook Blinds" and so on; name the devices that way when pairing, or change the ids here.
+- platform: group
+  name: Master Bedroom Blinds
+  unique_id: master_bedroom_blinds
+  entities:
+    - cover.master_bedroom_main_blinds_curtain
+    - cover.master_bedroom_bedside_blinds_curtain
+
+- platform: group
+  name: Hobby Room Blinds
+  unique_id: hobby_room_blinds
+  entities:
+    - cover.hobby_room_main_blinds_curtain
+    - cover.hobby_room_nook_blinds_curtain

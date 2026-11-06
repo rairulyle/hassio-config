@@ -1,0 +1,22 @@
+{#-
+  Blind helpers for cover entities (a single blind or a cover group).
+  blind_icon(entity_id):  mdi:blinds-horizontal while any part is open or moving, mdi:blinds-horizontal-closed when closed or offline.
+  blind_label(entity_id): "Closed", "Open", "Open · 40%" (a group reads the average position), "Opening…", "Closing…", "Offline".
+  Usage: {% from 'blinds.jinja' import blind_label %}{{ blind_label('cover.bedroom_blinds_curtain') }}
+  The blind rows (app_style in www/bubble/bubble-modules.yaml) and the room card blinds tile
+  (dashboards/templates/button_cards/cards/rooms/app_room_card_blinds.yaml) build the same label and icon in JavaScript: keep them in step.
+-#}
+{%- macro blind_icon(entity_id) -%}
+{{ 'mdi:blinds-horizontal-closed' if states(entity_id) in ['closed', 'unavailable', 'unknown'] else 'mdi:blinds-horizontal' }}
+{%- endmacro -%}
+{%- macro blind_label(entity_id) -%}
+{%- set s = states(entity_id) -%}
+{%- set p = state_attr(entity_id, 'current_position') -%}
+{%- if s in ['opening', 'closing'] -%}
+{{ s | capitalize }}…
+{%- elif s == 'open' and p is number and 0 < p < 100 -%}
+Open · {{ p | round(0) | int }}%
+{%- else -%}
+{{ {'open':'Open','closed':'Closed'}.get(s, 'Offline') }}
+{%- endif -%}
+{%- endmacro -%}

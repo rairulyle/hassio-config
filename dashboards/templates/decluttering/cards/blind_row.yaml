@@ -1,0 +1,56 @@
+# Blind row: a one-line Bubble slider for a blind or a room's blind group, like light_row, with
+# round sheer, open, stop and close buttons on the right. Sheer runs script.blinds_sheer on the row's entity, so a
+# group row sets every blind in the room.
+# variables: entity (cover), name (optional, defaults to the entity name), icon (optional, defaults to the entity icon),
+#            conditions (optional: conditional-card conditions that must hold for the row to show; a room whose blinds
+#            are not all paired yet passes "its blind group is not unavailable")
+# Icon tap opens more-info; drag the body for the position. Colours and the state text ("Open · 40%") come from the
+# global app_style module in www/bubble/bubble-modules.yaml.
+blind_row:
+  default:
+    - name: ''
+    - icon: ''
+    - conditions: []
+  card:
+    type: conditional
+    conditions: '[[conditions]]'
+    card:
+      type: custom:bubble-card
+      card_type: button
+      button_type: slider
+      entity: '[[entity]]'
+      name: '[[name]]'
+      icon: '[[icon]]'
+      show_state: true
+      tap_action:
+        action: more-info
+      sub_button:
+        # Sheer: blinds down with the sheer stripes lined up
+        - icon: mdi:weather-sunny
+          state_background: false
+          tap_action:
+            action: perform-action
+            perform_action: script.blinds_sheer
+            data:
+              blinds: '[[entity]]'
+        - icon: mdi:arrow-up
+          state_background: false
+          tap_action:
+            action: perform-action
+            perform_action: cover.open_cover
+            target:
+              entity_id: '[[entity]]'
+        - icon: mdi:stop
+          state_background: false
+          tap_action:
+            action: perform-action
+            perform_action: cover.stop_cover
+            target:
+              entity_id: '[[entity]]'
+        - icon: mdi:arrow-down
+          state_background: false
+          tap_action:
+            action: perform-action
+            perform_action: cover.close_cover
+            target:
+              entity_id: '[[entity]]'

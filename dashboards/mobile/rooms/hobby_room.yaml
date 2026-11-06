@@ -146,6 +146,38 @@ cards:
         hide_state: true
 
   #
+  # Blinds: hidden until one of the room's blinds is paired (cover.yaml has the expected ids)
+  #
+  - type: conditional
+    conditions: &blinds_paired
+      - condition: state
+        entity: cover.hobby_room_blinds
+        state_not: unavailable
+    card:
+      type: custom:decluttering-card
+      template: section_title
+      variables:
+        - title: Blinds
+  - type: custom:decluttering-card
+    template: blind_row
+    variables:
+      - entity: cover.hobby_room_blinds
+      - name: All blinds
+      - conditions: *blinds_paired
+  - type: custom:decluttering-card
+    template: blind_row
+    variables:
+      - entity: cover.hobby_room_main_blinds_curtain
+      - name: Main Blinds
+      - conditions: *blinds_paired
+  - type: custom:decluttering-card
+    template: blind_row
+    variables:
+      - entity: cover.hobby_room_nook_blinds_curtain
+      - name: Nook Blinds
+      - conditions: *blinds_paired
+
+  #
   # PC: tap opens details so the plug can't be switched off by accident
   #
   - type: custom:decluttering-card
