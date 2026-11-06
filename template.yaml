@@ -68,3 +68,25 @@
           {% set cat = (e.sub_label[0] if e.sub_label is list else e.sub_label) | lower %}
           {% set all = (this.attributes.sightings if this.attributes.sightings is mapping else {}) %}
           {{ dict(all, **{e.camera: dict(all.get(e.camera, {}), **{cat: {'id': e.id, 'at': e.start_time}})}) }}
+
+# Carport gate as a lock, so it counts with the other locks (chips, Locks pop-up). The relay only takes
+# lock/unlock pulses and reports nothing back, so the state is the last operation sent
+# (input_select.carport_gate_last_operation), "locking"/"unlocking" while the cooldown timer runs, and
+# unavailable while the relay is offline. Lock and unlock run script.carport_gate, which holds the
+# cooldown and offline checks; the carport page buttons use the same script.
+- lock:
+    - name: Carport Gate
+      unique_id: carport_gate
+      default_entity_id: lock.carport_gate
+      availability: "{{ ['switch.driveway_gate_lock', 'switch.driveway_gate_unlock'] | select('has_value') | list | count == 2 }}"
+      state: >
+        {% set op = states('input_select.carport_gate_last_operation') | lower %}
+        {{ (op ~ 'ing') if is_state('timer.carport_gate_cooldown', 'active') else (op ~ 'ed') }}
+      lock:
+        action: script.carport_gate
+        data:
+          operation: lock
+      unlock:
+        action: script.carport_gate
+        data:
+          operation: unlock
