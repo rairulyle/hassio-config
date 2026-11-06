@@ -140,19 +140,19 @@ cards:
         hide_state: true
 
   #
-  # Server: tap opens details so the plug can't be switched off by accident
+  # PC: tap opens details so the plug can't be switched off by accident
   #
   - type: custom:decluttering-card
     template: section_title
     variables:
-      - title: Server
+      - title: PC
   - type: custom:decluttering-card
     template: socket_tile
     variables:
-      - entity: switch.hobby_room_server_socket
-      - power: sensor.hobby_room_server_socket_power
-      - name: Server Socket
-      - icon: mdi:server
+      - entity: switch.hobby_room_person1_pc_socket
+      - power: sensor.hobby_room_person1_pc_socket_power
+      - name: Person 1 PC
+      - icon: mdi:desktop-tower-monitor
       - tap: more-info
 
   #
@@ -325,19 +325,19 @@ cards:
       - type: custom:decluttering-card
         template: section_title
         variables:
-          - title: Server Socket
+          - title: PC Socket
       - type: grid
         columns: 2
         square: false
         cards:
           - type: custom:mushroom-entity-card
-            entity: sensor.hobby_room_server_socket_energy
+            entity: sensor.hobby_room_person1_pc_socket_energy
             name: Energy
             fill_container: true
             tap_action:
               action: more-info
           - type: custom:mushroom-entity-card
-            entity: switch.hobby_room_server_socket_child_lock
+            entity: switch.hobby_room_person1_pc_socket_child_lock
             name: Child Lock
             fill_container: true
             tap_action:
