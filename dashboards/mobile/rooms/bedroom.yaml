@@ -20,8 +20,14 @@ cards:
           action: more-info
       - type: template
         entity: sensor.bedroom_climate_sensor_temperature
-        icon: mdi:thermometer-water
-        content: "{{ states('sensor.bedroom_climate_sensor_temperature') | float(0) | round(1) }}° · {{ states('sensor.bedroom_climate_sensor_humidity') | float(0) | round(0) | int }}%"
+        icon: mdi:thermometer
+        content: "{{ states('sensor.bedroom_climate_sensor_temperature') | float(0) | round(1) }}°"
+        tap_action:
+          action: more-info
+      - type: template
+        entity: sensor.bedroom_climate_sensor_humidity
+        icon: mdi:water-percent
+        content: "{{ states('sensor.bedroom_climate_sensor_humidity') | float(0) | round(0) | int }}%"
         tap_action:
           action: more-info
       - type: template
