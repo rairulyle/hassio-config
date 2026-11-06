@@ -121,40 +121,45 @@ cards:
           action: more-info
 
   #
-  # Batteries
+  # Batteries: every battery sensor that reports a percentage, lowest first, named area + device.
+  # Phones and watches (mobile_app), Xiaomi appliances (xiaomi_miot: fountains, vacuum), Browser Mod
+  # browsers and restored ghosts of removed devices are skipped: locks, the gate, climate sensors stay.
   #
   - type: custom:decluttering-card
     template: section_title
     variables:
       - title: Batteries
-  - type: grid
-    columns: 2
-    square: false
-    cards:
-      - type: custom:mushroom-entity-card
-        entity: sensor.person1_galaxy_z_fold8_ultra_person1_z_fold8_ultra_battery_level
-        name: Person 1
-        fill_container: true
-        tap_action:
-          action: more-info
-      - type: custom:mushroom-entity-card
-        entity: sensor.person2_galaxy_z_fold8_person2_z_fold8_battery_level
-        name: Person 2
-        fill_container: true
-        tap_action:
-          action: more-info
-      - type: custom:mushroom-entity-card
-        entity: sensor.xiaomi_iv02_f7b6_battery_level
-        name: Pet Fountain
-        fill_container: true
-        tap_action:
-          action: more-info
-      - type: custom:mushroom-entity-card
-        entity: sensor.ijai_v3_aaa0_battery_level
-        name: Vacuum
-        fill_container: true
-        tap_action:
-          action: more-info
+  - type: custom:auto-entities
+    card:
+      type: grid
+      columns: 2
+      square: false
+    card_param: cards
+    sort:
+      method: state
+      numeric: true
+    filter:
+      template: >-
+        {% set ns = namespace(cards=[]) %}
+        {% for s in states.sensor
+             | selectattr('attributes.device_class', 'eq', 'battery')
+             | selectattr('attributes.unit_of_measurement', 'eq', '%')
+             | rejectattr('entity_id', 'in', integration_entities('mobile_app'))
+             | rejectattr('entity_id', 'in', integration_entities('browser_mod'))
+             | rejectattr('entity_id', 'in', integration_entities('xiaomi_miot'))
+             | rejectattr('attributes.restored', 'defined') %}
+          {% set name = s.name | regex_replace('(?i)\s*battery( level)?$', '') %}
+          {% set area = area_name(s.entity_id) %}
+          {% set name = area ~ ' ' ~ name if area and area not in name else name %}
+          {% set ns.cards = ns.cards + [{
+            'type': 'custom:mushroom-entity-card',
+            'entity': s.entity_id,
+            'name': name,
+            'fill_container': true,
+            'tap_action': {'action': 'more-info'},
+          }] %}
+        {% endfor %}
+        {{ ns.cards }}
 
   #
   # Maintenance
