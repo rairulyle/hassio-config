@@ -1,5 +1,5 @@
-- id: '1677318411784'
-  alias: Feed cats on a schedule basis
+- id: pets_feed_cats_noon
+  alias: 'Pets: feed the cats at noon'
   description: ''
   triggers:
   - at: '12:00:00'
@@ -11,8 +11,8 @@
     metadata: {}
     data: {}
   mode: single
-- id: '1730897112322'
-  alias: Auto Theme Switch
+- id: system_theme_on_startup
+  alias: 'System: set the theme on startup'
   description: ''
   triggers:
   - trigger: homeassistant
@@ -25,8 +25,8 @@
       mode: dark
       name: Catppuccin Auto Latte Mocha
   mode: single
-- id: '1732557076878'
-  alias: 'Notify: Feed Cat1, Cat2, and Cat3'
+- id: pets_feed_reminder
+  alias: 'Pets: remind us to feed the cats'
   description: ''
   triggers:
   - at: '22:30:00'
@@ -69,8 +69,8 @@
       language: ja
       entity_id: media_player.google_home_mini
   mode: single
-- id: '1732558528812'
-  alias: 'Notify: Greetings!'
+- id: home_weather_greeting
+  alias: 'Home: greet us with the weather'
   description: ''
   triggers:
   - at: 07:30:00
@@ -140,8 +140,8 @@
       entity_id: media_player.google_home_mini
       language: en-gb
   mode: single
-- id: '1791788047'
-  alias: Master Bedroom - Aircon to Fan at 3 AM
+- id: master_bedroom_aircon_to_fan_3am
+  alias: 'Master bedroom: switch the aircon to the fan at 3 AM'
   description: Once everyone is asleep, turn off the aircon and switch the standing
     fan to oscillating natural wind.
   triggers:
@@ -174,8 +174,8 @@
     data:
       oscillating: true
   mode: single
-- id: '1791894118'
-  alias: Master Bathroom - Exhaust Fan with Lights
+- id: master_bathroom_exhaust_fan_with_lights
+  alias: 'Master bathroom: run the exhaust fan with the lights'
   description: Run the exhaust fan (wall switch L3) while any bathroom light is on,
     and for 5 minutes after they all go off.
   triggers:
@@ -212,8 +212,8 @@
           entity_id: switch.master_bathroom_exhaust_fan
         data: {}
   mode: single
-- id: carport_gate_cooldown
-  alias: Carport - Gate Cooldown
+- id: carport_start_gate_cooldown
+  alias: 'Carport: start the gate cooldown'
   description: Records which gate relay fired and starts the cooldown, including presses
     from the Tuya app.
   triggers:
@@ -235,8 +235,8 @@
     target:
       entity_id: timer.carport_gate_cooldown
   mode: single
-- id: carport_gate_back_online
-  alias: Carport - Gate Back Online
+- id: carport_gate_locked_when_online
+  alias: 'Carport: mark the gate locked when back online'
   description: When the gate relay comes back online (or HA starts), assume the gate
     is locked.
   triggers:
@@ -253,8 +253,8 @@
     data:
       option: Lock
   mode: single
-- id: '1792307408000'
-  alias: Camera offline alert
+- id: cameras_offline_alert
+  alias: 'Cameras: alert when a camera goes offline'
   description: High-priority push to Person 1 and Person 2 when a Frigate camera has no video
     for 2 minutes, one "Frigate offline" alert (camera alerts paused) when Frigate
     itself is down, and a quiet note when things come back.
@@ -532,8 +532,8 @@
                   clickAction: '{{ frigate_url }}'
   mode: parallel
   max: 25
-- id: doorbell_ring
-  alias: Doorbell ring
+- id: gate_doorbell_ring
+  alias: 'Gate: ring our phones on a doorbell press'
   description: The Reolink doorbell's Visitor button at the pedestrian gate rings
     Person 1's and Person 2's phones (high priority, "Doorbell" channel) with a snapshot.
     Answer opens the Gate view (/lovelace/gate) for live video and two-way talk through
@@ -590,8 +590,8 @@
       seconds: 30
   mode: single
   max_exceeded: silent
-- id: frigate_threat_alert
-  alias: Frigate threat alert
+- id: cameras_threat_alert
+  alias: 'Cameras: alert on a potential threat'
   description: Push to Person 1 and Person 2 when Frigate's GenAI (Gemini) review summary
     rates an alert as potential_threat_level 1 (high-priority "Frigate review" notification)
     or 2 (URGENT alarm_stream notification, TTS on speakers, re-sent once if nobody
@@ -791,8 +791,8 @@
           - light.hallway_all_lights
           - light.walk_in_closet_all_lights
   mode: restart
-- id: zigbee_coordinator_mode_alert
-  alias: Zigbee coordinator mode alert
+- id: zigbee_coordinator_left_ethernet
+  alias: 'Zigbee: alert when the coordinator leaves Ethernet'
   description: High-priority alert on Person 1's phone when the SLZB-MR4U leaves Ethernet
     mode (USB or Wi-Fi). Zigbee2MQTT can't reach tcp://192.168.10.20:6638 then, so
     every Zigbee device is down. The SMLIGHT integration polls slowly, so a Zigbee2MQTT

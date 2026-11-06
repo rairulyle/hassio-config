@@ -276,7 +276,7 @@ cards:
           fed = diff < 120 ? 'Fed just now'
             : 'Fed ' + (diff < 3600 ? Math.floor(diff / 60) + 'm' : (diff < 86400 ? Math.floor(diff / 3600) + 'h' : Math.floor(diff / 86400) + 'd')) + ' ago';
         }
-        const sch = hass.states['automation.feed_cats'];
+        const sch = hass.states['automation.pets_feed_the_cats_at_noon'];
         let next = '';
         if (sch && sch.state === 'on') {
           const lunch = new Date(); lunch.setHours(12, 0, 0, 0);
@@ -395,7 +395,7 @@ cards:
     variables:
       - title: Routines
   - type: tile
-    entity: automation.feed_cats
+    entity: automation.pets_feed_the_cats_at_noon
     name: Scheduled Feeding
     icon: mdi:cat
     vertical: false
@@ -413,7 +413,7 @@ cards:
     square: false
     cards:
       - type: custom:mushroom-entity-card
-        entity: automation.notify_feed_cat1_and_cat2
+        entity: automation.pets_remind_us_to_feed_the_cats
         name: Feeding Reminders
         secondary_info: last-changed
         fill_container: true
@@ -422,7 +422,7 @@ cards:
         hold_action:
           action: more-info
       - type: custom:mushroom-entity-card
-        entity: automation.notify_ohayou_gozaimasu
+        entity: automation.home_greet_us_with_the_weather
         name: Morning Greeting
         secondary_info: last-changed
         fill_container: true

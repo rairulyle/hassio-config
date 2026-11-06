@@ -12,10 +12,10 @@ cards:
     card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
     chips:
       - type: template
-        entity: automation.feed_cats
+        entity: automation.pets_feed_the_cats_at_noon
         icon: mdi:clock
-        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('automation.feed_cats') }}"
-        content: "{{ 'Schedule On' if is_state('automation.feed_cats','on') else 'Schedule Off' }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('automation.pets_feed_the_cats_at_noon') }}"
+        content: "{{ 'Schedule On' if is_state('automation.pets_feed_the_cats_at_noon','on') else 'Schedule Off' }}"
         tap_action:
           action: more-info
       # Litter: the worst of both boxes, naming the box (litter_state / litter_label in custom_templates/litterbox.jinja).
@@ -134,7 +134,7 @@ cards:
 
   #
   # Feeding: the two Xiaomi feeders in the master bedroom. script.feed_cat feeds both, from here,
-  # the Home card and automation.feed_cats, so its last run is the last meal.
+  # the Home card and automation.pets_feed_the_cats_at_noon, so its last run is the last meal.
   #
   - type: custom:decluttering-card
     template: section_title
@@ -161,7 +161,7 @@ cards:
         hold_action:
           action: more-info
       - type: custom:mushroom-entity-card
-        entity: automation.feed_cats
+        entity: automation.pets_feed_the_cats_at_noon
         name: Schedule
         fill_container: true
         tap_action:
@@ -367,7 +367,7 @@ cards:
         square: false
         cards:
           - type: custom:mushroom-entity-card
-            entity: automation.feed_cats
+            entity: automation.pets_feed_the_cats_at_noon
             name: Scheduled Feeding
             secondary_info: last-changed
             fill_container: true
@@ -376,7 +376,7 @@ cards:
             hold_action:
               action: more-info
           - type: custom:mushroom-entity-card
-            entity: automation.notify_feed_cat1_and_cat2
+            entity: automation.pets_remind_us_to_feed_the_cats
             name: Feeding Reminders
             secondary_info: last-changed
             fill_container: true

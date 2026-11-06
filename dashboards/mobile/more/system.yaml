@@ -111,7 +111,7 @@ cards:
     square: false
     cards:
       - type: custom:mushroom-entity-card
-        entity: automation.auto_theme_switch
+        entity: automation.system_set_the_theme_on_startup
         name: Auto Theme
         secondary_info: last-changed
         fill_container: true

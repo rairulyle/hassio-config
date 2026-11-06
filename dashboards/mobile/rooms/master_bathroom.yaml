@@ -61,7 +61,7 @@ cards:
   - type: custom:mushroom-template-card
     entity: switch.master_bathroom_exhaust_fan
     primary: Exhaust Fan
-    secondary: "{{ 'On' if is_state('switch.master_bathroom_exhaust_fan', 'on') else 'Off' }}{{ ' · Auto with lights' if is_state('automation.master_bathroom_exhaust_fan_with_lights', 'on') }}"
+    secondary: "{{ 'On' if is_state('switch.master_bathroom_exhaust_fan', 'on') else 'Off' }}{{ ' · Auto with lights' if is_state('automation.master_bathroom_run_the_exhaust_fan_with_the_lights', 'on') }}"
     icon: mdi:fan
     color: "{% from 'state_color.jinja' import state_css_color %}{{ state_css_color('switch.master_bathroom_exhaust_fan') }}"
     fill_container: true

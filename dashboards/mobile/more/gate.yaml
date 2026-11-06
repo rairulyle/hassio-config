@@ -5,7 +5,7 @@ theme: Catppuccin Auto Latte Mocha Dashboard
 subview: true
 layout: !include /config/dashboards/templates/includes/layouts/app_page_layout.yaml
 cards:
-  # Pedestrian gate doorbell "call" page, opened by the Doorbell ring notification (/lovelace/gate).
+  # Pedestrian gate doorbell "call" page, opened by the doorbell notification (/lovelace/gate).
   # A black full-screen call screen like a phone app: caller and status at the top, the video in the
   # middle, round call buttons at the bottom. card_mod pins the card over the whole screen, which
   # also covers the HA header. No navbar; Android back leaves.
