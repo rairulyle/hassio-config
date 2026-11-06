@@ -5,34 +5,32 @@ theme: Catppuccin Auto Latte Mocha Dashboard
 layout: !include /config/dashboards/templates/includes/layouts/app_homepage_layout.yaml
 cards:
   #
-  # Household header: the glance chips, then the two residents
+  # Household header: the glance chips (whole-house lights on, aircons running, locks open or unlocked: every lock.* plus the pedestrian gate sensor), then the two residents
   #
   - type: custom:mushroom-chips-card
     card_mod: !include /config/dashboards/templates/includes/card_mod/chips/app_chip_scroll_row.yaml
     chips:
       - type: template
-        entity: climate.master_bedroom_aircon
-        icon: "{% from 'aircon.jinja' import aircon_icon %}{{ aircon_icon('climate.master_bedroom_aircon') }}"
-        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('climate.master_bedroom_aircon') }}"
-        content: "{% from 'aircon.jinja' import aircon_label %}{{ aircon_label('climate.master_bedroom_aircon') }} ›"
-        tap_action:
-          action: navigate
-          navigation_path: /lovelace/rooms-master-bedroom
-        hold_action:
-          action: more-info
-      - type: action
         icon: mdi:lightbulb-group
-        icon_color: amber
+        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('light', 'on' if states('sensor.home_lights_on_count') | int(0) > 0 else 'off') }}"
+        content: "{% set n = states('sensor.home_lights_on_count') | int(0) %}{{ (n ~ ' On') if n > 0 else 'Off' }}"
         tap_action:
           action: navigate
           navigation_path: "#lights"
       - type: template
-        entity: lock.master_bedroom_door
-        icon: "{{ 'mdi:lock' if is_state('lock.master_bedroom_door','locked') else ('mdi:lock-question' if is_state('lock.master_bedroom_door','unavailable') else 'mdi:lock-open-variant') }}"
-        icon_color: "{% from 'state_color.jinja' import state_color %}{{ state_color('lock.master_bedroom_door') }}"
-        content: "{{ {'locked':'Locked','unlocked':'Unlocked','locking':'Locking…','unlocking':'Unlocking…','jammed':'Jammed','open':'Open'}.get(states('lock.master_bedroom_door'), 'Offline') }}"
+        icon: mdi:thermostat
+        icon_color: "{% from 'state_color.jinja' import state_color %}{% set n = ['climate.bedroom_aircon', 'climate.hobby_room_aircon', 'climate.master_bedroom_aircon'] | map('states') | reject('in', ['off', 'unavailable', 'unknown']) | list | count %}{{ state_color('climate', 'cool' if n > 0 else 'off') }}"
+        content: "{% set n = ['climate.bedroom_aircon', 'climate.hobby_room_aircon', 'climate.master_bedroom_aircon'] | map('states') | reject('in', ['off', 'unavailable', 'unknown']) | list | count %}{{ (n ~ ' On') if n > 0 else 'Off' }}"
         tap_action:
-          action: more-info
+          action: navigate
+          navigation_path: '#aircons'
+      - type: template
+        icon: "{% set s = (states.lock | map(attribute='state') | list) + [states('sensor.pedestrian_gate')] %}{{ 'mdi:lock-open-variant' if s | reject('in', ['locked', 'unavailable', 'unknown']) | list else ('mdi:lock-question' if s | reject('in', ['unavailable', 'unknown']) | list | count == 0 else 'mdi:lock') }}"
+        icon_color: "{% from 'state_color.jinja' import state_color %}{% set s = (states.lock | map(attribute='state') | list) + [states('sensor.pedestrian_gate')] %}{{ state_color('lock', 'unlocked' if s | reject('in', ['locked', 'unavailable', 'unknown']) | list else ('unavailable' if s | reject('in', ['unavailable', 'unknown']) | list | count == 0 else 'locked')) }}"
+        content: "{% set s = (states.lock | map(attribute='state') | list) + [states('sensor.pedestrian_gate')] %}{% set n = s | reject('in', ['locked', 'unavailable', 'unknown']) | list | count %}{{ (n ~ ' Unlocked') if n > 0 else ('Offline' if s | reject('in', ['unavailable', 'unknown']) | list | count == 0 else 'Locked') }}"
+        tap_action:
+          action: navigate
+          navigation_path: '#locks'
 
   #
   # Greeting: time of day, the signed-in resident, the weather outside, and a Meteocons illustration on the right (www/dashboard/weather, MIT)
@@ -722,3 +720,81 @@ cards:
         features:
           - type: fan-preset-modes
             style: dropdown
+
+  #
+  # Aircons popup: every aircon under its room title, the same card as the room pages
+  #
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#aircons'
+    name: Aircons
+    icon: mdi:thermostat
+    show_header: true
+    close_by_clicking_outside: true
+    styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+    margin_top_mobile: max(0px, calc(100vh - 760px))
+    margin_top_desktop: max(0px, calc(100vh - 760px))
+    cards:
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Master Bedroom
+      - type: custom:decluttering-card
+        template: aircon_card
+        variables:
+          - entity: climate.master_bedroom_aircon
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Hobby Room
+      - type: custom:decluttering-card
+        template: aircon_card
+        variables:
+          - entity: climate.hobby_room_aircon
+      - type: custom:decluttering-card
+        template: section_title
+        variables:
+          - title: Bedroom
+      - type: custom:decluttering-card
+        template: aircon_card
+        variables:
+          - entity: climate.bedroom_aircon
+
+  #
+  # Locks popup: every lock, the pedestrian gate and the carport gate. Tap opens the entity dialog
+  # (the door locks and the carport gate are driven from there; the pedestrian gate is status only).
+  #
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#locks'
+    name: Locks
+    icon: mdi:lock
+    show_header: true
+    close_by_clicking_outside: true
+    styles: !include /config/dashboards/templates/includes/app_popup_styles.yaml
+    margin_top_mobile: max(0px, calc(100vh - 760px))
+    margin_top_desktop: max(0px, calc(100vh - 760px))
+    cards:
+      # one stack, so the rows run full width (a Mushroom card on its own takes half the pop-up)
+      - type: vertical-stack
+        cards:
+          - type: custom:decluttering-card
+            template: lock_row
+            variables:
+              - entity: lock.master_bedroom_door
+              - name: Master Bedroom Door
+          - type: custom:decluttering-card
+            template: lock_row
+            variables:
+              - entity: lock.hobby_room_door
+              - name: Hobby Room Door
+          - type: custom:decluttering-card
+            template: lock_row
+            variables:
+              - entity: sensor.pedestrian_gate
+              - name: Pedestrian Gate
+          - type: custom:decluttering-card
+            template: lock_row
+            variables:
+              - entity: lock.carport_gate
+              - name: Carport Gate

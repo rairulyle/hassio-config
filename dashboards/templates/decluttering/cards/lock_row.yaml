@@ -1,0 +1,17 @@
+# Lock row for the Locks pop-up: name, "<State> · <time> ago", lock icon and HA's lock colours
+# (custom_templates/state_color.jinja, the same as the chips and room tiles). Works for any lock.* entity
+# (locked / unlocked / locking / unlocking / jammed, "Offline" when unavailable) and for sensor.pedestrian_gate
+# (locked / unlocked / open / jammed). Tap or hold opens the entity dialog.
+# variables: entity, name
+lock_row:
+  card:
+    type: custom:mushroom-template-card
+    entity: '[[entity]]'
+    primary: '[[name]]'
+    secondary: "{% set s = states('[[entity]]') %}{{ 'Offline' if s == 'unavailable' else (s | capitalize ~ '…') if s.endswith('ing') else s | capitalize }} · {{ relative_time(states['[[entity]]'].last_changed) }} ago"
+    icon: "{% set m = {'locked': 'mdi:lock', 'unlocked': 'mdi:lock-open-variant', 'locking': 'mdi:lock-clock', 'unlocking': 'mdi:lock-clock', 'open': 'mdi:gate-open', 'jammed': 'mdi:lock-alert'} %}{{ m.get(states('[[entity]]'), 'mdi:lock-question') }}"
+    icon_color: "{% from 'state_color.jinja' import state_css_color %}{{ state_css_color('lock', states('[[entity]]')) }}"
+    tap_action:
+      action: more-info
+    hold_action:
+      action: more-info
