@@ -9,15 +9,19 @@ turn_off_gaming_pc:
   icon: mdi:youtube-gaming
 feed_cat:
   alias: Feed Cats
-  description: One meal from both Xiaomi feeders in the master bedroom (each feeder's Target Feeding Measure).
+  description: One meal of 5 portions from both Xiaomi feeders in the master bedroom. Sends the
+    amount with the feed action because the feeders refuse a Target Feeding Measure below 10.
   sequence:
-  - action: button.press
+  - action: xiaomi_miot.call_action
     metadata: {}
-    data: {}
-    target:
+    data:
       entity_id:
-      - button.xiaomi_iv2001_dc59_pet_food_out
-      - button.xiaomi_iv2001_f93f_pet_food_out
+      - sensor.xiaomi_iv2001_dc59_pet_feeder
+      - sensor.xiaomi_iv2001_f93f_pet_feeder
+      siid: 2
+      aiid: 1
+      params:
+      - 5
   mode: single
   icon: mdi:cat
 turn_off_desktop2_pc:
@@ -65,3 +69,5 @@ carport_gate:
   - action: switch.turn_on
     target:
       entity_id: switch.driveway_gate_{{ operation }}
+blinds_sheer:
+  alias: Blinds - Sheer
